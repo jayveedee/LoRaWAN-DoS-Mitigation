@@ -1,4 +1,5 @@
 #include <Sodaq_RN2483.h>
+#include <Arduino.h>
 
 // ---------------------------------------------------------------------------------------------------------
 // Declarations
@@ -7,12 +8,8 @@
   #define CONSOLE_STREAM SerialUSB
   #define LORA_STREAM Serial2
   #define LORA_RESET_PIN LORA_RESET
-#elif defined(ARDUINO_SODAQ_ONE)
-  #define CONSOLE_STREAM SerialUSB
-  #define LORA_STREAM Serial1
-  #define LORA_RESET_PIN LORA_RESET
 #else
-  #error "Please select Sodaq ExpLoRer or SodaqOne board"
+  #error "Please select Sodaq ExpLoRer board"
 #endif
 
 #define COMMON_ANODE
@@ -21,6 +18,9 @@
 
 #define USE_OTAA 0
 #define USE_ABP 1
+
+#define COMMAND_MODE 1 
+#define LORA_MODE 0 
 
 #if USE_ABP
   static const uint8_t DEV_ADDR[4] = {0x01, 0x82, 0x29, 0xCC};
@@ -40,8 +40,9 @@ void setup()
 {
   while (!CONSOLE_STREAM && millis() < 10000);
 
+  CONSOLE_STREAM.begin(LoRaBee.getDefaultBaudRate());
   LORA_STREAM.begin(LoRaBee.getDefaultBaudRate());
-  LoRaBee.setDiag(CONSOLE_STREAM);
+  //LoRaBee.setDiag(CONSOLE_STREAM);
 
   CONSOLE_STREAM.println("------------------------------------");
   CONSOLE_STREAM.println("Booting...");
@@ -83,13 +84,16 @@ void setup()
 
 void loop()
 {
-  CONSOLE_STREAM.println("------------------------------------");
-
-  // get frame counters
-  fetchFrameCounters();
-
-  // send message
-  sendMessage();
+  #if LORA_MODE
+    CONSOLE_STREAM.println("------------------------------------");
+    // get frame counters
+    fetchFrameCounters();
+    // send message
+    sendMessage();
+  #elif COMMAND_MODE
+    // listen for ocmmands
+    listenForCommands();
+  #endif
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -111,10 +115,16 @@ void fetchFrameCounters()
 
 void sendMessage()
 {
-  CONSOLE_STREAM.println("Setting SF to 12 and band mode to 5...");
+  uint8_t sf = 6;
+  uint8_t frq = 1;
+  uint8_t fsb = 0;
+  char printbuf[64];  // Buffer to hold the formatted string
+  sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
+  CONSOLE_STREAM.println(printbuf);
 
-  LoRaBee.setSpreadingFactor(12);
-  LoRaBee.setPowerIndex(5);
+  LoRaBee.setSpreadingFactor(sf); // Set spreading factor
+  LoRaBee.setPowerIndex(frq); // Set band rate
+  LoRaBee.setFsbChannels(fsb); // Enable all channels
 
   delay(3000);
 
@@ -132,7 +142,7 @@ void sendMessage()
   case NoError:
     CONSOLE_STREAM.println("Successful transmission.");
     setRgbColor(0x00, 0xFF, 0x00);
-    delay(2000);
+    delay(10000);
     setRgbColor(0x00, 0x00, 0x00);
     break;
   case NoResponse:
@@ -196,4 +206,24 @@ void setRgbColor(uint8_t red, uint8_t green, uint8_t blue)
     analogWrite(LED_RED, red);
     analogWrite(LED_GREEN, green);
     analogWrite(LED_BLUE, blue);
+}
+
+void listenForCommands() {
+  if (CONSOLE_STREAM.available())
+  {
+    while (CONSOLE_STREAM.available()) 
+    {
+      uint8_t inChar = CONSOLE_STREAM.read();
+      LORA_STREAM.write(inChar);
+    }
+  }
+
+  if (LORA_STREAM.available())
+  {
+    while (LORA_STREAM.available()) 
+    {
+      uint8_t inChar = LORA_STREAM.read();
+      CONSOLE_STREAM.write(inChar);
+    }
+  }
 }
