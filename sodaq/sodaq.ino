@@ -19,16 +19,16 @@
 #define USE_OTAA 0
 #define USE_ABP 1
 
-#define COMMAND_MODE 1 
-#define LORA_MODE 0 
+#define COMMAND_MODE 0 
+#define LORA_MODE 1 
 
 #if USE_ABP
   static const uint8_t DEV_ADDR[4] = {0x01, 0x82, 0x29, 0xCC};
   static const uint8_t NWK_SKEY[16] = {0x25, 0x41, 0xB4, 0xA7, 0x14, 0x59, 0x35, 0x92, 0x73, 0x93, 0x35, 0x86, 0x17, 0x65, 0x1B, 0xCC};
   static const uint8_t APP_SKEY[16] = {0xBF, 0xF2, 0xCA, 0x2C, 0x71, 0x91, 0xF8, 0x95, 0x36, 0x5C, 0xCF, 0x82, 0x2C, 0x32, 0x24, 0xCC};
 #elif USE_OTAA
-  static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  static const uint8_t APP_KEY[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  static const uint8_t APP_EUI[8] = {0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x06, 0xEB, 0x56};
+  static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
 #else
   #error "Please use ABP or OTAA"
 #endif
@@ -115,18 +115,18 @@ void fetchFrameCounters()
 
 void sendMessage()
 {
-  uint8_t sf = 6;
-  uint8_t frq = 1;
-  uint8_t fsb = 0;
-  char printbuf[64];  // Buffer to hold the formatted string
-  sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
-  CONSOLE_STREAM.println(printbuf);
+  // uint8_t sf = 9;
+  // uint8_t frq = 1;
+  // uint8_t fsb = 0;
+  // char printbuf[64];  // Buffer to hold the formatted string
+  // sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
+  // CONSOLE_STREAM.println(printbuf);
 
-  LoRaBee.setSpreadingFactor(sf); // Set spreading factor
-  LoRaBee.setPowerIndex(frq); // Set band rate
-  LoRaBee.setFsbChannels(fsb); // Enable all channels
+  // LoRaBee.setSpreadingFactor(sf); // Set spreading factor
+  // LoRaBee.setPowerIndex(frq); // Set band rate
+  // LoRaBee.setFsbChannels(fsb); // Enable all channels
 
-  delay(3000);
+  // delay(3000);
 
   CONSOLE_STREAM.println("Sending message...");
 
