@@ -1,4 +1,4 @@
-#include <Sodaq_RN2483.h>
+#include "Sodaq_RN2483.h"
 #include <Arduino.h>
 
 // ---------------------------------------------------------------------------------------------------------
@@ -115,16 +115,16 @@ void fetchFrameCounters()
 
 void sendMessage()
 {
-  // uint8_t sf = 9;
-  // uint8_t frq = 1;
-  // uint8_t fsb = 0;
-  // char printbuf[64];  // Buffer to hold the formatted string
-  // sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
-  // CONSOLE_STREAM.println(printbuf);
+  uint8_t sf = 9;
+  uint8_t frq = 1;
+  uint8_t fsb = 0;
+  char printbuf[64];  // Buffer to hold the formatted string
+  sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
+  CONSOLE_STREAM.println(printbuf);
 
-  // LoRaBee.setSpreadingFactor(sf); // Set spreading factor
-  // LoRaBee.setPowerIndex(frq); // Set band rate
-  // LoRaBee.setFsbChannels(fsb); // Enable all channels
+  LoRaBee.setSpreadingFactor(sf); // Set spreading factor
+  LoRaBee.setPowerIndex(frq); // Set band rate
+  LoRaBee.setFsbChannels(fsb); // Enable all channels
 
   // delay(3000);
 
@@ -171,6 +171,14 @@ void sendMessage()
     break;
   case Busy:
     CONSOLE_STREAM.println("The device is busy. Sleeping for 10 extra seconds.");
+    delay(10000);
+    break;
+  case Silent:
+    CONSOLE_STREAM.println("The device is silent. Sleeping for 10 extra seconds.");
+    delay(10000);
+    break;
+  case NoFreeChannel:
+    CONSOLE_STREAM.println("The device has no free channel. Sleeping for 10 extra seconds.");
     delay(10000);
     break;
   case NetworkFatalError:
