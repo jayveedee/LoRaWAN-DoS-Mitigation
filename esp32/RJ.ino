@@ -41,6 +41,7 @@ void setup() {
 
   radio.setPreambleLength(8);
   radio.setOutputPower(14);
+  radio.setBandwidth(125.0);
   radio.setCodingRate(5);
   radio.setSpreadingFactor(9);
   radio.setSyncWord(34);
@@ -55,21 +56,44 @@ void loop() {
   
   //*** Addition of printstatement for monitoring 
   int noise = radio.scanChannel();
+
   if (noise == RADIOLIB_PREAMBLE_DETECTED) {
     // radio.transmit("");
-    Serial.println(noise);
-    delay(100);
-    Serial.println("Detected");
+    Serial.println("Preamble detected!");
+    Serial.print("Frequency: ");
     Serial.println(frequency);
+
     Serial.print("RSSI: ");
     Serial.println(radio.getRSSI());
 
     Serial.print("SNR: ");
     Serial.println(radio.getSNR());
-    while(true);
+    
+    // Start listening for the actual packet
+    int state = radio.startReceive();
+
+    // Prepare a variable to hold received data
+    // String receivedData;
+
+    // Wait for reception to complete (Use receive(String &data))
+    // int state = radio.receive(receivedData);
+
+    if (state == RADIOLIB_ERR_NONE) {
+      // Successfully received a packet
+      Serial.println("Packet received!");
+      Serial.print("Data: ");
+      Serial.println(state);
+      Serial.print("RSSI: ");
+      Serial.println(radio.getRSSI());
+      Serial.print("SNR: ");
+      Serial.println(radio.getSNR());
+    } else {
+      Serial.print("Packet reception failed! Error code: ");
+      Serial.println(state);
+    }
   }
   frequency = frequency + 0.2;
-  if (frequency > 868.5) {
+  if (frequency > 868.7) {
     frequency = 867.1;
   }
 
