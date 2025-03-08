@@ -33,47 +33,41 @@
   #error "Please use ABP or OTAA"
 #endif
 
+uint8_t count = 0;
+
 // ---------------------------------------------------------------------------------------------------------
 // Init Methods
 // ---------------------------------------------------------------------------------------------------------
-void setup()
-{
+void setup() {
   while (!CONSOLE_STREAM && millis() < 10000);
 
   CONSOLE_STREAM.begin(LoRaBee.getDefaultBaudRate());
   LORA_STREAM.begin(LoRaBee.getDefaultBaudRate());
-  //LoRaBee.setDiag(CONSOLE_STREAM);
 
   CONSOLE_STREAM.println("------------------------------------");
   CONSOLE_STREAM.println("Booting...");
 
-  if (FORCE_FULL_JOIN || !LoRaBee.initResume(LORA_STREAM, LORA_RESET_PIN))
-  {
+  if (FORCE_FULL_JOIN || !LoRaBee.initResume(LORA_STREAM, LORA_RESET_PIN)) {
     LoRaBee.init(LORA_STREAM, LORA_RESET_PIN, true, true);
 
     uint8_t eui[8];
-    if (LoRaBee.getHWEUI(eui, sizeof(eui)) != 8)
-    {
+    if (LoRaBee.getHWEUI(eui, sizeof(eui)) != 8) {
       return;
     }
 
     #if USE_ABP
-      if (LoRaBee.initABP(DEV_ADDR, APP_SKEY, NWK_SKEY, false))
-      {
+      if (LoRaBee.initABP(DEV_ADDR, APP_SKEY, NWK_SKEY, false)) {
         CONSOLE_STREAM.println("ABP Mode initialization successful.");
       }
-      else
-      {
+      else {
         CONSOLE_STREAM.println("ABP Mode initialization failed.");
         return;
       }
     #else
-      if (LoRaBee.initOTA(eui, APP_EUI, APP_KEY, false))
-      {
+      if (LoRaBee.initOTA(eui, APP_EUI, APP_KEY, false)) {
         CONSOLE_STREAM.println("OTAA Mode initialization successful.");
       }
-      else
-      {
+      else {
         CONSOLE_STREAM.println("OTAA Mode initialization failed.");
         return;
       }
@@ -82,8 +76,7 @@ void setup()
   CONSOLE_STREAM.println("Done");
 }
 
-void loop()
-{
+void loop() {
   #if LORA_MODE
     CONSOLE_STREAM.println("------------------------------------");
     // get frame counters
@@ -99,8 +92,7 @@ void loop()
 // ---------------------------------------------------------------------------------------------------------
 // Helper Methods
 // ---------------------------------------------------------------------------------------------------------
-void fetchFrameCounters()
-{
+void fetchFrameCounters() {
   char dnbuf[16];
   char upbuf[16];
 
@@ -113,8 +105,7 @@ void fetchFrameCounters()
   CONSOLE_STREAM.println(upbuf);
 }
 
-void sendMessage()
-{
+void sendMessage() {
   uint8_t sf = 9;
   uint8_t frq = 1;
   uint8_t fsb = 0;
@@ -126,24 +117,25 @@ void sendMessage()
   LoRaBee.setPowerIndex(frq); // Set band rate
   LoRaBee.setFsbChannels(fsb); // Enable all channels
 
-  // delay(3000);
+  setRgbColor(0xFF, 0xFF, 0x00);
 
-  CONSOLE_STREAM.println("Sending message...");
-
-  uint8_t buf[] = {'t', 'e', 's', 't'};
+  uint8_t buf[] = {'t', 'e', 's', 't', count};
+  CONSOLE_STREAM.print("Sending message... : ");
+  for (int i = 0; i < sizeof(buf) - 1; i++) {  
+    CONSOLE_STREAM.print((char)buf[i]);  
+  }
+  CONSOLE_STREAM.println(count);
 
   uint8_t res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
 
   CONSOLE_STREAM.print("LoRa transmission result: ");
   CONSOLE_STREAM.println(res);
 
-  switch (res)
-  {
+  switch (res) {
   case NoError:
     CONSOLE_STREAM.println("Successful transmission.");
     setRgbColor(0x00, 0xFF, 0x00);
     delay(10000);
-    setRgbColor(0x00, 0x00, 0x00);
     break;
   case NoResponse:
     CONSOLE_STREAM.println("There was no response from the device.");
@@ -151,61 +143,67 @@ void sendMessage()
     break;
   case Timeout:
     CONSOLE_STREAM.println("Connection timed-out. Check your serial connection to the device! Sleeping for 20sec.");
-    setRgbColor(0xFF, 0x00, 0x00);
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(20000);
     break;
   case PayloadSizeError:
     CONSOLE_STREAM.println("The size of the payload is greater than allowed. Transmission failed!");
     setRgbColor(0xFF, 0x00, 0x00);
+    delay(10000);
     break;
   case InternalError:
     CONSOLE_STREAM.println("Oh No! This shouldn't happen. Something is really wrong! Try restarting the device!\r\nThe program will now halt.");
-    setRgbColor(0xFF, 0x00, 0x00);
-    while (1)
-    {
-      delay(250);
-      setRgbColor(0x00, 0x00, 0x00);
+    while (1) {
+      setRgbColor(0xFF, 0xA5, 0x00);
       delay(250);
       setRgbColor(0xFF, 0x00, 0x00);
+      delay(250);
     };
     break;
   case Busy:
     CONSOLE_STREAM.println("The device is busy. Sleeping for 10 extra seconds.");
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(10000);
     break;
   case Silent:
     CONSOLE_STREAM.println("The device is silent. Sleeping for 10 extra seconds.");
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(10000);
     break;
   case NoFreeChannel:
     CONSOLE_STREAM.println("The device has no free channel. Sleeping for 10 extra seconds.");
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(10000);
     break;
   case NetworkFatalError:
     CONSOLE_STREAM.println("There is a non-recoverable error with the network connection. You should re-connect.\r\nThe program will now halt.");
     setRgbColor(0xFF, 0x00, 0x00);
-    while (1)
-    {
-    };
+    while (1) { };
     break;
   case NotConnected:
     CONSOLE_STREAM.println("The device is not connected to the network. Please connect to the network before attempting to send data.\r\nThe program will now halt.");
     setRgbColor(0xFF, 0x00, 0x00);
-    while (1)
-    {
-    };
+    while (1) { };
     break;
   case NoAcknowledgment:
     CONSOLE_STREAM.println("There was no acknowledgment sent back!");
     setRgbColor(0xFF, 0x00, 0x00);
+    delay(10000);
     break;
   default:
+    setRgbColor(0x00, 0x00, 0x00);
     break;
   }
+
+  if (count == 255) {
+    count = 0;
+  }
+  else {
+    count++;
+  } 
 }
 
-void setRgbColor(uint8_t red, uint8_t green, uint8_t blue)
-{
+void setRgbColor(uint8_t red, uint8_t green, uint8_t blue) {
   #ifdef COMMON_ANODE
     red = 255 - red;
     green = 255 - green;
@@ -217,19 +215,15 @@ void setRgbColor(uint8_t red, uint8_t green, uint8_t blue)
 }
 
 void listenForCommands() {
-  if (CONSOLE_STREAM.available())
-  {
-    while (CONSOLE_STREAM.available()) 
-    {
+  if (CONSOLE_STREAM.available()) {
+    while (CONSOLE_STREAM.available()) {
       uint8_t inChar = CONSOLE_STREAM.read();
       LORA_STREAM.write(inChar);
     }
   }
 
-  if (LORA_STREAM.available())
-  {
-    while (LORA_STREAM.available()) 
-    {
+  if (LORA_STREAM.available()) {
+    while (LORA_STREAM.available()) {
       uint8_t inChar = LORA_STREAM.read();
       CONSOLE_STREAM.write(inChar);
     }
