@@ -16,8 +16,8 @@
 #define FORCE_FULL_JOIN 1
 #define LORA_PORT 1
 
-#define USE_OTAA 0
-#define USE_ABP 1
+#define USE_OTAA 1
+#define USE_ABP 0
 
 #define COMMAND_MODE 0 
 #define LORA_MODE 1 
@@ -27,7 +27,7 @@
   static const uint8_t NWK_SKEY[16] = {0x25, 0x41, 0xB4, 0xA7, 0x14, 0x59, 0x35, 0x92, 0x73, 0x93, 0x35, 0x86, 0x17, 0x65, 0x1B, 0xCC};
   static const uint8_t APP_SKEY[16] = {0xBF, 0xF2, 0xCA, 0x2C, 0x71, 0x91, 0xF8, 0x95, 0x36, 0x5C, 0xCF, 0x82, 0x2C, 0x32, 0x24, 0xCC};
 #elif USE_OTAA
-  static const uint8_t APP_EUI[8] = {0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x06, 0xEB, 0x56};
+  static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
   static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
 #else
   #error "Please use ABP or OTAA"
@@ -126,7 +126,7 @@ void sendMessage() {
   }
   CONSOLE_STREAM.println(count);
 
-  uint8_t res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
+  uint8_t res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
 
   CONSOLE_STREAM.print("LoRa transmission result: ");
   CONSOLE_STREAM.println(res);
@@ -135,6 +135,8 @@ void sendMessage() {
   case NoError:
     CONSOLE_STREAM.println("Successful transmission.");
     setRgbColor(0x00, 0xFF, 0x00);
+    if (count == 255) { count = 0; } 
+    else { count++; } 
     delay(10000);
     break;
   case NoResponse:
@@ -194,13 +196,6 @@ void sendMessage() {
     setRgbColor(0x00, 0x00, 0x00);
     break;
   }
-
-  if (count == 255) {
-    count = 0;
-  }
-  else {
-    count++;
-  } 
 }
 
 void setRgbColor(uint8_t red, uint8_t green, uint8_t blue) {
