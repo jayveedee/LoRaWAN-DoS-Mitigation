@@ -15,31 +15,30 @@ float frequency =       867.1;
 SX1276 radio = new Module(LORA_SS, LORA_DIO0, LORA_RST, LORA_DIO1);
 
 void setup() {
+  while (!Serial && millis() < 10000);
+
   Serial.begin(115200);
   delay(2000);
 
+  Serial.println("------------------------------------");
+  Serial.println("Booting...");
+
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
 
-  // Get SPI clock divider
-  uint32_t clockDiv = SPI.getClockDivider();
-    
-    // ESP32 APB clock is 80 MHz, so SPI speed is:
-  uint32_t spiSpeed = 80000000 / clockDiv;
+  uint32_t clockDiv = SPI.getClockDivider(); // Get SPI clock divider
+  uint32_t spiSpeed = 80000000 / clockDiv; // ESP32 APB clock is 80 MHz, so SPI speed is:
 
   Serial.print("Estimated Default SPI Frequency: ");
   Serial.print(spiSpeed);
   Serial.println(" Hz");
   SPI.setFrequency(1000000);  // Lower SPI to 1 MHz
   
-  // Setup SX1276 wiring to ESP32
   int state = radio.begin();
   if (state != RADIOLIB_ERR_NONE) {
-    Serial.println("ERROR!!!!!!!");
+    Serial.print("Error. State: ");
     Serial.println(state);
     while (true);
   } 
-  Serial.println("No errors so far");
-  
 
   radio.setPreambleLength(8);
   radio.setOutputPower(14);
@@ -55,49 +54,61 @@ void setup() {
 
 void loop() {
   radio.setFrequency(frequency);
-  
-  //*** Addition of printstatement for monitoring 
   int noise = radio.scanChannel();
 
   if (noise == RADIOLIB_PREAMBLE_DETECTED) {
-    // radio.transmit("");
-    Serial.println("Preamble detected!");
-    Serial.print("Frequency: ");
+    Serial.println("------------------------------------");
+    Serial.print("LoRa Preamble Detected! The frequency is: ");
     Serial.println(frequency);
 
-    Serial.print("RSSI: ");
-    Serial.println(radio.getRSSI());
+    // radio.transmit("");
 
-    Serial.print("SNR: ");
-    Serial.println(radio.getSNR());
-    
-    // Start listening for the actual packet
-    Serial.println("Receiving...");
-    uint8_t receivedData[MAX_PAYLOAD_SIZE];
-    int state = radio.readData(receivedData, 0);
-    Serial.println("Done Receiving.");
-
-    parseByteArray(receivedData, sizeof(receivedData));
+    int state = fetchPacket(true);
 
     if (state == RADIOLIB_ERR_NONE) {
-      // Successfully received a packet
-      Serial.println("Packet received!");
-      Serial.print("Data: ");
-      Serial.println(state);
-      Serial.print("RSSI: ");
-      Serial.println(radio.getRSSI());
-      Serial.print("SNR: ");
-      Serial.println(radio.getSNR());
+      Serial.println("No error.");
     } else {
-      Serial.print("Packet reception failed! Error code: ");
-      Serial.println(state);
+      Serial.println("Error.");
     }
+
+    radio.standby();
   }
+
   frequency = frequency + 0.2;
   if (frequency > 868.7) {
     frequency = 867.1;
   }
+}
 
+int16_t fetchPacket(bool printBytes) {
+  Serial.println("Receiving LoRa packet...");
+
+  int16_t state;
+  int numBytes = radio.getPacketLength();
+
+  if (printBytes) {
+    byte byteArr[numBytes];  
+    state = radio.readData(byteArr, numBytes);
+
+    Serial.print("  Data (Hex): ");
+    for (int i = 0; i < numBytes; i++) {
+      Serial.printf("%02X ", byteArr[i]);  
+    }
+    Serial.println();
+  } else {
+    String str;
+    state = radio.readData(str);
+
+    Serial.print("  Data (String): ");
+    Serial.println(str);
+  }
+
+  Serial.print("  State: ");
+  Serial.println(state);
+
+  Serial.println("Packet Received.");
+
+  return state;
 }
 
 void parseByteArray(const uint8_t* data, size_t length) {
