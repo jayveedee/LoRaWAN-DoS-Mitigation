@@ -8,6 +8,7 @@
   #define CONSOLE_STREAM SerialUSB
   #define LORA_STREAM Serial2
   #define LORA_RESET_PIN LORA_RESET
+  #define BUTTON PUSH_BUTTON
 #else
   #error "Please select Sodaq ExpLoRer board"
 #endif
@@ -16,22 +17,11 @@
 #define FORCE_FULL_JOIN 1
 #define LORA_PORT 1
 
-#define USE_OTAA 1
-#define USE_ABP 0
-
 #define COMMAND_MODE 0 
 #define LORA_MODE 1 
 
-#if USE_ABP
-  static const uint8_t DEV_ADDR[4] = {0x01, 0x82, 0x29, 0xCC};
-  static const uint8_t NWK_SKEY[16] = {0x25, 0x41, 0xB4, 0xA7, 0x14, 0x59, 0x35, 0x92, 0x73, 0x93, 0x35, 0x86, 0x17, 0x65, 0x1B, 0xCC};
-  static const uint8_t APP_SKEY[16] = {0xBF, 0xF2, 0xCA, 0x2C, 0x71, 0x91, 0xF8, 0x95, 0x36, 0x5C, 0xCF, 0x82, 0x2C, 0x32, 0x24, 0xCC};
-#elif USE_OTAA
-  static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-  static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
-#else
-  #error "Please use ABP or OTAA"
-#endif
+static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
 
 uint8_t count = 0;
 
@@ -55,24 +45,13 @@ void setup() {
       return;
     }
 
-    #if USE_ABP
-      if (LoRaBee.initABP(DEV_ADDR, APP_SKEY, NWK_SKEY, false)) {
-        CONSOLE_STREAM.println("ABP Mode initialization successful.");
-      }
-      else {
-        CONSOLE_STREAM.println("ABP Mode initialization failed.");
-        return;
-      }
-    #else
-      if (LoRaBee.initOTA(eui, APP_EUI, APP_KEY, false)) {
-        CONSOLE_STREAM.println("OTAA Mode initialization successful.");
-      }
-      else {
-        CONSOLE_STREAM.println("OTAA Mode initialization failed.");
-        return;
-      }
-    #endif
+    if (LoRaBee.initOTA(eui, APP_EUI, APP_KEY, false)) {
+      CONSOLE_STREAM.println("OTAA Mode initialization successful.");
+    } else {
+      CONSOLE_STREAM.println("OTAA Mode initialization failed.");
+      return;
   }
+
   CONSOLE_STREAM.println("Done");
 }
 
@@ -126,7 +105,8 @@ void sendMessage() {
   }
   CONSOLE_STREAM.println(count);
 
-  uint8_t res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
+  uint8_t res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
+  // uint8_t res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
 
   CONSOLE_STREAM.print("LoRa transmission result: ");
   CONSOLE_STREAM.println(res);
