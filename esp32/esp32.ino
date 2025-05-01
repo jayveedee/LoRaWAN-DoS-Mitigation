@@ -9,6 +9,7 @@
 #define LORA_RST        14
 
 float frequency =       867.1;
+int SF = 9;
 
 SX1276 radio = new Module(LORA_SS, LORA_DIO0, LORA_RST, LORA_DIO1);
 
@@ -40,7 +41,7 @@ void setup() {
   radio.setOutputPower(17);
   radio.setBandwidth(125.0);
   radio.setCodingRate(5);
-  radio.setSpreadingFactor(9);
+  radio.setSpreadingFactor(SF);
   radio.setSyncWord(34);
   radio.setGain(1);
 
@@ -53,6 +54,7 @@ void loop() {
   if (radio.scanChannel() == RADIOLIB_PREAMBLE_DETECTED) {
     Serial.println("Preamble detected");
     Serial.println(frequency);
+    Serial.println("SF: " + SF);
     radio.transmit("");
     delay(100);
     Serial.println("radio transmitting");
@@ -60,6 +62,11 @@ void loop() {
   }
   frequency = frequency + 0.2;
   if (frequency > 868.5) {
+    SF++;
+    if (SF > 12) {
+      SF = 9;
+    }
+    radio.setSpreadingFactor(SF);
     frequency = 867.1;
   }
 
