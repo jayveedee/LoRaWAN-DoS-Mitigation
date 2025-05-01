@@ -23,6 +23,10 @@
 #define COMMAND_MODE 0 
 #define LORA_MODE 1 
 
+#define SEND_NO_ACK 0
+#define SEND_REQ_ACK_3_RETRIES 0
+#define SEND_REQ_ACK_DYNAMIC 1
+
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
 
@@ -88,10 +92,7 @@ void fetchFrameCounters() {
   CONSOLE_STREAM.println(upbuf);
 }
 
-void sendMessage() {
-  uint8_t sf = 9;
-  uint8_t frq = 1;
-  uint8_t fsb = 0;
+void configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb) {
   char printbuf[64];  // Buffer to hold the formatted string
   sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
   CONSOLE_STREAM.println(printbuf);
@@ -99,7 +100,9 @@ void sendMessage() {
   LoRaBee.setSpreadingFactor(sf); // Set spreading factor
   LoRaBee.setPowerIndex(frq); // Set band rate
   LoRaBee.setFsbChannels(fsb); // Enable all channels
+}
 
+void sendMessage() {
   setRgbColor(0xFF, 0xFF, 0x00);
 
   uint8_t buf[] = {'t', 'e', 's', 't', count};
@@ -109,14 +112,52 @@ void sendMessage() {
   }
   CONSOLE_STREAM.println(count);
 
-  //uint8_t res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
-  uint8_t res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
+  uint8_t res;
+  bool isInErrorState = false;
+  #if SEND_NO_ACK
+    CONSOLE_STREAM.println("Sending messages with: SEND_NO_ACK mode");
+    configureTransmission(9, 1, 0);
+    res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
+    isInErrorState = handleErrorState(res);
+  #elif SEND_REQ_ACK_3_RETRIES
+    CONSOLE_STREAM.println("Sending messages with: SEND_REQ_ACK_3_RETRIES mode");
+    configureTransmission(9, 1, 0);
+    LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
+    isInErrorState = handleErrorState(res);
+  #elif SEND_REQ_ACK_DYNAMIC
+    CONSOLE_STREAM.println("Sending messages with: SEND_REQ_ACK_DYNAMIC mode");
+    uint8_t sf = 9;
+    uint8_t frq = 1;
+    uint8_t fsb = 0;
+    while (res != NoError) {
+      configureTransmission(sf, frq, fsb);
+      res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 0);
+      isInErrorState = handleErrorState(res);
+      if (isInErrorState == true) {
+        sf++;
+        if (sf > 12) {
+          CONSOLE_STREAM.println("Unsuccessful transmission.");
+          break;
+        } else {
+          CONSOLE_STREAM.print("Unsuccessful transmission, retrying and incrementing spreading factor to: ");
+          CONSOLE_STREAM.println(sf);
+          fetchFrameCounters();
+        }
+      } else {
+        break;
+      }
+    }
+  #endif
+}
 
+bool handleErrorState(uint8_t res) {
   CONSOLE_STREAM.print("LoRa transmission result: ");
   CONSOLE_STREAM.println(res);
 
+  bool isInErrorState = true;
   switch (res) {
   case NoError:
+    isInErrorState = false;
     CONSOLE_STREAM.println("Successful transmission.");
     setRgbColor(0x00, 0xFF, 0x00);
     if (count == 255) { count = 0; } 
@@ -180,6 +221,8 @@ void sendMessage() {
     setRgbColor(0x00, 0x00, 0x00);
     break;
   }
+
+  return isInErrorState;
 }
 
 void setRgbColor(uint8_t red, uint8_t green, uint8_t blue) {
