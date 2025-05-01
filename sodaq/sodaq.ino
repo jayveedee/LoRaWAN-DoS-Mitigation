@@ -50,6 +50,7 @@ void setup() {
     } else {
       CONSOLE_STREAM.println("OTAA Mode initialization failed.");
       return;
+    }
   }
 
   CONSOLE_STREAM.println("Done");
@@ -105,8 +106,8 @@ void sendMessage() {
   }
   CONSOLE_STREAM.println(count);
 
-  uint8_t res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
-  // uint8_t res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
+  //uint8_t res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
+  uint8_t res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
 
   CONSOLE_STREAM.print("LoRa transmission result: ");
   CONSOLE_STREAM.println(res);

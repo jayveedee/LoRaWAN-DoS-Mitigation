@@ -37,7 +37,7 @@ void setup() {
   
 
   radio.setPreambleLength(8);
-  radio.setOutputPower(14);
+  radio.setOutputPower(17);
   radio.setBandwidth(125.0);
   radio.setCodingRate(5);
   radio.setSpreadingFactor(9);
