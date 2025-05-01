@@ -1,0 +1,206 @@
+13:46:53.715 -> ------------------------------------
+13:46:53.715 -> Downlink frame counter: 0
+13:46:53.715 -> Uplink frame counter: 0
+13:46:53.715 -> Initializing SF as 9, band rate as 1, channels as 0
+13:46:54.331 -> Sending message... : test0
+13:47:26.726 -> LoRa transmission result: 8
+13:47:26.726 -> There was no acknowledgment sent back!
+13:47:36.750 -> ------------------------------------
+13:47:36.750 -> Downlink frame counter: 0
+13:47:36.750 -> Uplink frame counter: 1
+13:47:36.750 -> Initializing SF as 9, band rate as 1, channels as 0
+13:47:37.373 -> Sending message... : test0
+13:47:53.092 -> LoRa transmission result: 0
+13:47:53.092 -> Successful transmission.
+13:48:03.135 -> ------------------------------------
+13:48:03.135 -> Downlink frame counter: 0
+13:48:03.135 -> Uplink frame counter: 2
+13:48:03.135 -> Initializing SF as 9, band rate as 1, channels as 0
+13:48:03.712 -> Sending message... : test1
+13:48:11.262 -> LoRa transmission result: 0
+13:48:11.262 -> Successful transmission.
+13:48:21.271 -> ------------------------------------
+13:48:21.271 -> Downlink frame counter: 1
+13:48:21.343 -> Uplink frame counter: 3
+13:48:21.343 -> Initializing SF as 9, band rate as 1, channels as 0
+13:48:21.909 -> Sending message... : test2
+13:48:44.706 -> LoRa transmission result: 0
+13:48:44.706 -> Successful transmission.
+13:48:21.343 -> Uplink frame counter: 3
+13:48:21.343 -> Initializing SF as 9, band rate as 1, channels as 0
+13:48:21.909 -> Sending message... : test2
+13:48:44.706 -> LoRa transmission result: 0
+13:48:44.706 -> Successful transmission.
+13:48:54.670 -> ------------------------------------
+13:48:54.742 -> Downlink frame counter: 2
+13:48:54.742 -> Uplink frame counter: 4
+13:48:54.742 -> Initializing SF as 9, band rate as 1, channels as 0
+13:48:55.314 -> Sending message... : test3
+13:49:01.880 -> LoRa transmission result: 0
+13:49:01.880 -> Successful transmission.
+13:49:11.853 -> ------------------------------------
+13:49:11.853 -> Downlink frame counter: 3
+13:49:11.853 -> Uplink frame counter: 5
+13:49:11.853 -> Initializing SF as 9, band rate as 1, channels as 0
+13:49:12.486 -> Sending message... : test4
+13:49:13.629 -> LoRa transmission result: 10
+13:49:13.629 -> The device has no free channel. Sleeping for 10 extra seconds.
+13:49:23.658 -> ------------------------------------
+13:49:23.658 -> Downlink frame counter: 3
+13:49:23.658 -> Uplink frame counter: 5
+13:49:23.658 -> Initializing SF as 9, band rate as 1, channels as 0
+13:49:24.285 -> Sending message... : test4
+13:49:25.463 -> LoRa transmission result: 10
+13:49:25.463 -> The device has no free channel. Sleeping for 10 extra seconds.
+13:49:35.418 -> ------------------------------------
+13:49:35.468 -> Downlink frame counter: 3
+13:49:35.468 -> Uplink frame counter: 5
+13:49:35.468 -> Initializing SF as 9, band rate as 1, channels as 0
+13:49:36.042 -> Sending message... : test4
+13:49:42.631 -> LoRa transmission result: 0
+13:49:42.631 -> Successful transmission.
+13:49:52.605 -> ------------------------------------
+13:49:52.605 -> Downlink frame counter: 4
+13:49:52.605 -> Uplink frame counter: 6
+13:49:52.605 -> Initializing SF as 9, band rate as 1, channels as 0
+13:49:53.245 -> Sending message... : test5
+13:50:08.861 -> LoRa transmission result: 8
+13:50:08.861 -> There was no acknowledgment sent back!
+13:50:18.894 -> ------------------------------------
+13:50:18.894 -> Downlink frame counter: 4
+13:50:18.894 -> Uplink frame counter: 7
+13:50:18.894 -> Initializing SF as 9, band rate as 1, channels as 0
+13:50:19.482 -> Sending message... : test5
+13:50:20.648 -> LoRa transmission result: 10
+13:50:20.648 -> The device has no free channel. Sleeping for 10 extra seconds.
+13:50:30.686 -> ------------------------------------
+13:50:30.686 -> Downlink frame counter: 4
+13:50:30.686 -> Uplink frame counter: 7
+13:50:30.686 -> Initializing SF as 9, band rate as 1, channels as 0
+13:50:31.297 -> Sending message... : test5
+13:50:37.826 -> LoRa transmission result: 0
+13:50:37.826 -> Successful transmission.
+13:50:47.853 -> ------------------------------------
+13:50:47.853 -> Downlink frame counter: 5
+13:50:47.853 -> Uplink frame counter: 8
+13:50:47.853 -> Initializing SF as 9, band rate as 1, channels as 0
+13:50:48.451 -> Sending message... : test6
+13:50:55.043 -> LoRa transmission result: 0
+13:50:55.043 -> Successful transmission.
+13:51:04.998 -> ------------------------------------
+13:51:05.074 -> Downlink frame counter: 6
+13:51:05.074 -> Uplink frame counter: 9
+13:51:05.074 -> Initializing SF as 9, band rate as 1, channels as 0
+13:51:05.640 -> Sending message... : test7
+13:51:20.429 -> LoRa transmission result: 0
+13:51:20.429 -> Successful transmission.
+13:51:30.404 -> ------------------------------------
+13:51:30.454 -> Downlink frame counter: 7
+13:51:30.454 -> Uplink frame counter: 10
+13:51:30.454 -> Initializing SF as 9, band rate as 1, channels as 0
+13:51:31.051 -> Sending message... : test8
+13:51:37.577 -> LoRa transmission result: 0
+13:51:37.577 -> Successful transmission.
+13:51:47.586 -> ------------------------------------
+13:51:47.586 -> Downlink frame counter: 8
+13:51:47.586 -> Uplink frame counter: 11
+13:51:47.633 -> Initializing SF as 9, band rate as 1, channels as 0
+13:51:48.197 -> Sending message... : test9
+13:51:54.768 -> LoRa transmission result: 0
+13:51:54.768 -> Successful transmission.
+13:52:04.760 -> ------------------------------------
+13:52:04.760 -> Downlink frame counter: 9
+13:52:04.760 -> Uplink frame counter: 12
+13:52:04.760 -> Initializing SF as 9, band rate as 1, channels as 0
+13:52:05.402 -> Sending message... : test10
+13:52:06.567 -> LoRa transmission result: 10
+13:52:06.567 -> The device has no free channel. Sleeping for 10 extra seconds.
+13:52:16.542 -> ------------------------------------
+13:52:16.542 -> Downlink frame counter: 9
+13:52:16.542 -> Uplink frame counter: 12
+13:52:16.542 -> Initializing SF as 9, band rate as 1, channels as 0
+13:52:17.169 -> Sending message... : test10
+13:52:18.342 -> LoRa transmission result: 10
+13:52:18.342 -> The device has no free channel. Sleeping for 10 extra seconds.
+13:52:28.327 -> ------------------------------------
+13:52:28.373 -> Downlink frame counter: 9
+13:52:28.373 -> Uplink frame counter: 12
+13:52:28.373 -> Initializing SF as 9, band rate as 1, channels as 0
+13:52:28.943 -> Sending message... : test10
+13:52:35.504 -> LoRa transmission result: 0
+13:52:35.504 -> Successful transmission.
+13:52:45.494 -> ------------------------------------
+13:52:45.551 -> Downlink frame counter: 10
+13:52:45.551 -> Uplink frame counter: 13
+13:52:45.551 -> Initializing SF as 9, band rate as 1, channels as 0
+13:52:46.116 -> Sending message... : test11
+13:53:00.924 -> LoRa transmission result: 0
+13:53:00.924 -> Successful transmission.
+13:53:10.900 -> ------------------------------------
+13:53:10.972 -> Downlink frame counter: 11
+13:53:10.972 -> Uplink frame counter: 14
+13:53:10.972 -> Initializing SF as 9, band rate as 1, channels as 0
+13:53:11.522 -> Sending message... : test12
+13:53:26.341 -> LoRa transmission result: 0
+13:53:26.341 -> Successful transmission.
+13:53:36.345 -> ------------------------------------
+13:53:36.345 -> Downlink frame counter: 12
+13:53:36.345 -> Uplink frame counter: 15
+13:53:36.345 -> Initializing SF as 9, band rate as 1, channels as 0
+13:53:36.972 -> Sending message... : test13
+13:53:43.511 -> LoRa transmission result: 0
+13:53:43.511 -> Successful transmission.
+13:53:53.486 -> ------------------------------------
+13:53:53.486 -> Downlink frame counter: 13
+13:53:53.486 -> Uplink frame counter: 16
+13:53:53.486 -> Initializing SF as 9, band rate as 1, channels as 0
+13:53:54.120 -> Sending message... : test14
+13:54:01.515 -> LoRa transmission result: 8
+13:54:01.515 -> There was no acknowledgment sent back!
+13:54:11.541 -> ------------------------------------
+13:54:11.541 -> Downlink frame counter: 13
+13:54:11.541 -> Uplink frame counter: 17
+13:54:11.541 -> Initializing SF as 9, band rate as 1, channels as 0
+13:54:12.152 -> Sending message... : test14
+13:54:26.938 -> LoRa transmission result: 0
+13:54:26.938 -> Successful transmission.
+13:54:36.918 -> ------------------------------------
+13:54:36.918 -> Downlink frame counter: 14
+13:54:36.918 -> Uplink frame counter: 18
+13:54:36.918 -> Initializing SF as 9, band rate as 1, channels as 0
+13:54:37.541 -> Sending message... : test15
+13:55:22.551 -> LoRa transmission result: 0
+13:55:22.551 -> Successful transmission.
+13:55:32.578 -> ------------------------------------
+13:55:32.578 -> Downlink frame counter: 15
+13:55:32.578 -> Uplink frame counter: 19
+13:55:32.578 -> Initializing SF as 9, band rate as 1, channels as 0
+13:55:33.186 -> Sending message... : test16
+13:55:34.362 -> LoRa transmission result: 10
+13:55:34.362 -> The device has no free channel. Sleeping for 10 extra seconds.
+13:55:44.330 -> ------------------------------------
+13:55:44.380 -> Downlink frame counter: 15
+13:55:44.380 -> Uplink frame counter: 19
+13:55:44.380 -> Initializing SF as 9, band rate as 1, channels as 0
+13:55:44.967 -> Sending message... : test16
+13:55:46.122 -> LoRa transmission result: 10
+13:55:46.122 -> The device has no free channel. Sleeping for 10 extra seconds.
+13:55:56.118 -> ------------------------------------
+13:55:56.169 -> Downlink frame counter: 15
+13:55:56.169 -> Uplink frame counter: 19
+13:55:56.169 -> Initializing SF as 9, band rate as 1, channels as 0
+13:55:56.747 -> Sending message... : test16
+13:56:03.325 -> LoRa transmission result: 0
+13:56:03.325 -> Successful transmission.
+13:56:13.309 -> ------------------------------------
+13:56:13.309 -> Downlink frame counter: 16
+13:56:13.309 -> Uplink frame counter: 20
+13:56:13.309 -> Initializing SF as 9, band rate as 1, channels as 0
+13:56:13.965 -> Sending message... : test17
+13:56:21.328 -> LoRa transmission result: 8
+13:56:21.328 -> There was no acknowledgment sent back!
+13:56:31.366 -> ------------------------------------
+13:56:31.366 -> Downlink frame counter: 16
+13:56:31.366 -> Uplink frame counter: 21
+13:56:31.366 -> Initializing SF as 9, band rate as 1, channels as 0
+13:56:31.993 -> Sending message... : test17
