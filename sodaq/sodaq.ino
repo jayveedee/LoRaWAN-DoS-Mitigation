@@ -1,4 +1,7 @@
-#include "Sodaq_RN2483.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483_internal.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483.cpp"
+#include "lib/Sodaq_RN2483/Utils.h"
 #include <Arduino.h>
 
 // ---------------------------------------------------------------------------------------------------------
