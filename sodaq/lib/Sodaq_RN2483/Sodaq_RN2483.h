@@ -156,7 +156,7 @@ class Sodaq_RN2483
     // using the given spreading factor parameter.
     bool setSpreadingFactor(uint8_t spreadingFactor);
 
-    // Sets the power index (868MHz: 1 to 5 / 915MHz: 5, 7, 8, 9 or 10)
+    // Sets the power index (868MHz: 1 to 5 / 915MHz: 6, 7, 8, 9 or 10)
     // Returns true if successful.
     bool setPowerIndex(uint8_t powerIndex);
 

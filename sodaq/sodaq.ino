@@ -1,4 +1,7 @@
-#include "Sodaq_RN2483.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483_internal.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483.cpp"
+#include "lib/Sodaq_RN2483/Utils.h"
 #include <Arduino.h>
 
 // ---------------------------------------------------------------------------------------------------------
@@ -8,6 +11,7 @@
   #define CONSOLE_STREAM SerialUSB
   #define LORA_STREAM Serial2
   #define LORA_RESET_PIN LORA_RESET
+  #define BUTTON PUSH_BUTTON
 #else
   #error "Please select Sodaq ExpLoRer board"
 #endif
@@ -16,74 +20,50 @@
 #define FORCE_FULL_JOIN 1
 #define LORA_PORT 1
 
-#define USE_OTAA 0
-#define USE_ABP 1
-
 #define COMMAND_MODE 0 
 #define LORA_MODE 1 
 
-#if USE_ABP
-  static const uint8_t DEV_ADDR[4] = {0x01, 0x82, 0x29, 0xCC};
-  static const uint8_t NWK_SKEY[16] = {0x25, 0x41, 0xB4, 0xA7, 0x14, 0x59, 0x35, 0x92, 0x73, 0x93, 0x35, 0x86, 0x17, 0x65, 0x1B, 0xCC};
-  static const uint8_t APP_SKEY[16] = {0xBF, 0xF2, 0xCA, 0x2C, 0x71, 0x91, 0xF8, 0x95, 0x36, 0x5C, 0xCF, 0x82, 0x2C, 0x32, 0x24, 0xCC};
-#elif USE_OTAA
-  static const uint8_t APP_EUI[8] = {0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x06, 0xEB, 0x56};
-  static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
-#else
-  #error "Please use ABP or OTAA"
-#endif
+#define SEND_NO_ACK 0
+#define SEND_REQ_ACK_3_RETRIES 0
+#define SEND_REQ_ACK_DYNAMIC 1
+
+static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
+
+uint8_t count = 0;
 
 // ---------------------------------------------------------------------------------------------------------
 // Init Methods
 // ---------------------------------------------------------------------------------------------------------
-void setup()
-{
+void setup() {
   while (!CONSOLE_STREAM && millis() < 10000);
 
   CONSOLE_STREAM.begin(LoRaBee.getDefaultBaudRate());
   LORA_STREAM.begin(LoRaBee.getDefaultBaudRate());
-  //LoRaBee.setDiag(CONSOLE_STREAM);
 
   CONSOLE_STREAM.println("------------------------------------");
   CONSOLE_STREAM.println("Booting...");
 
-  if (FORCE_FULL_JOIN || !LoRaBee.initResume(LORA_STREAM, LORA_RESET_PIN))
-  {
+  if (FORCE_FULL_JOIN || !LoRaBee.initResume(LORA_STREAM, LORA_RESET_PIN)) {
     LoRaBee.init(LORA_STREAM, LORA_RESET_PIN, true, true);
 
     uint8_t eui[8];
-    if (LoRaBee.getHWEUI(eui, sizeof(eui)) != 8)
-    {
+    if (LoRaBee.getHWEUI(eui, sizeof(eui)) != 8) {
       return;
     }
 
-    #if USE_ABP
-      if (LoRaBee.initABP(DEV_ADDR, APP_SKEY, NWK_SKEY, false))
-      {
-        CONSOLE_STREAM.println("ABP Mode initialization successful.");
-      }
-      else
-      {
-        CONSOLE_STREAM.println("ABP Mode initialization failed.");
-        return;
-      }
-    #else
-      if (LoRaBee.initOTA(eui, APP_EUI, APP_KEY, false))
-      {
-        CONSOLE_STREAM.println("OTAA Mode initialization successful.");
-      }
-      else
-      {
-        CONSOLE_STREAM.println("OTAA Mode initialization failed.");
-        return;
-      }
-    #endif
+    if (LoRaBee.initOTA(eui, APP_EUI, APP_KEY, false)) {
+      CONSOLE_STREAM.println("OTAA Mode initialization successful.");
+    } else {
+      CONSOLE_STREAM.println("OTAA Mode initialization failed.");
+      return;
+    }
   }
+
   CONSOLE_STREAM.println("Done");
 }
 
-void loop()
-{
+void loop() {
   #if LORA_MODE
     CONSOLE_STREAM.println("------------------------------------");
     // get frame counters
@@ -99,8 +79,7 @@ void loop()
 // ---------------------------------------------------------------------------------------------------------
 // Helper Methods
 // ---------------------------------------------------------------------------------------------------------
-void fetchFrameCounters()
-{
+void fetchFrameCounters() {
   char dnbuf[16];
   char upbuf[16];
 
@@ -113,11 +92,7 @@ void fetchFrameCounters()
   CONSOLE_STREAM.println(upbuf);
 }
 
-void sendMessage()
-{
-  uint8_t sf = 9;
-  uint8_t frq = 1;
-  uint8_t fsb = 0;
+void configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb) {
   char printbuf[64];  // Buffer to hold the formatted string
   sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
   CONSOLE_STREAM.println(printbuf);
@@ -125,25 +100,69 @@ void sendMessage()
   LoRaBee.setSpreadingFactor(sf); // Set spreading factor
   LoRaBee.setPowerIndex(frq); // Set band rate
   LoRaBee.setFsbChannels(fsb); // Enable all channels
+}
 
-  // delay(3000);
+void sendMessage() {
+  setRgbColor(0xFF, 0xFF, 0x00);
 
-  CONSOLE_STREAM.println("Sending message...");
+  uint8_t buf[] = {'t', 'e', 's', 't', count};
+  CONSOLE_STREAM.print("Sending message... : ");
+  for (int i = 0; i < sizeof(buf) - 1; i++) {  
+    CONSOLE_STREAM.print((char)buf[i]);  
+  }
+  CONSOLE_STREAM.println(count);
 
-  uint8_t buf[] = {'t', 'e', 's', 't'};
+  uint8_t res;
+  bool isInErrorState = false;
+  #if SEND_NO_ACK
+    CONSOLE_STREAM.println("Sending messages with: SEND_NO_ACK mode");
+    configureTransmission(9, 1, 0);
+    res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
+    isInErrorState = handleErrorState(res);
+  #elif SEND_REQ_ACK_3_RETRIES
+    CONSOLE_STREAM.println("Sending messages with: SEND_REQ_ACK_3_RETRIES mode");
+    configureTransmission(9, 1, 0);
+    LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
+    isInErrorState = handleErrorState(res);
+  #elif SEND_REQ_ACK_DYNAMIC
+    CONSOLE_STREAM.println("Sending messages with: SEND_REQ_ACK_DYNAMIC mode");
+    uint8_t sf = 9;
+    uint8_t frq = 1;
+    uint8_t fsb = 0;
+    while (res != NoError) {
+      configureTransmission(sf, frq, fsb);
+      res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 0);
+      isInErrorState = handleErrorState(res);
+      if (isInErrorState == true) {
+        sf++;
+        if (sf > 12) {
+          CONSOLE_STREAM.println("Unsuccessful transmission.");
+          break;
+        } else {
+          CONSOLE_STREAM.print("Unsuccessful transmission, retrying and incrementing spreading factor to: ");
+          CONSOLE_STREAM.println(sf);
+          fetchFrameCounters();
+        }
+      } else {
+        break;
+      }
+    }
+  #endif
+}
 
-  uint8_t res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
-
+bool handleErrorState(uint8_t res) {
   CONSOLE_STREAM.print("LoRa transmission result: ");
   CONSOLE_STREAM.println(res);
 
-  switch (res)
-  {
+  bool isInErrorState = true;
+  switch (res) {
   case NoError:
+    isInErrorState = false;
     CONSOLE_STREAM.println("Successful transmission.");
     setRgbColor(0x00, 0xFF, 0x00);
+    if (count == 255) { count = 0; } 
+    else { count++; } 
     delay(10000);
-    setRgbColor(0x00, 0x00, 0x00);
     break;
   case NoResponse:
     CONSOLE_STREAM.println("There was no response from the device.");
@@ -151,61 +170,62 @@ void sendMessage()
     break;
   case Timeout:
     CONSOLE_STREAM.println("Connection timed-out. Check your serial connection to the device! Sleeping for 20sec.");
-    setRgbColor(0xFF, 0x00, 0x00);
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(20000);
     break;
   case PayloadSizeError:
     CONSOLE_STREAM.println("The size of the payload is greater than allowed. Transmission failed!");
     setRgbColor(0xFF, 0x00, 0x00);
+    delay(10000);
     break;
   case InternalError:
     CONSOLE_STREAM.println("Oh No! This shouldn't happen. Something is really wrong! Try restarting the device!\r\nThe program will now halt.");
-    setRgbColor(0xFF, 0x00, 0x00);
-    while (1)
-    {
-      delay(250);
-      setRgbColor(0x00, 0x00, 0x00);
+    while (1) {
+      setRgbColor(0xFF, 0xA5, 0x00);
       delay(250);
       setRgbColor(0xFF, 0x00, 0x00);
+      delay(250);
     };
     break;
   case Busy:
     CONSOLE_STREAM.println("The device is busy. Sleeping for 10 extra seconds.");
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(10000);
     break;
   case Silent:
     CONSOLE_STREAM.println("The device is silent. Sleeping for 10 extra seconds.");
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(10000);
     break;
   case NoFreeChannel:
     CONSOLE_STREAM.println("The device has no free channel. Sleeping for 10 extra seconds.");
+    setRgbColor(0xFF, 0xA5, 0x00);
     delay(10000);
     break;
   case NetworkFatalError:
     CONSOLE_STREAM.println("There is a non-recoverable error with the network connection. You should re-connect.\r\nThe program will now halt.");
     setRgbColor(0xFF, 0x00, 0x00);
-    while (1)
-    {
-    };
+    while (1) { };
     break;
   case NotConnected:
     CONSOLE_STREAM.println("The device is not connected to the network. Please connect to the network before attempting to send data.\r\nThe program will now halt.");
     setRgbColor(0xFF, 0x00, 0x00);
-    while (1)
-    {
-    };
+    while (1) { };
     break;
   case NoAcknowledgment:
     CONSOLE_STREAM.println("There was no acknowledgment sent back!");
     setRgbColor(0xFF, 0x00, 0x00);
+    delay(10000);
     break;
   default:
+    setRgbColor(0x00, 0x00, 0x00);
     break;
   }
+
+  return isInErrorState;
 }
 
-void setRgbColor(uint8_t red, uint8_t green, uint8_t blue)
-{
+void setRgbColor(uint8_t red, uint8_t green, uint8_t blue) {
   #ifdef COMMON_ANODE
     red = 255 - red;
     green = 255 - green;
@@ -217,19 +237,15 @@ void setRgbColor(uint8_t red, uint8_t green, uint8_t blue)
 }
 
 void listenForCommands() {
-  if (CONSOLE_STREAM.available())
-  {
-    while (CONSOLE_STREAM.available()) 
-    {
+  if (CONSOLE_STREAM.available()) {
+    while (CONSOLE_STREAM.available()) {
       uint8_t inChar = CONSOLE_STREAM.read();
       LORA_STREAM.write(inChar);
     }
   }
 
-  if (LORA_STREAM.available())
-  {
-    while (LORA_STREAM.available()) 
-    {
+  if (LORA_STREAM.available()) {
+    while (LORA_STREAM.available()) {
       uint8_t inChar = LORA_STREAM.read();
       CONSOLE_STREAM.write(inChar);
     }
