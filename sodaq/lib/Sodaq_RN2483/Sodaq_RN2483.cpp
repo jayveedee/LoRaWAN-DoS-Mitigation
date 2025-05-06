@@ -635,6 +635,107 @@ bool Sodaq_RN2483::setFsbChannels(uint8_t fsb)
     return allOk;
 }
 
+/**
+ * Get the SNR (Signal-to-Noise Ratio) of the last received packet
+ * 
+ * @return The SNR value in dB, or -128 if no packet has been received
+ */
+int8_t Sodaq_RN2483::getSNR()
+{
+    debugPrintLn("[getSNR]");
+    
+    // Buffer to store response
+    char buffer[20];
+    
+    println("radio get snr");
+    
+    // Read the response using the existing readLn method
+    if (readLn() > 0) {
+        debugPrint("[getSNR] -> \"");
+        debugPrint(this->_inputBuffer);
+        debugPrintLn("\"");
+        
+        // Convert string to integer
+        return atoi(this->_inputBuffer);
+    }
+    
+    // Return minimum value if unable to get SNR
+    return -128;
+}
+
+/**
+ * Estimate RSSI based on SNR and other parameters
+ * 
+ * @return The estimated RSSI value in dBm, or -200 if unable to estimate
+ */
+int16_t Sodaq_RN2483::getRSSI()
+{
+    debugPrintLn("[getRSSI]");
+    
+    // Get the SNR value
+    int8_t snr = getSNR();
+    
+    // If no valid SNR is available, return a very low value
+    if (snr == -128) {
+        return -200;
+    }
+    
+    // According to LoRa signal characteristics, RSSI can be estimated 
+    // Using a base RSSI value appropriate for the frequency band
+    int16_t baseRSSI = -157; // Base RSSI for LoRa (typical value, may need adjustment)
+    
+    debugPrint("[getRSSI] SNR: ");
+    debugPrintLn(snr);
+    
+    if (snr < 0) {
+        return baseRSSI + snr;
+    } else {
+        return baseRSSI;
+    }
+}
+
+/**
+ * Sets the radio channel parameters
+ * 
+ * @param channel The channel number to set (0-15)
+ * @param frequency The frequency in Hz
+ * @return true if the channel was set successfully, false otherwise
+ */
+bool Sodaq_RN2483::setChannel(uint8_t channel, uint32_t frequency)
+{
+    debugPrintLn("[setChannel]");
+    
+    if (channel > 15) {
+        debugPrintLn("[setChannel] Channel out of range (0-15)");
+        return false;
+    }
+    
+    // Check frequency range based on module type
+    if (_isRN2903) {
+        // RN2903 (915MHz band)
+        if (frequency < 902000000 || frequency > 928000000) {
+            debugPrintLn("[setChannel] Frequency out of range for RN2903");
+            return false;
+        }
+    } else {
+        // RN2483 (868MHz or 433MHz band)
+        if ((frequency < 863000000 || frequency > 870000000) && 
+            (frequency < 433050000 || frequency > 434790000)) {
+            debugPrintLn("[setChannel] Frequency out of range for RN2483");
+            return false;
+        }
+    }
+    
+    // Using the MAC command to set channel frequency as per RN2483 manual
+    print(STR_CMD_SET);
+    print("ch freq ");
+    print(channel);
+    print(" ");
+    println(frequency);
+    
+    return expectOK();
+}
+
 // Sets the spreading factor.
 // In reality it sets the datarate of the module according to the
 // LoraWAN specs mapping for 868MHz and 915MHz,
