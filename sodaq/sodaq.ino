@@ -1,8 +1,23 @@
+// Include the aurduino library
+#include <Arduino.h>
+
+// Include the sodaq_RN2483 library for common utils
 #include "lib/Sodaq_RN2483/Sodaq_RN2483_internal.h"
 #include "lib/Sodaq_RN2483/Sodaq_RN2483.h"
 #include "lib/Sodaq_RN2483/Sodaq_RN2483.cpp"
 #include "lib/Sodaq_RN2483/Utils.h"
-#include <Arduino.h>
+
+// Include all transmission strategies (have to include header and implementation)
+#include "lib/strategies/TransmissionStrategy.h"
+#include "lib/strategies/TransmissionStrategy.cpp"
+#include "lib/strategies/StandardTransmission.h"
+#include "lib/strategies/StandardTransmission.cpp"
+#include "lib/strategies/RetryTransmission.h"
+#include "lib/strategies/RetryTransmission.cpp"
+#include "lib/strategies/DynamicTransmission.h"
+#include "lib/strategies/DynamicTransmission.cpp"
+#include "lib/strategies/LBTTransmission.h"
+#include "lib/strategies/LBTTransmission.cpp"
 
 // ---------------------------------------------------------------------------------------------------------
 // Declarations
@@ -20,17 +35,22 @@
 #define FORCE_FULL_JOIN 1
 #define LORA_PORT 1
 
-#define COMMAND_MODE 0 
-#define LORA_MODE 1 
+// Transmission strategy types
+#define STRATEGY_STANDARD 0      // No ACK, standard transmission
+#define STRATEGY_RETRY 1         // With ACK and fixed retries
+#define STRATEGY_DYNAMIC 2       // Dynamic spreading factor / coding rate / etc adjustment
+#define STRATEGY_LBT 3           // Listen Before Talk jamming mitigation
 
-#define SEND_NO_ACK 0
-#define SEND_REQ_ACK_3_RETRIES 0
-#define SEND_REQ_ACK_DYNAMIC 1
+// Set the active transmission strategy here
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_LBT
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
 
 uint8_t count = 0;
+
+// Pointer to the active transmission strategy
+TransmissionStrategy* activeStrategy = nullptr;
 
 // ---------------------------------------------------------------------------------------------------------
 // Init Methods
@@ -60,171 +80,51 @@ void setup() {
     }
   }
 
+  // Initialize the selected transmission strategy
+  #if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_STANDARD
+    activeStrategy = new StandardTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+    CONSOLE_STREAM.println("Standard transmission strategy initialized");
+  #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_RETRY
+    activeStrategy = new RetryTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor, 3);
+    CONSOLE_STREAM.println("Retry transmission strategy initialized");
+  #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC
+    activeStrategy = new DynamicTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+    CONSOLE_STREAM.println("Dynamic SF transmission strategy initialized");
+  #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
+    activeStrategy = new LBTTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+    CONSOLE_STREAM.println("LBTTransmission strategy initialized");
+  #else
+    // Default to standard transmission if no valid strategy is selected
+    activeStrategy = new StandardTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+    CONSOLE_STREAM.println("Default to standard transmission strategy");
+  #endif
+
   CONSOLE_STREAM.println("Done");
 }
 
 void loop() {
-  #if LORA_MODE
-    CONSOLE_STREAM.println("------------------------------------");
-    // get frame counters
-    fetchFrameCounters();
-    // send message
-    sendMessage();
-  #elif COMMAND_MODE
-    // listen for ocmmands
-    listenForCommands();
-  #endif
-}
-
-// ---------------------------------------------------------------------------------------------------------
-// Helper Methods
-// ---------------------------------------------------------------------------------------------------------
-void fetchFrameCounters() {
-  char dnbuf[16];
-  char upbuf[16];
-
-  LoRaBee.getMacParam("dnctr", dnbuf, 16);
-  LoRaBee.getMacParam("upctr", upbuf, 16);
-
-  CONSOLE_STREAM.print("Downlink frame counter: ");
-  CONSOLE_STREAM.println(dnbuf);
-  CONSOLE_STREAM.print("Uplink frame counter: ");
-  CONSOLE_STREAM.println(upbuf);
-}
-
-void configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb) {
-  char printbuf[64];  // Buffer to hold the formatted string
-  sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
-  CONSOLE_STREAM.println(printbuf);
-
-  LoRaBee.setSpreadingFactor(sf); // Set spreading factor
-  LoRaBee.setPowerIndex(frq); // Set band rate
-  LoRaBee.setFsbChannels(fsb); // Enable all channels
-}
-
-void sendMessage() {
-  setRgbColor(0xFF, 0xFF, 0x00);
-
+  CONSOLE_STREAM.println("------------------------------------");
+  
+  // Prepare message data
   uint8_t buf[] = {'t', 'e', 's', 't', count};
-  CONSOLE_STREAM.print("Sending message... : ");
-  for (int i = 0; i < sizeof(buf) - 1; i++) {  
-    CONSOLE_STREAM.print((char)buf[i]);  
-  }
-  CONSOLE_STREAM.println(count);
-
-  uint8_t res;
-  bool isInErrorState = false;
-  #if SEND_NO_ACK
-    CONSOLE_STREAM.println("Sending messages with: SEND_NO_ACK mode");
-    configureTransmission(9, 1, 0);
-    res = LoRaBee.send(LORA_PORT, buf, sizeof(buf));
-    isInErrorState = handleErrorState(res);
-  #elif SEND_REQ_ACK_3_RETRIES
-    CONSOLE_STREAM.println("Sending messages with: SEND_REQ_ACK_3_RETRIES mode");
-    configureTransmission(9, 1, 0);
-    LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 3);
-    isInErrorState = handleErrorState(res);
-  #elif SEND_REQ_ACK_DYNAMIC
-    CONSOLE_STREAM.println("Sending messages with: SEND_REQ_ACK_DYNAMIC mode");
-    uint8_t sf = 9;
-    uint8_t frq = 1;
-    uint8_t fsb = 0;
-    while (res != NoError) {
-      configureTransmission(sf, frq, fsb);
-      res = LoRaBee.sendReqAck(LORA_PORT, buf, sizeof(buf), 0);
-      isInErrorState = handleErrorState(res);
-      if (isInErrorState == true) {
-        sf++;
-        if (sf > 12) {
-          CONSOLE_STREAM.println("Unsuccessful transmission.");
-          break;
-        } else {
-          CONSOLE_STREAM.print("Unsuccessful transmission, retrying and incrementing spreading factor to: ");
-          CONSOLE_STREAM.println(sf);
-          fetchFrameCounters();
-        }
-      } else {
-        break;
-      }
-    }
+  
+  // Get frame counters for debugging
+  activeStrategy->fetchFrameCounters();
+  
+  // Send using the active transmission strategy
+  bool success = activeStrategy->sendMessage(LORA_PORT, buf, sizeof(buf), count);
+  
+  // Additional actions for specific strategies
+  #if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
+    // Cast to LBTTransmission to access LBT-specific methods
+    LBTTransmission* lbtStrategy = static_cast<LBTTransmission*>(activeStrategy);
+    lbtStrategy->logJammingEvent();
   #endif
+  
+  // No need to add transmission delay because the transmission strategies handle delays based on error states
 }
 
-bool handleErrorState(uint8_t res) {
-  CONSOLE_STREAM.print("LoRa transmission result: ");
-  CONSOLE_STREAM.println(res);
-
-  bool isInErrorState = true;
-  switch (res) {
-  case NoError:
-    isInErrorState = false;
-    CONSOLE_STREAM.println("Successful transmission.");
-    setRgbColor(0x00, 0xFF, 0x00);
-    if (count == 255) { count = 0; } 
-    else { count++; } 
-    delay(10000);
-    break;
-  case NoResponse:
-    CONSOLE_STREAM.println("There was no response from the device.");
-    setRgbColor(0xFF, 0x00, 0x00);
-    break;
-  case Timeout:
-    CONSOLE_STREAM.println("Connection timed-out. Check your serial connection to the device! Sleeping for 20sec.");
-    setRgbColor(0xFF, 0xA5, 0x00);
-    delay(20000);
-    break;
-  case PayloadSizeError:
-    CONSOLE_STREAM.println("The size of the payload is greater than allowed. Transmission failed!");
-    setRgbColor(0xFF, 0x00, 0x00);
-    delay(10000);
-    break;
-  case InternalError:
-    CONSOLE_STREAM.println("Oh No! This shouldn't happen. Something is really wrong! Try restarting the device!\r\nThe program will now halt.");
-    while (1) {
-      setRgbColor(0xFF, 0xA5, 0x00);
-      delay(250);
-      setRgbColor(0xFF, 0x00, 0x00);
-      delay(250);
-    };
-    break;
-  case Busy:
-    CONSOLE_STREAM.println("The device is busy. Sleeping for 10 extra seconds.");
-    setRgbColor(0xFF, 0xA5, 0x00);
-    delay(10000);
-    break;
-  case Silent:
-    CONSOLE_STREAM.println("The device is silent. Sleeping for 10 extra seconds.");
-    setRgbColor(0xFF, 0xA5, 0x00);
-    delay(10000);
-    break;
-  case NoFreeChannel:
-    CONSOLE_STREAM.println("The device has no free channel. Sleeping for 10 extra seconds.");
-    setRgbColor(0xFF, 0xA5, 0x00);
-    delay(10000);
-    break;
-  case NetworkFatalError:
-    CONSOLE_STREAM.println("There is a non-recoverable error with the network connection. You should re-connect.\r\nThe program will now halt.");
-    setRgbColor(0xFF, 0x00, 0x00);
-    while (1) { };
-    break;
-  case NotConnected:
-    CONSOLE_STREAM.println("The device is not connected to the network. Please connect to the network before attempting to send data.\r\nThe program will now halt.");
-    setRgbColor(0xFF, 0x00, 0x00);
-    while (1) { };
-    break;
-  case NoAcknowledgment:
-    CONSOLE_STREAM.println("There was no acknowledgment sent back!");
-    setRgbColor(0xFF, 0x00, 0x00);
-    delay(10000);
-    break;
-  default:
-    setRgbColor(0x00, 0x00, 0x00);
-    break;
-  }
-
-  return isInErrorState;
-}
-
+// RGB LED control function
 void setRgbColor(uint8_t red, uint8_t green, uint8_t blue) {
   #ifdef COMMON_ANODE
     red = 255 - red;
@@ -234,20 +134,4 @@ void setRgbColor(uint8_t red, uint8_t green, uint8_t blue) {
     analogWrite(LED_RED, red);
     analogWrite(LED_GREEN, green);
     analogWrite(LED_BLUE, blue);
-}
-
-void listenForCommands() {
-  if (CONSOLE_STREAM.available()) {
-    while (CONSOLE_STREAM.available()) {
-      uint8_t inChar = CONSOLE_STREAM.read();
-      LORA_STREAM.write(inChar);
-    }
-  }
-
-  if (LORA_STREAM.available()) {
-    while (LORA_STREAM.available()) {
-      uint8_t inChar = LORA_STREAM.read();
-      CONSOLE_STREAM.write(inChar);
-    }
-  }
 }
