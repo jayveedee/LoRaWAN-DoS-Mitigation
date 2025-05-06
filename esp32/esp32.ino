@@ -52,10 +52,15 @@ void loop() {
   radio.setFrequency(frequency);
   //*** Addition of printstatement for monitoring 
   if (radio.scanChannel() == RADIOLIB_PREAMBLE_DETECTED) {
+    delay(1000);
     Serial.println("Preamble detected");
     Serial.println(frequency);
-    Serial.println("SF: " + SF);
-    radio.transmit("");
+    Serial.print("SF: ");
+    Serial.println(SF);
+    byte dummy[60] = {0};  // Longer payload → longer airtime
+    radio.transmit(dummy, sizeof(dummy));
+
+    // radio.transmit("");
     delay(100);
     Serial.println("radio transmitting");
     Serial.println("__________________");
