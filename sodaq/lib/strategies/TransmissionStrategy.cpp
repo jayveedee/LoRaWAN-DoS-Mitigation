@@ -1,12 +1,14 @@
 #include "TransmissionStrategy.h"
 
-TransmissionStrategy::TransmissionStrategy(Stream* console, Sodaq_RN2483* loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t)) {
+TransmissionStrategy::TransmissionStrategy(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+{
   _console = console;
   _loRaBee = loRaBee;
   _setRgbColor = setRgbColorCallback;
 }
 
-void TransmissionStrategy::fetchFrameCounters() {
+void TransmissionStrategy::fetchFrameCounters()
+{
   char dnbuf[16];
   char upbuf[16];
 
@@ -19,18 +21,26 @@ void TransmissionStrategy::fetchFrameCounters() {
   _console->println(upbuf);
 }
 
-bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t& count) {
+bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t &count)
+{
   _console->print("LoRa transmission result: ");
   _console->println(res);
 
   bool isInErrorState = true;
-  switch (res) {
+  switch (res)
+  {
   case NoError:
     isInErrorState = false;
     _console->println("Successful transmission.");
     _setRgbColor(0x00, 0xFF, 0x00);
-    if (count == 255) { count = 0; } 
-    else { count++; } 
+    if (count == 255)
+    {
+      count = 0;
+    }
+    else
+    {
+      count++;
+    }
     delay(10000);
     break;
   case NoResponse:
@@ -49,7 +59,8 @@ bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t& count) {
     break;
   case InternalError:
     _console->println("Oh No! This shouldn't happen. Something is really wrong! Try restarting the device!\r\nThe program will now halt.");
-    while (1) {
+    while (1)
+    {
       _setRgbColor(0xFF, 0xA5, 0x00);
       delay(250);
       _setRgbColor(0xFF, 0x00, 0x00);
@@ -74,12 +85,16 @@ bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t& count) {
   case NetworkFatalError:
     _console->println("There is a non-recoverable error with the network connection. You should re-connect.\r\nThe program will now halt.");
     _setRgbColor(0xFF, 0x00, 0x00);
-    while (1) { };
+    while (1)
+    {
+    };
     break;
   case NotConnected:
     _console->println("The device is not connected to the network. Please connect to the network before attempting to send data.\r\nThe program will now halt.");
     _setRgbColor(0xFF, 0x00, 0x00);
-    while (1) { };
+    while (1)
+    {
+    };
     break;
   case NoAcknowledgment:
     _console->println("There was no acknowledgment sent back!");
