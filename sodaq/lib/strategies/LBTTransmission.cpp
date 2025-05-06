@@ -16,67 +16,52 @@ LBTTransmission::LBTTransmission(Stream *console, Sodaq_RN2483 *loRaBee, void (*
   _jammingStats.retryCount = 0;
 }
 
-void LBTTransmission::setRSSIThreshold(int16_t threshold)
+bool LBTTransmission::detectJamming()
 {
-  _rssiThreshold = threshold;
-}
-
-void LBTTransmission::setListenTimeout(uint16_t timeout)
-{
-  _listenTimeout = timeout;
-}
-
-void LBTTransmission::setMaxRetryCount(byte count)
-{
-  _maxRetryCount = count;
-}
-
-void LBTTransmission::setDummyPayloadSize(byte size)
-{
-  _dummyPayloadSize = size;
-}
-
-bool LBTTransmission::detectJamming() {
   _console->println("Using channel activity detection method");
-  
+
   // Instead of listening with receive mode, we'll use the MAC state to infer channel activity
   // We'll attempt to do a very quick check of the channel
-  
-  // Attempt to get general MAC status 
+
+  // Attempt to get general MAC status
   char statusBuffer[16];
   _loRaBee->getMacParam("status", statusBuffer, sizeof(statusBuffer));
   _console->print("MAC status: ");
   _console->println(statusBuffer);
-  
+
   // Use get SNR to estimate if the channel is jammed
   int8_t snr = _loRaBee->getSNR();
   int16_t rssi = _loRaBee->getRSSI();
-  
+
   _console->print("Current RSSI: ");
   _console->println(rssi);
   _console->print("Current SNR: ");
   _console->println(snr);
-  
+
   // Consider the channel jammed if the RSSI is higher than threshold
   bool jammingDetected = (rssi > _rssiThreshold);
-  
+
   // Update jamming statistics
   _jammingStats.totalTransmissions++;
-  
-  if (jammingDetected) {
-      _console->println("Channel appears to be jammed");
-      _setRgbColor(0xFF, 0x00, 0x00); // Red
-      _jammingStats.jammingDetected++;
-      _jammingStats.lastJammingTime = millis();
-  } else {
-      _console->println("Channel appears to be clear");
-      _setRgbColor(0x00, 0xFF, 0x00); // Green
+
+  if (jammingDetected)
+  {
+    _console->println("Channel appears to be jammed");
+    _setRgbColor(0xFF, 0x00, 0x00); // Red
+    _jammingStats.jammingDetected++;
+    _jammingStats.lastJammingTime = millis();
   }
-  
+  else
+  {
+    _console->println("Channel appears to be clear");
+    _setRgbColor(0x00, 0xFF, 0x00); // Green
+  }
+
   return jammingDetected;
 }
 
-void LBTTransmission::implementMitigationStrategy() {
+void LBTTransmission::implementMitigationStrategy()
+{
   _console->println("Implementing jamming mitigation strategy");
   _setRgbColor(0xFF, 0xA5, 0x00); // Orange - Implementing mitigation
 
@@ -86,21 +71,24 @@ void LBTTransmission::implementMitigationStrategy() {
   _console->print(backoffTime);
   _console->println(" ms");
   delay(backoffTime);
-  
+
   // Strategy 2: Try to change channel if possible
   byte newChannel = (_jammingStats.currentChannel + 1) % 8;
-  uint32_t baseFrequency = 868100000; // Base frequency for 868MHz band
+  uint32_t baseFrequency = 868100000;                            // Base frequency for 868MHz band
   uint32_t newFrequency = baseFrequency + (newChannel * 200000); // 200kHz spacing
-  
+
   _console->print("Attempting to switch to channel ");
   _console->println(newChannel);
-  
-  if (_loRaBee->setChannel(newChannel, newFrequency)) {
-      _jammingStats.currentChannel = newChannel;
-      _console->print("Successfully switched to channel: ");
-      _console->println(newChannel);
-  } else {
-      _console->println("Channel change not possible at this time");
+
+  if (_loRaBee->setChannel(newChannel, newFrequency))
+  {
+    _jammingStats.currentChannel = newChannel;
+    _console->print("Successfully switched to channel: ");
+    _console->println(newChannel);
+  }
+  else
+  {
+    _console->println("Channel change not possible at this time");
   }
 }
 
