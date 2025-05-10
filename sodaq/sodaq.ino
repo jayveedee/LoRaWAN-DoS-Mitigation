@@ -57,11 +57,14 @@ TransmissionStrategy *activeStrategy = nullptr;
 // ---------------------------------------------------------------------------------------------------------
 void setup()
 {
+  // Wait for Serial to be available
   while (!CONSOLE_STREAM && millis() < 10000)
     ;
 
   CONSOLE_STREAM.begin(LoRaBee.getDefaultBaudRate());
   LORA_STREAM.begin(LoRaBee.getDefaultBaudRate());
+
+  setRgbColor(0x00, 0xFF, 0x7F);
 
   CONSOLE_STREAM.println("------------------------------------");
   CONSOLE_STREAM.println("Booting...");
@@ -83,6 +86,7 @@ void setup()
     else
     {
       CONSOLE_STREAM.println("OTAA Mode initialization failed.");
+      setRgbColor(0xFF, 0x00, 0x00);
       return;
     }
   }
@@ -106,7 +110,12 @@ void setup()
   CONSOLE_STREAM.println("Default to standard transmission strategy");
 #endif
 
+  setRgbColor(0x00, 0xFF, 0x00);
   CONSOLE_STREAM.println("Done");
+
+  delay(500);
+
+  setRgbColor(0x00, 0x7F, 0xFF);
 }
 
 void loop()
