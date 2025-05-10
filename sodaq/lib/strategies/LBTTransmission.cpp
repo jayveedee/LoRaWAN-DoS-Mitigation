@@ -94,11 +94,13 @@ void LBTTransmission::implementMitigationStrategy()
 
 bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
-  _console->println("Starting secure transmission with jamming detection...");
+  bool sentMessageSucessfully = true;
+
+  _setRgbColor(0xFF, 0xFF, 0x00);
 
   _jammingStats.retryCount = 0;
 
-  _console->print("Sending message... : ");
+  _console->print("Sending message with LBT strategy... : ");
   for (int i = 0; i < size - 1; i++)
   {
     _console->print((char)buffer[i]);
@@ -120,18 +122,13 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
 
       if (!errorState)
       {
-        return true;
-      }
-
-      // If we're in a busy state, wait a bit longer than the normal error handler
-      if (result == Busy)
-      {
-        _console->println("Device is busy, waiting for an extended period...");
-        delay(15000); // Additional wait time beyond what handleErrorState provides
+        sentMessageSucessfully = true;
+        break;
       }
     }
     else
     {
+      sentMessageSucessfully = false;
       implementMitigationStrategy();
     }
 
@@ -142,7 +139,7 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
 
   _console->println("Max retry count reached, transmission failed");
   _setRgbColor(0xFF, 0x00, 0x00);
-  return false;
+  return sentMessageSucessfully;
 }
 
 void LBTTransmission::logJammingEvent()

@@ -20,9 +20,11 @@ void DynamicTransmission::configureTransmission(uint8_t sf, uint8_t frq, uint8_t
 
 bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
+  bool sentMessageSucessfully = true;
+
   _setRgbColor(0xFF, 0xFF, 0x00);
 
-  _console->print("Sending message with dynamic SF strategy... : ");
+  _console->print("Sending message with dynamic strategy... : ");
   for (int i = 0; i < size - 1; i++)
   {
     _console->print((char)buffer[i]);
@@ -33,13 +35,12 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
   uint8_t frq = 1;
   uint8_t fsb = 0;
   uint8_t res = 0xFF; // Initialize with error
-  bool isInErrorState = true;
 
   while (res != NoError && sf <= 12)
   {
     configureTransmission(sf, frq, fsb);
     res = _loRaBee->sendReqAck(port, buffer, size, 0);
-    isInErrorState = handleErrorState(res, count);
+    bool isInErrorState = handleErrorState(res, count);
 
     if (isInErrorState)
     {
@@ -47,6 +48,7 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
       if (sf > 12)
       {
         _console->println("Unsuccessful transmission.");
+        sentMessageSucessfully = false;
         break;
       }
       else
@@ -62,5 +64,6 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
     }
   }
 
-  return !isInErrorState;
+  _setRgbColor(0xFF, 0x00, 0x00);
+  return sentMessageSucessfully;
 }

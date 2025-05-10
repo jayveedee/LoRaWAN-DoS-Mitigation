@@ -19,6 +19,8 @@ void RetryTransmission::configureTransmission(uint8_t sf, uint8_t frq, uint8_t f
 
 bool RetryTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
+  bool sentMessageSucessfully = true;
+
   _setRgbColor(0xFF, 0xFF, 0x00);
 
   _console->print("Sending message with retry strategy... : ");
@@ -32,5 +34,11 @@ bool RetryTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size,
   uint8_t res = _loRaBee->sendReqAck(port, buffer, size, _maxRetries);
   bool isInErrorState = handleErrorState(res, count);
 
-  return !isInErrorState;
+  if (isInErrorState) {
+    _console->println("Unsuccessful transmission. ");
+    sentMessageSucessfully = false;
+  }
+
+  _setRgbColor(0xFF, 0x00, 0x00);
+  return sentMessageSucessfully;
 }
