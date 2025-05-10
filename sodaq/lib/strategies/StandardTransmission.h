@@ -6,7 +6,6 @@
 class StandardTransmission : public TransmissionStrategy
 {
 private:
-  void configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb);
 
 public:
   StandardTransmission(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));

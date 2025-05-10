@@ -12,6 +12,7 @@ protected:
   void (*_setRgbColor)(uint8_t red, uint8_t green, uint8_t blue);
 
   bool handleErrorState(uint8_t res, uint8_t &count);
+  void configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb);
 
 public:
   TransmissionStrategy(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));

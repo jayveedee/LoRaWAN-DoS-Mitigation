@@ -7,22 +7,9 @@ DynamicTransmission::DynamicTransmission(Stream *console, Sodaq_RN2483 *loRaBee,
 {
 }
 
-void DynamicTransmission::configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb)
-{
-  char printbuf[64];
-  sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
-  _console->println(printbuf);
-
-  _loRaBee->setSpreadingFactor(sf);
-  _loRaBee->setPowerIndex(frq);
-  _loRaBee->setFsbChannels(fsb);
-}
-
 bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
   bool sentMessageSucessfully = true;
-
-  _setRgbColor(0xFF, 0xFF, 0x00);
 
   _console->print("Sending message with dynamic strategy... : ");
   for (int i = 0; i < size - 1; i++)
@@ -39,6 +26,8 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
   while (res != NoError && sf <= 12)
   {
     configureTransmission(sf, frq, fsb);
+
+    _setRgbColor(0x00, 0xFF, 0x7F);
     res = _loRaBee->sendReqAck(port, buffer, size, 0);
     bool isInErrorState = handleErrorState(res, count);
 
@@ -64,6 +53,5 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
     }
   }
 
-  _setRgbColor(0xFF, 0x00, 0x00);
   return sentMessageSucessfully;
 }

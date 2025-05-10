@@ -23,18 +23,6 @@ struct JammingStats
 
 class LBTTransmission : public TransmissionStrategy
 {
-public:
-  LBTTransmission(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
-
-  // Core functionality
-  bool detectJamming();
-  virtual bool sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count) override;
-
-  // Statistics and logging
-  void logJammingEvent();
-  JammingStats getJammingStats();
-  void resetJammingStats();
-
 private:
   // Configuration parameters
   int16_t _rssiThreshold;
@@ -47,6 +35,16 @@ private:
 
   // Internal helpers
   void implementMitigationStrategy();
+  bool detectJamming();
+
+public:
+  LBTTransmission(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
+
+  // Core functionality
+  virtual bool sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count) override;
+
+  // Statistics and logging
+  void logJammingEvent();
 };
 
 #endif

@@ -21,6 +21,17 @@ void TransmissionStrategy::fetchFrameCounters()
   _console->println(upbuf);
 }
 
+void TransmissionStrategy::configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb)
+{
+  char printbuf[64];
+  sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
+  _console->println(printbuf);
+
+  _loRaBee->setSpreadingFactor(sf);
+  _loRaBee->setPowerIndex(frq);
+  _loRaBee->setFsbChannels(fsb);
+}
+
 bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t &count)
 {
   _console->print("LoRa transmission result: ");
@@ -44,12 +55,13 @@ bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t &count)
     delay(10000);
     break;
   case NoResponse:
-    _console->println("There was no response from the device.");
-    _setRgbColor(0xFF, 0x00, 0x00);
+    _console->println("There was no response from the device. Sleeping for 10sec.");
+    _setRgbColor(0xFF, 0xFF, 0x00);
+    delay(10000);
     break;
   case Timeout:
-    _console->println("Connection timed-out. Check your serial connection to the device! Sleeping for 20sec.");
-    _setRgbColor(0xFF, 0xA5, 0x00);
+    _console->println("Connection timed-out. Check your serial connection to the device! Sleeping for 10sec.");
+    _setRgbColor(0xFF, 0xFF, 0x00);
     delay(20000);
     break;
   case PayloadSizeError:
@@ -59,27 +71,24 @@ bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t &count)
     break;
   case InternalError:
     _console->println("Oh No! This shouldn't happen. Something is really wrong! Try restarting the device!\r\nThe program will now halt.");
+    _setRgbColor(0xFF, 0x00, 0x00);
     while (1)
     {
-      _setRgbColor(0xFF, 0xA5, 0x00);
-      delay(250);
-      _setRgbColor(0xFF, 0x00, 0x00);
-      delay(250);
     };
     break;
   case Busy:
     _console->println("The device is busy. Sleeping for 10 extra seconds.");
-    _setRgbColor(0xFF, 0xA5, 0x00);
+    _setRgbColor(0xFF, 0xFF, 0x00);
     delay(10000);
     break;
   case Silent:
     _console->println("The device is silent. Sleeping for 10 extra seconds.");
-    _setRgbColor(0xFF, 0xA5, 0x00);
+    _setRgbColor(0xFF, 0xFF, 0x00);
     delay(10000);
     break;
   case NoFreeChannel:
     _console->println("The device has no free channel. Sleeping for 10 extra seconds.");
-    _setRgbColor(0xFF, 0xA5, 0x00);
+    _setRgbColor(0xFF, 0x60, 0x00);
     delay(10000);
     break;
   case NetworkFatalError:
@@ -98,11 +107,11 @@ bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t &count)
     break;
   case NoAcknowledgment:
     _console->println("There was no acknowledgment sent back!");
-    _setRgbColor(0xFF, 0x00, 0x00);
+    _setRgbColor(0xFF, 0xB0, 0x50);
     delay(10000);
     break;
   default:
-    _setRgbColor(0x00, 0x00, 0x00);
+    _setRgbColor(0x00, 0x7F, 0xFF);
     break;
   }
 

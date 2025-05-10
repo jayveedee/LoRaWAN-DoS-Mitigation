@@ -6,7 +6,6 @@
 class RetryTransmission : public TransmissionStrategy
 {
 private:
-  void configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb);
   uint8_t _maxRetries;
 
 public:

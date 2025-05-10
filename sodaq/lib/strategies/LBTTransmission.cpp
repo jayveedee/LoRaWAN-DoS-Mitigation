@@ -96,8 +96,6 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
 {
   bool sentMessageSucessfully = true;
 
-  _setRgbColor(0xFF, 0xFF, 0x00);
-
   _jammingStats.retryCount = 0;
 
   _console->print("Sending message with LBT strategy... : ");
@@ -107,6 +105,8 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
   }
   _console->println(count);
 
+  configureTransmission(9, 1, 0);
+
   while (_jammingStats.retryCount < _maxRetryCount)
   {
     bool isJamming = detectJamming();
@@ -115,9 +115,8 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
     {
       _console->println("No interference detected, proceeding with transmission");
 
-      _setRgbColor(0xFF, 0xFF, 0x00);
+      _setRgbColor(0x00, 0xFF, 0x7F);
       uint8_t result = _loRaBee->send(port, buffer, size);
-
       bool errorState = handleErrorState(result, count);
 
       if (!errorState)
@@ -138,7 +137,6 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
   }
 
   _console->println("Max retry count reached, transmission failed");
-  _setRgbColor(0xFF, 0x00, 0x00);
   return sentMessageSucessfully;
 }
 
@@ -157,17 +155,4 @@ void LBTTransmission::logJammingEvent()
   _console->print((millis() - _jammingStats.lastJammingTime) / 1000);
   _console->println(" seconds ago");
   _console->println("-------------------------");
-}
-
-JammingStats LBTTransmission::getJammingStats()
-{
-  return _jammingStats;
-}
-
-void LBTTransmission::resetJammingStats()
-{
-  _jammingStats.totalTransmissions = 0;
-  _jammingStats.jammingDetected = 0;
-  _jammingStats.lastJammingTime = 0;
-  _jammingStats.retryCount = 0;
 }
