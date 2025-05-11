@@ -7,18 +7,23 @@ TransmissionStrategy::TransmissionStrategy(Stream *console, Sodaq_RN2483 *loRaBe
   _setRgbColor = setRgbColorCallback;
 }
 
-void TransmissionStrategy::fetchFrameCounters()
+FrameCounters TransmissionStrategy::fetchFrameCounters()
 {
   char dnbuf[16];
   char upbuf[16];
-
   _loRaBee->getMacParam("dnctr", dnbuf, 16);
   _loRaBee->getMacParam("upctr", upbuf, 16);
-
   _console->print("Downlink frame counter: ");
   _console->println(dnbuf);
   _console->print("Uplink frame counter: ");
   _console->println(upbuf);
+
+  // Convert char arrays to integers
+  FrameCounters counters;
+  counters.downlink = atoi(dnbuf);
+  counters.uplink = atoi(upbuf);
+
+  return counters;
 }
 
 void TransmissionStrategy::configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb)

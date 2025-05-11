@@ -4,6 +4,11 @@
 #include <Arduino.h>
 #include "../Sodaq_RN2483/Sodaq_RN2483.h"
 
+struct FrameCounters {
+  int downlink;
+  int uplink;
+};
+
 class TransmissionStrategy
 {
 protected:
@@ -17,7 +22,7 @@ protected:
 public:
   TransmissionStrategy(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
   virtual bool sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count) = 0;
-  virtual void fetchFrameCounters();
+  virtual FrameCounters fetchFrameCounters();
   virtual ~TransmissionStrategy() {}
 };
 

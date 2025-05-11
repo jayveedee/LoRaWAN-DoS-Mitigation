@@ -42,7 +42,7 @@
 #define STRATEGY_LBT 3      // Listen Before Talk jamming mitigation
 
 // Set the active transmission strategy here
-#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_LBT
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_DYNAMIC
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
@@ -126,7 +126,7 @@ void loop()
   uint8_t buf[] = {'t', 'e', 's', 't', count};
 
   // Get frame counters for debugging
-  activeStrategy->fetchFrameCounters();
+  FrameCounters counters = activeStrategy->fetchFrameCounters();
 
   // Send using the active transmission strategy
   bool success = activeStrategy->sendMessage(LORA_PORT, buf, sizeof(buf), count);
@@ -139,6 +139,13 @@ void loop()
 #endif
 
   // No need to add transmission delay because the transmission strategies handle delays based on error states
+
+  if (counters.uplink == 50)
+  {
+    CONSOLE_STREAM.println("Reached 50 uplink frame counters, halting Sodaq.");
+    while (1)
+      ;
+  }
 }
 
 // RGB LED control function
