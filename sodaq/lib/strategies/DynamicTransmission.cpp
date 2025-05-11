@@ -31,7 +31,7 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
     res = _loRaBee->sendReqAck(port, buffer, size, 0);
     bool isInErrorState = handleErrorState(res, count);
 
-    if (isInErrorState)
+    if (res == NoAcknowledgment && isInErrorState)
     {
       sf++;
       if (sf > 12)
