@@ -150,6 +150,37 @@ class Sodaq_RN2483
     // Returns true if all channels were set successfully.
     bool setFsbChannels(uint8_t fsb);
 
+    /**
+     * Puts the module into receive mode
+     * 
+     * @param timeout The time in milliseconds to stay in receive mode (0 for continuous mode)
+     * @return true if the command was successful, false otherwise
+     */
+    bool receive(uint32_t timeout = 0);
+    
+    /**
+     * Get the SNR (Signal-to-Noise Ratio) of the last received packet
+     * 
+     * @return The SNR value in dB, or -128 if no packet has been received
+     */
+    int8_t getSNR();
+
+    /**
+     * Estimate RSSI based on SNR and other parameters
+     * 
+     * @return The estimated RSSI value in dBm, or -200 if unable to estimate
+     */
+    int16_t getRSSI();
+
+    /**
+     * Sets the radio channel parameters
+     * 
+     * @param channel The channel number to set (0-15)
+     * @param frequency The frequency in Hz
+     * @return true if the channel was set successfully, false otherwise
+     */
+    bool setChannel(uint8_t channel, uint32_t frequency);
+
     // Sets the spreading factor.
     // In reality it sets the datarate of the module according to the
     // LoraWAN specs mapping for 868MHz and 915MHz,
