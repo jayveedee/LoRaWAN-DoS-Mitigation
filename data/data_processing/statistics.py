@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 # Load the JSON data
-with open("data\\transmission_requireAckDynamic_Jamming.json", "r") as f:
+with open("samples/size50/50x_standard_w_jamming.json", "r") as f:
     data = json.load(f)
 
 # Automatically find all unique dev_addrs
@@ -34,7 +34,7 @@ for entry in data:
 
         if dev_addr == target_dev_addr:
             f_cnt = mac_payload["f_hdr"].get("f_cnt", None)
-            if f_cnt is not None and f_cnt <= 20:
+            if f_cnt is not None and f_cnt <= 50:
                 f_cnt_values.append(f_cnt)
             else:
                 missing_fcnt.append(entry)
@@ -42,7 +42,7 @@ for entry in data:
         continue
 
 # Analysis
-expected_count = 20+1
+expected_count = 50+1
 received_count = len(set(f_cnt_values))+1
 lost_count = expected_count - received_count
 success_rate = received_count / expected_count * 100
