@@ -9,8 +9,6 @@ DynamicTransmission::DynamicTransmission(Stream *console, Sodaq_RN2483 *loRaBee,
 
 bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
-  bool sentMessageSucessfully = true;
-
   _console->print("Sending message with dynamic strategy... : ");
   for (int i = 0; i < size - 1; i++)
   {
@@ -18,17 +16,21 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
   }
   _console->println(count);
 
-  uint8_t sf = 9;
-  uint8_t frq = 1;
-  uint8_t fsb = 0;
-  uint8_t res = 0xFF; // Initialize with error
+  return configureDynamicTransmission(false, port, buffer, size, count);
+}
+
+bool DynamicTransmission::configureDynamicTransmission(bool withRetry, uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
+{
+  bool sentMessageSucessfully = true;
+
+  uint16_t retries = withRetry ? 3 : 0;
 
   while (res != NoError && sf <= 12)
   {
     configureTransmission(sf, frq, fsb);
 
     _setRgbColor(0x00, 0xFF, 0x7F);
-    res = _loRaBee->sendReqAck(port, buffer, size, 3); // need to use same frame counter later if possible
+    res = _loRaBee->sendReqAck(port, buffer, size, retries); // need to use same frame counter later if possible
     bool isInErrorState = handleErrorState(res, count);
 
     if (res == NoAcknowledgment && isInErrorState)
@@ -47,7 +49,8 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
         fetchFrameCounters();
       }
     }
-    else if (isInErrorState) {
+    else if (isInErrorState)
+    {
       // Continue, maybe add max retry
     }
     else
