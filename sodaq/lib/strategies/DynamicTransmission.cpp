@@ -28,7 +28,7 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
     configureTransmission(sf, frq, fsb);
 
     _setRgbColor(0x00, 0xFF, 0x7F);
-    res = _loRaBee->sendReqAck(port, buffer, size, 0);
+    res = _loRaBee->sendReqAck(port, buffer, size, 3); // need to use same frame counter later if possible
     bool isInErrorState = handleErrorState(res, count);
 
     if (res == NoAcknowledgment && isInErrorState)
@@ -46,6 +46,9 @@ bool DynamicTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t siz
         _console->println(sf);
         fetchFrameCounters();
       }
+    }
+    else if (isInErrorState) {
+      // Continue, maybe add max retry
     }
     else
     {

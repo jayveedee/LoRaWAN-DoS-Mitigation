@@ -140,7 +140,7 @@ void loop()
 
   // No need to add transmission delay because the transmission strategies handle delays based on error states
 
-  if (counters.uplink == 50)
+  if (counters.uplink >= 50 && success)
   {
     CONSOLE_STREAM.println("Reached 50 uplink frame counters, halting Sodaq.");
     while (1)
