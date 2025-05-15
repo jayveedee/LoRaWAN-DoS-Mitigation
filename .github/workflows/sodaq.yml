@@ -27,8 +27,8 @@ jobs:
 
       - name: Install SODAQ SAMD platform
         run: |
-          arduino-cli core update-index --additional-urls https://sodaq.github.io/package_sodaq_index.json
-          arduino-cli core install SODAQ:samd --additional-urls https://sodaq.github.io/package_sodaq_index.json
+          arduino-cli core update-index --additional-urls http://downloads.sodaq.net/package_sodaq_index.json
+          arduino-cli core install SODAQ:samd --additional-urls http://downloads.sodaq.net/package_sodaq_index.json
 
       - name: Install Arduino AVR platform (if needed)
         run: |
