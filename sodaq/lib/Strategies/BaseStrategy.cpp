@@ -28,9 +28,8 @@ FrameCounters BaseStrategy::fetchFrameCounters()
 
 void BaseStrategy::configureTransmission(const char *cr, uint8_t sf, uint8_t frq, uint8_t fsb)
 {
-  char printbuf[64];
-  sprintf(printbuf, "Initializing coding rate as %s, SF as %d, band rate as %d, channels as %d", cr, sf, frq, fsb);
-  _console->println(printbuf);
+  String message = "Config: CR:" + String(cr) + " SF:" + String(sf) + " FR:" + String(frq) + " CH:" + String(fsb);
+  _console->println(message);
 
   _loRaBee->setSpreadingFactor(sf);
   _loRaBee->setPowerIndex(frq);

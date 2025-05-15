@@ -44,10 +44,10 @@
 #define STRATEGY_STANDARD 0         // No ACK, standard transmission
 #define STRATEGY_RETRY 1            // With ACK and fixed retries
 #define STRATEGY_DYNAMIC_SF 2       // Dynamic spreading factor adjustment
-#define STRATEGY_DYNAMIC_CR 3       // Dynamic coding rate adjustment
+#define STRATEGY_DYNAMIC_CR 3       // Dynamic coding rate adjustment                     (cr does not work)
 #define STRATEGY_DYNAMIC_SF_RETRY 4 // Dynamic spreading adjustment with 3 retries
-#define STRATEGY_DYNAMIC_CR_RETRY 5 // Dynamic coding rate adjustment with 3 retries
-#define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation
+#define STRATEGY_DYNAMIC_CR_RETRY 5 // Dynamic coding rate adjustment with 3 retries      (cr does not work)
+#define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation              (lbt does not work)
 
 // Set the active transmission strategy here
 #define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_DYNAMIC_CR

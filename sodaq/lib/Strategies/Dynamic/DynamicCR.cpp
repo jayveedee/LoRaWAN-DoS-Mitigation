@@ -22,6 +22,7 @@ bool DynamicCR::adjustParameter()
 void DynamicCR::resetParameter()
 {
     crIndex = 0;
+    cr = codingRates[crIndex];
 }
 
 String DynamicCR::getParameterName()
