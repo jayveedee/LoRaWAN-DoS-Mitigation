@@ -34,7 +34,7 @@ void BaseStrategy::configureTransmission(const char *cr, uint8_t sf, uint8_t frq
   _loRaBee->setSpreadingFactor(sf);
   _loRaBee->setPowerIndex(frq);
   _loRaBee->setFsbChannels(fsb);
-  _loRaBee->setCodingRate(cr);
+  //_loRaBee->setCodingRate(cr); TODO doesn't work like this
 }
 
 bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count)

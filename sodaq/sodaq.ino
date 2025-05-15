@@ -1,11 +1,6 @@
-// Include the aurduino library
+// Include the aurduino libraries
 #include <Arduino.h>
-
-// Include the sodaq_RN2483 library for common utils
-#include "lib/Sodaq_RN2483/Sodaq_RN2483_internal.h"
-#include "lib/Sodaq_RN2483/Sodaq_RN2483.h"
-#include "lib/Sodaq_RN2483/Sodaq_RN2483.cpp"
-#include "lib/Sodaq_RN2483/Utils.h"
+#include <Sodaq_RN2483.h>
 
 // Include all transmission strategies (have to include header and implementation)
 #include "lib/Strategies/BaseStrategy.h"
@@ -50,7 +45,7 @@
 #define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation              (lbt does not work)
 
 // Set the active transmission strategy here
-#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_DYNAMIC_CR
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_LBT
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
@@ -151,7 +146,7 @@ void loop()
 // Additional actions for specific strategies
 #if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
   // Cast to LBTTransmission to access LBT-specific methods
-  LBTTransmission *lbtStrategy = static_cast<LBTTransmission *>(activeStrategy);
+  LBT *lbtStrategy = static_cast<LBT *>(activeStrategy);
   lbtStrategy->logJammingEvent();
 #endif
 
