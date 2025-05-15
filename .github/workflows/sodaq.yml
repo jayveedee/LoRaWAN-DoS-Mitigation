@@ -42,6 +42,7 @@ jobs:
           arduino-cli lib install "Microchip_RN487x"
           arduino-cli lib install "RadioLib"
           arduino-cli lib install "Sodaq_wdt"
+          arduino-cli lib install "Sodaq_RN2483"
 
       - name: Install custom libraries from lib folder
         run: |
