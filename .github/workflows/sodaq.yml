@@ -2,80 +2,80 @@ name: Compile SODAQ Sketch
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
-      - 'sodaq/**'
-      - 'lib/**'
-      - '.github/workflows/compile-sodaq.yml'
+      - "sodaq/**"
+      - "lib/**"
+      - ".github/workflows/compile-sodaq.yml"
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'sodaq/**'
-      - 'lib/**'
-      - '.github/workflows/compile-sodaq.yml'
+      - "sodaq/**"
+      - "lib/**"
+      - ".github/workflows/compile-sodaq.yml"
 
 jobs:
   compile-sodaq:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    
-    - name: Setup Arduino CLI
-      uses: arduino/setup-arduino-cli@v1
-    
-    - name: Install SODAQ SAMD platform
-      run: |
-        arduino-cli core update-index --additional-urls https://downloads.sodaq.com/package_sodaq_samd_index.json
-        arduino-cli core install SODAQ:samd --additional-urls https://downloads.sodaq.com/package_sodaq_samd_index.json
-    
-    - name: Install Arduino AVR platform (if needed)
-      run: |
-        arduino-cli core install arduino:avr
-    
-    - name: Install required libraries
-      run: |
-        arduino-cli lib install "ArduinoBLE"
-        arduino-cli lib install "BLEPeripheral"
-        arduino-cli lib install "LoRa"
-        arduino-cli lib install "Microchip_RN487x"
-        arduino-cli lib install "RadioLib"
-        arduino-cli lib install "Sodaq_wdt"
-    
-    - name: Install custom libraries from lib folder
-      run: |
-        mkdir -p ~/Arduino/libraries
-        if [ -d "./lib" ]; then
-          for dir in ./lib/*/; do
-            if [ -d "$dir" ]; then
-              lib_name=$(basename "$dir")
-              echo "Installing custom library: $lib_name"
-              cp -r "$dir" ~/Arduino/libraries/
-            fi
-          done
-        fi
-    
-    - name: List installed libraries
-      run: arduino-cli lib list
-    
-    - name: Compile SODAQ sketch
-      run: |
-        arduino-cli compile --fqbn SODAQ:samd:sodaq_explorer ./sodaq/sodaq.ino --verbose
-    
-    - name: Upload compilation artifacts
-      uses: actions/upload-artifact@v3
-      if: success()
-      with:
-        name: sodaq-build
-        path: |
-          sodaq/**/*.bin
-          sodaq/**/*.hex
-          sodaq/**/*.elf
-    
-    - name: Check binary size
-      run: |
-        if [ -f "./sodaq/sodaq.ino.bin" ]; then
-          size=$(stat -c%s "./sodaq/sodaq.ino.bin" 2>/dev/null || stat -f%z "./sodaq/sodaq.ino.bin")
-          echo "SODAQ binary size: $size bytes"
-        fi
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Install SODAQ SAMD platform
+        run: |
+          arduino-cli core update-index --additional-urls https://downloads.sodaq.com/package_sodaq_samd_index.json
+          arduino-cli core install SODAQ:samd --additional-urls https://downloads.sodaq.com/package_sodaq_samd_index.json
+
+      - name: Install Arduino AVR platform (if needed)
+        run: |
+          arduino-cli core install arduino:avr
+
+      - name: Install required libraries
+        run: |
+          arduino-cli lib install "ArduinoBLE"
+          arduino-cli lib install "BLEPeripheral"
+          arduino-cli lib install "LoRa"
+          arduino-cli lib install "Microchip_RN487x"
+          arduino-cli lib install "RadioLib"
+          arduino-cli lib install "Sodaq_wdt"
+
+      - name: Install custom libraries from lib folder
+        run: |
+          mkdir -p ~/Arduino/libraries
+          if [ -d "./lib" ]; then
+            for dir in ./lib/*/; do
+              if [ -d "$dir" ]; then
+                lib_name=$(basename "$dir")
+                echo "Installing custom library: $lib_name"
+                cp -r "$dir" ~/Arduino/libraries/
+              fi
+            done
+          fi
+
+      - name: List installed libraries
+        run: arduino-cli lib list
+
+      - name: Compile SODAQ sketch
+        run: |
+          arduino-cli compile --fqbn SODAQ:samd:sodaq_explorer ./sodaq/sodaq.ino --verbose
+
+      - name: Upload compilation artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: sodaq-build
+          path: |
+            sodaq/**/*.bin
+            sodaq/**/*.hex
+            sodaq/**/*.elf
+
+      - name: Check binary size
+        run: |
+          if [ -f "./sodaq/sodaq.ino.bin" ]; then
+            size=$(stat -c%s "./sodaq/sodaq.ino.bin" 2>/dev/null || stat -f%z "./sodaq/sodaq.ino.bin")
+            echo "SODAQ binary size: $size bytes"
+          fi
