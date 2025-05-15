@@ -191,6 +191,10 @@ class Sodaq_RN2483
     // Returns true if successful.
     bool setPowerIndex(uint8_t powerIndex);
 
+    // Sets the coding rate.
+    // Returns true if successful.
+    bool setCodingRate(const char* codingRate);
+
     // Returns mac parameter.
     void getMacParam(const char* paramName, char* buffer, uint8_t size);
 

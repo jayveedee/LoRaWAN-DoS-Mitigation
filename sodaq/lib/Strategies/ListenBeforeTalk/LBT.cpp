@@ -1,7 +1,7 @@
-#include "LBTTransmission.h"
+#include "LBT.h"
 
-LBTTransmission::LBTTransmission(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
-    : TransmissionStrategy(console, loRaBee, setRgbColorCallback)
+LBT::LBT(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+    : BaseStrategy(console, loRaBee, setRgbColorCallback)
 {
   _rssiThreshold = DEFAULT_RSSI_THRESHOLD;
   _listenTimeout = DEFAULT_LISTEN_TIMEOUT;
@@ -16,7 +16,7 @@ LBTTransmission::LBTTransmission(Stream *console, Sodaq_RN2483 *loRaBee, void (*
   _jammingStats.retryCount = 0;
 }
 
-bool LBTTransmission::detectJamming()
+bool LBT::detectJamming()
 {
   _console->println("Using channel activity detection method");
 
@@ -60,7 +60,7 @@ bool LBTTransmission::detectJamming()
   return jammingDetected;
 }
 
-void LBTTransmission::implementMitigationStrategy()
+void LBT::implementMitigationStrategy()
 {
   _console->println("Implementing jamming mitigation strategy");
   _setRgbColor(0xFF, 0xA5, 0x00); // Orange - Implementing mitigation
@@ -92,7 +92,7 @@ void LBTTransmission::implementMitigationStrategy()
   }
 }
 
-bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
+bool LBT::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
   bool sentMessageSucessfully = true;
 
@@ -105,7 +105,7 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
   }
   _console->println(count);
 
-  configureTransmission(9, 1, 0);
+  configureTransmission("4/5", 9, 1, 0);
 
   while (_jammingStats.retryCount < _maxRetryCount)
   {
@@ -140,7 +140,7 @@ bool LBTTransmission::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, u
   return sentMessageSucessfully;
 }
 
-void LBTTransmission::logJammingEvent()
+void LBT::logJammingEvent()
 {
   _console->println("--- Jamming Statistics ---");
   _console->print("Total transmissions: ");

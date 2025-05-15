@@ -1,13 +1,13 @@
-#include "TransmissionStrategy.h"
+#include "BaseStrategy.h"
 
-TransmissionStrategy::TransmissionStrategy(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+BaseStrategy::BaseStrategy(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
 {
   _console = console;
   _loRaBee = loRaBee;
   _setRgbColor = setRgbColorCallback;
 }
 
-FrameCounters TransmissionStrategy::fetchFrameCounters()
+FrameCounters BaseStrategy::fetchFrameCounters()
 {
   char dnbuf[16];
   char upbuf[16];
@@ -26,18 +26,18 @@ FrameCounters TransmissionStrategy::fetchFrameCounters()
   return counters;
 }
 
-void TransmissionStrategy::configureTransmission(uint8_t sf, uint8_t frq, uint8_t fsb)
+void BaseStrategy::configureTransmission(const char *cr, uint8_t sf, uint8_t frq, uint8_t fsb)
 {
-  char printbuf[64];
-  sprintf(printbuf, "Initializing SF as %d, band rate as %d, channels as %d", sf, frq, fsb);
-  _console->println(printbuf);
+  String message = "Config: CR:" + String(cr) + " SF:" + String(sf) + " FR:" + String(frq) + " CH:" + String(fsb);
+  _console->println(message);
 
   _loRaBee->setSpreadingFactor(sf);
   _loRaBee->setPowerIndex(frq);
   _loRaBee->setFsbChannels(fsb);
+  _loRaBee->setCodingRate(cr);
 }
 
-bool TransmissionStrategy::handleErrorState(uint8_t res, uint8_t &count)
+bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count)
 {
   _console->print("LoRa transmission result: ");
   _console->println(res);
