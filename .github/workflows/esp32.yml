@@ -1,0 +1,77 @@
+name: Compile ESP32 Sketch
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'esp32/**'
+      - 'lib/**'
+      - '.github/workflows/compile-esp32.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'esp32/**'
+      - 'lib/**'
+      - '.github/workflows/compile-esp32.yml'
+
+jobs:
+  compile-esp32:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Arduino CLI
+      uses: arduino/setup-arduino-cli@v1
+    
+    - name: Install ESP32 platform
+      run: |
+        arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+        arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+    
+    - name: Install required libraries
+      run: |
+        arduino-cli lib install "ArduinoBLE"
+        arduino-cli lib install "BLEPeripheral"
+        arduino-cli lib install "LoRa"
+        arduino-cli lib install "Microchip_RN487x"
+        arduino-cli lib install "RadioLib"
+        arduino-cli lib install "Sodaq_wdt"
+    
+    - name: Install custom libraries from lib folder
+      run: |
+        mkdir -p ~/Arduino/libraries
+        if [ -d "./lib" ]; then
+          for dir in ./lib/*/; do
+            if [ -d "$dir" ]; then
+              lib_name=$(basename "$dir")
+              echo "Installing custom library: $lib_name"
+              cp -r "$dir" ~/Arduino/libraries/
+            fi
+          done
+        fi
+    
+    - name: List installed libraries
+      run: arduino-cli lib list
+    
+    - name: Compile ESP32 sketch
+      run: |
+        arduino-cli compile --fqbn esp32:esp32:esp32 ./esp32/esp32.ino --verbose
+    
+    - name: Upload compilation artifacts
+      uses: actions/upload-artifact@v3
+      if: success()
+      with:
+        name: esp32-build
+        path: |
+          esp32/**/*.bin
+          esp32/**/*.hex
+          esp32/**/*.elf
+    
+    - name: Check binary size
+      run: |
+        if [ -f "./esp32/esp32.ino.bin" ]; then
+          size=$(stat -c%s "./esp32/esp32.ino.bin" 2>/dev/null || stat -f%z "./esp32/esp32.ino.bin")
+          echo "ESP32 binary size: $size bytes"
+        fi
