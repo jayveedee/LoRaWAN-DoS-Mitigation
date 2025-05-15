@@ -1,0 +1,60 @@
+name: Arduino Build
+
+on: [push, pull_request]
+
+jobs:
+  build-esp32:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Arduino CLI
+      uses: arduino/setup-arduino-cli@v1
+    
+    - name: Install ESP32 platform
+      run: |
+        arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+        arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+    
+    - name: Install ESP32 libraries
+      run: |
+        arduino-cli lib install "TFT_eSPI"
+        arduino-cli lib install "Button2"
+        arduino-cli lib install "ArduinoJson"
+    
+    - name: Copy custom libraries
+      run: |
+        mkdir -p ~/Arduino/libraries
+        cp -r ./lib/* ~/Arduino/libraries/ 2>/dev/null || true
+    
+    - name: Compile ESP32 sketch
+      run: |
+        arduino-cli compile --fqbn esp32:esp32:esp32 ./esp32/esp32.ino
+
+  build-sodaq:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Arduino CLI
+      uses: arduino/setup-arduino-cli@v1
+    
+    - name: Install SAMD platform
+      run: |
+        arduino-cli core update-index
+        arduino-cli core install arduino:samd
+    
+    - name: Install SODAQ libraries
+      run: |
+        arduino-cli lib install "Sodaq_RN2483"
+        arduino-cli lib install "RTCZero"
+        arduino-cli lib install "ArduinoJson"
+    
+    - name: Copy custom libraries
+      run: |
+        mkdir -p ~/Arduino/libraries
+        cp -r ./lib/* ~/Arduino/libraries/ 2>/dev/null || true
+    
+    - name: Compile SODAQ sketch
+      run: |
+        arduino-cli compile --fqbn arduino:samd:sodaq_explorer ./sodaq/sodaq.ino
