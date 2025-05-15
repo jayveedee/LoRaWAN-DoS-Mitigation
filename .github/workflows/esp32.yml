@@ -42,8 +42,8 @@ jobs:
       - name: Install custom libraries from lib folder
         run: |
           mkdir -p ~/Arduino/libraries
-          if [ -d "./lib" ]; then
-            for dir in ./lib/*/; do
+          if [ -d "./esp32/lib" ]; then
+            for dir in ./esp32/lib/*/; do
               if [ -d "$dir" ]; then
                 lib_name=$(basename "$dir")
                 echo "Installing custom library: $lib_name"
