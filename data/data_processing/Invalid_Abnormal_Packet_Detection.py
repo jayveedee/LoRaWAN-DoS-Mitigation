@@ -18,7 +18,7 @@ def uplink():
     rssi = metadata.get("rssi", -999)
     snr = metadata.get("snr", -999)
 
-    # Decode payload
+    # Decode payload (to hex string)
     decoded_payload = base64.b64decode(payload).hex() if payload else ""
     alerts = []
 
@@ -26,39 +26,41 @@ def uplink():
     if not payload:
         alerts.append("⚠️ Empty payload detected")
 
-    # Parse timestamp from TTN ISO format
+    # Parse timestamp safely
     try:
         timestamp = datetime.fromisoformat(received_at.replace("Z", "+00:00"))
     except Exception:
         timestamp = datetime.now(timezone.utc)
-        alerts.append("⚠️ Invalid timestamp format")
+        alerts.append("⚠️ Invalid timestamp format; using server time")
 
-    # Init state for new device
+    # Initialize or retrieve device state
     if dev_eui not in device_state:
         device_state[dev_eui] = {
-            "last_fcnt": fcnt,
+            "last_fcnt": fcnt if isinstance(fcnt, int) else None,
             "last_payload": decoded_payload,
             "last_time": timestamp,
         }
-
     else:
         state = device_state[dev_eui]
 
         # FCnt gap detection
-        gap = fcnt - state["last_fcnt"]
-        if gap > 1:
-            alerts.append(f"⚠️ FCnt gap of {gap} — possible packet loss or jamming")
+        if isinstance(fcnt, int) and isinstance(state["last_fcnt"], int):
+            gap = fcnt - state["last_fcnt"]
+            if gap > 1:
+                alerts.append(f"⚠️ FCnt gap of {gap} — possible packet loss or jamming")
+        else:
+            alerts.append("⚠️ Invalid or missing FCnt; skipping FCnt gap detection")
 
-        # Irregular interval detection
+        # Irregular timing detection
         time_diff = (timestamp - state["last_time"]).total_seconds()
         if time_diff > 20:
             alerts.append(f"⚠️ Delay of {time_diff:.1f}s — expected ~10s. Possible disruption")
 
-        # Repeated payload
-        if decoded_payload == state["last_payload"]:
+        # Repeated payload with different FCnt
+        if decoded_payload == state["last_payload"] and fcnt != state["last_fcnt"]:
             alerts.append("⚠️ Repeated payload with new FCnt — retry likely due to missing ACK")
 
-        # RSSI or SNR drops
+        # RSSI and SNR thresholds
         if rssi < -115:
             alerts.append(f"⚠️ Low RSSI ({rssi}) — could indicate interference")
         if snr < -10:
@@ -66,7 +68,7 @@ def uplink():
 
         # Update device state
         device_state[dev_eui] = {
-            "last_fcnt": fcnt,
+            "last_fcnt": fcnt if isinstance(fcnt, int) else state["last_fcnt"],
             "last_payload": decoded_payload,
             "last_time": timestamp,
         }
