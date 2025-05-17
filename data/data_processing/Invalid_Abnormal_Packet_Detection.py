@@ -19,7 +19,11 @@ def uplink():
     snr = metadata.get("snr", -999)
 
     # Decode payload (to hex string)
-    decoded_payload = base64.b64decode(payload).hex() if payload else ""
+    try:
+        decoded_payload = base64.b64decode(payload).decode("utf-8").strip()
+    except Exception:
+        decoded_payload = "<non-decodable binary>"
+
     alerts = []
 
     # Detect empty payload
