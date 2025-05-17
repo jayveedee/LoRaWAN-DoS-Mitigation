@@ -92,8 +92,7 @@ def uplink():
 
     # Log output
     print(f"[{datetime.now()}] DevEUI: {dev_eui} | FCnt: {fcnt} | RSSI: {rssi} | SNR: {snr}")
-    print(f"Payload (text): {decoded_string}")
-    print(f"Payload count (last byte): {count}")
+    print(f"Payload: {decoded_string} {count}")
     for alert in alerts:
         print("  •", alert)
 
