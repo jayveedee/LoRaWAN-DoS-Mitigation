@@ -46,7 +46,7 @@ bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uin
             {
                 _console->print("Unsuccessful transmission, retrying with same configuration up to a maxium of ");
                 _console->print(transmissionAmount);
-                _console->println("retries.");
+                _console->println(" retries.");
                 fetchFrameCounters();
             }
         }

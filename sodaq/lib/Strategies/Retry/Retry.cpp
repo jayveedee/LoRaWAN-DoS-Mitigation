@@ -35,7 +35,7 @@ bool Retry::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &co
     {
       _console->print("Unsuccessful transmission, retrying with same configuration up to a maxium of ");
       _console->print(_maxRetries);
-      _console->println("retries.");
+      _console->println(" retries.");
       fetchFrameCounters();
     }
   }
