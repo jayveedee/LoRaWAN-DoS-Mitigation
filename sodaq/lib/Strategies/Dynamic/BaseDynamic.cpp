@@ -37,6 +37,18 @@ bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uin
             _setRgbColor(0x00, 0xFF, 0x7F);
             res = _loRaBee->sendReqAck(port, buffer, size, 0);
             isInErrorState = handleErrorState(res, count);
+
+            if (!isInErrorState)
+            {
+                break;
+            }
+            else
+            {
+                _console->print("Unsuccessful transmission, retrying with same configuration up to a maxium of ");
+                _console->print(transmissionAmount);
+                _console->println("retries.");
+                fetchFrameCounters();
+            }
         }
 
         if (res == NoAcknowledgment && isInErrorState)

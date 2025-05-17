@@ -19,9 +19,26 @@ bool Retry::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &co
 
   configureTransmission("4/5", 9, 1, 0);
 
-  _setRgbColor(0x00, 0xFF, 0x7F);
-  uint8_t res = _loRaBee->sendReqAck(port, buffer, size, _maxRetries);
-  bool isInErrorState = handleErrorState(res, count);
+  uint8_t res = 0xFF;
+  bool isInErrorState = false;
+  for (uint8_t i = 0; i < _maxRetries - 1; i++)
+  {
+    _setRgbColor(0x00, 0xFF, 0x7F);
+    res = _loRaBee->sendReqAck(port, buffer, size, 0);
+    isInErrorState = handleErrorState(res, count);
+
+    if (!isInErrorState)
+    {
+      break;
+    }
+    else
+    {
+      _console->print("Unsuccessful transmission, retrying with same configuration up to a maxium of ");
+      _console->print(_maxRetries);
+      _console->println("retries.");
+      fetchFrameCounters();
+    }
+  }
 
   if (isInErrorState)
   {
