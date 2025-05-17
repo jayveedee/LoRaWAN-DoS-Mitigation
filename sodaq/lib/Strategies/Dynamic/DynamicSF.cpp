@@ -1,7 +1,7 @@
 #include "DynamicSF.h"
 
-DynamicSF::DynamicSF(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
-    : BaseDynamic(console, loRaBee, setRgbColorCallback)
+DynamicSF::DynamicSF(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+    : BaseDynamic(console, loraStream, loRaBee, setRgbColorCallback)
 {
 }
 

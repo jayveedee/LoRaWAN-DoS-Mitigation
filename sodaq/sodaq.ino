@@ -101,29 +101,29 @@ void setup()
 
 // Initialize the selected transmission strategy
 #if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_STANDARD
-  activeStrategy = new Standard(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new Standard(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Standard transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_RETRY
-  activeStrategy = new Retry(&CONSOLE_STREAM, &LoRaBee, setRgbColor, 3);
+  activeStrategy = new Retry(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor, 3);
   CONSOLE_STREAM.println("Retry transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_SF
-  activeStrategy = new DynamicSF(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicSF(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic SF transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_CR
-  activeStrategy = new DynamicCR(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicCR(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic CR transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_SF_RETRY
-  activeStrategy = new DynamicRetrySF(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicRetrySF(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic SF Retry transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_CR_ReTRY
-  activeStrategy = new DynamicRetryCR(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicRetryCR(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic CR Retry transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
-  activeStrategy = new LBT(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new LBT(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("LBTTransmission strategy initialized");
 #else
   // Default to standard transmission if no valid strategy is selected
-  activeStrategy = new Standard(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new Standard(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Default to standard transmission strategy");
 #endif
 

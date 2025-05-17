@@ -1,7 +1,7 @@
 #include "BaseDynamic.h"
 
-BaseDynamic::BaseDynamic(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
-    : BaseStrategy(console, loRaBee, setRgbColorCallback)
+BaseDynamic::BaseDynamic(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+    : BaseStrategy(console, loraStream, loRaBee, setRgbColorCallback)
 {
 }
 

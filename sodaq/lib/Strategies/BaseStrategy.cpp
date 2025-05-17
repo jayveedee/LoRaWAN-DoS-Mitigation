@@ -1,8 +1,9 @@
 #include "BaseStrategy.h"
 
-BaseStrategy::BaseStrategy(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+BaseStrategy::BaseStrategy(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
 {
   _console = console;
+  _loraStream = loraStream;
   _loRaBee = loRaBee;
   _setRgbColor = setRgbColorCallback;
 }

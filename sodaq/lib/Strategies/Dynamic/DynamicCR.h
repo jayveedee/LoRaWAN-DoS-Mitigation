@@ -11,7 +11,7 @@ protected:
     const uint8_t MAX_CR_INDEX = 3;
 
 public:
-    DynamicCR(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
+    DynamicCR(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
 
 protected:
     virtual bool adjustParameter() override;

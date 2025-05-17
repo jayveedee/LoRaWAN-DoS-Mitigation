@@ -1,7 +1,7 @@
 #include "Retry.h"
 
-Retry::Retry(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t), uint8_t maxRetries)
-    : BaseStrategy(console, loRaBee, setRgbColorCallback)
+Retry::Retry(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t), uint8_t maxRetries)
+    : BaseStrategy(console, loraStream, loRaBee, setRgbColorCallback)
 {
   _maxRetries = maxRetries;
 }

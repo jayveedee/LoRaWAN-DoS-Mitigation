@@ -9,7 +9,7 @@ protected:
     const uint8_t MAX_SF = 12;
 
 public:
-    DynamicSF(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
+    DynamicSF(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
 
 protected:
     virtual bool adjustParameter() override;
