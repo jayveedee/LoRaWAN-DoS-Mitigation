@@ -22,18 +22,22 @@ bool BaseDynamic::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8
 bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
     bool sentMessageSuccessfully = true;
-    uint16_t retries = withRetry ? 3 : 0;
+    uint16_t transmissionAmount = withRetry ? MAX_RETRIES : 1;
 
     resetParameter(); // Start with default value
     uint8_t res = 0xFF;
+    bool isInErrorState = false;
 
     while (res != NoError)
     {
         configureTransmission(cr, sf, frq, fsb);
 
-        _setRgbColor(0x00, 0xFF, 0x7F);
-        res = _loRaBee->sendReqAck(port, buffer, size, retries);
-        bool isInErrorState = handleErrorState(res, count);
+        for (uint8_t i = 0; i < transmissionAmount - 1; i++)
+        {
+            _setRgbColor(0x00, 0xFF, 0x7F);
+            res = _loRaBee->sendReqAck(port, buffer, size, 0);
+            isInErrorState = handleErrorState(res, count);
+        }
 
         if (res == NoAcknowledgment && isInErrorState)
         {
