@@ -18,25 +18,14 @@ def uplink():
     rssi = metadata.get("rssi", -999)
     snr = metadata.get("snr", -999)
 
-    # Decode payload (to hex string)
-    try:
-        decoded_payload = base64.b64decode(payload).decode("utf-8").strip()
-    except Exception:
-        decoded_payload = "<non-decodable binary>"
-
     alerts = []
 
-    # Detect empty payload
-    if not payload:
-        alerts.append("⚠️ Empty payload detected")
-
-    # Parse timestamp safely
+    # Parse timestamp safely (truncate nanoseconds to microseconds)
     try:
-        # Strip 'Z' and truncate to microseconds (6 digits)
         clean_time = received_at.replace("Z", "").split(".")
         if len(clean_time) == 2:
             time_part, nano = clean_time
-            micro = nano[:6].ljust(6, "0")  # ensure 6 digits
+            micro = nano[:6].ljust(6, "0")
             final_time = f"{time_part}.{micro}+00:00"
         else:
             final_time = received_at.replace("Z", "+00:00")
@@ -45,11 +34,26 @@ def uplink():
         timestamp = datetime.now(timezone.utc)
         alerts.append("⚠️ Invalid timestamp format; using server time")
 
-    # Initialize or retrieve device state
+    # Decode payload
+    try:
+        raw_bytes = base64.b64decode(payload)
+        decoded_string = raw_bytes[:-1].decode("utf-8").strip() if len(raw_bytes) > 1 else ""
+        count = raw_bytes[-1] if raw_bytes else None
+    except Exception:
+        decoded_string = "<non-decodable>"
+        count = None
+        alerts.append("⚠️ Failed to decode payload")
+
+    # Detect empty payload
+    if not payload:
+        alerts.append("⚠️ Empty payload detected")
+
+    # Initialize device state
     if dev_eui not in device_state:
         device_state[dev_eui] = {
             "last_fcnt": fcnt if isinstance(fcnt, int) else None,
-            "last_payload": decoded_payload,
+            "last_string": decoded_string,
+            "last_count": count,
             "last_time": timestamp,
         }
     else:
@@ -68,9 +72,9 @@ def uplink():
         if time_diff > 20:
             alerts.append(f"⚠️ Delay of {time_diff:.1f}s — expected ~10s. Possible disruption")
 
-        # Repeated payload with different FCnt
-        if decoded_payload == state["last_payload"] and fcnt != state["last_fcnt"]:
-            alerts.append("⚠️ Repeated payload with new FCnt — retry likely due to missing ACK")
+        # Repeated payload string with different FCnt
+        if decoded_string == state["last_string"] and fcnt != state["last_fcnt"]:
+            alerts.append("⚠️ Repeated payload with new FCnt — likely retry")
 
         # RSSI and SNR thresholds
         if rssi < -115:
@@ -81,17 +85,24 @@ def uplink():
         # Update device state
         device_state[dev_eui] = {
             "last_fcnt": fcnt if isinstance(fcnt, int) else state["last_fcnt"],
-            "last_payload": decoded_payload,
+            "last_string": decoded_string,
+            "last_count": count,
             "last_time": timestamp,
         }
 
-    # Print log
+    # Log output
     print(f"[{datetime.now()}] DevEUI: {dev_eui} | FCnt: {fcnt} | RSSI: {rssi} | SNR: {snr}")
-    print(f"Payload (hex): {decoded_payload}")
+    print(f"Payload (text): {decoded_string}")
+    print(f"Payload count (last byte): {count}")
     for alert in alerts:
         print("  •", alert)
 
-    return jsonify({"status": "received", "alerts": alerts}), 200
+    return jsonify({
+        "status": "received",
+        "text": decoded_string,
+        "count": count,
+        "alerts": alerts
+    }), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
