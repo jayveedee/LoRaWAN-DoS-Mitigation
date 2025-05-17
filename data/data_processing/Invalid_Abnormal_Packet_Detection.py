@@ -28,7 +28,15 @@ def uplink():
 
     # Parse timestamp safely
     try:
-        timestamp = datetime.fromisoformat(received_at.replace("Z", "+00:00"))
+        # Strip 'Z' and truncate to microseconds (6 digits)
+        clean_time = received_at.replace("Z", "").split(".")
+        if len(clean_time) == 2:
+            time_part, nano = clean_time
+            micro = nano[:6].ljust(6, "0")  # ensure 6 digits
+            final_time = f"{time_part}.{micro}+00:00"
+        else:
+            final_time = received_at.replace("Z", "+00:00")
+        timestamp = datetime.fromisoformat(final_time)
     except Exception:
         timestamp = datetime.now(timezone.utc)
         alerts.append("⚠️ Invalid timestamp format; using server time")
