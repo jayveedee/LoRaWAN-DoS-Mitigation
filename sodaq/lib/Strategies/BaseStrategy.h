@@ -2,7 +2,7 @@
 #define BASE_STRATEGY_H
 
 #include <Arduino.h>
-#include <Sodaq_RN2483.h>
+#include "../Sodaq_RN2483/Sodaq_RN2483.h"
 
 struct FrameCounters
 {

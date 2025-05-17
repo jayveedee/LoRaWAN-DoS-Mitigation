@@ -1,6 +1,11 @@
 // Include the aurduino libraries
 #include <Arduino.h>
-#include <Sodaq_RN2483.h>
+
+// Include the sodaq_RN2483 library for common utils
+#include "lib/Sodaq_RN2483/Sodaq_RN2483_internal.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483.h"
+#include "lib/Sodaq_RN2483/Sodaq_RN2483.cpp"
+#include "lib/Sodaq_RN2483/Utils.h"
 
 // Include all transmission strategies (have to include header and implementation)
 #include "lib/Strategies/BaseStrategy.h"
@@ -143,21 +148,14 @@ void loop()
   // Send using the active transmission strategy
   bool success = activeStrategy->sendMessage(LORA_PORT, buf, sizeof(buf), count);
 
-// Additional actions for specific strategies
-#if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
-  // Cast to LBTTransmission to access LBT-specific methods
-  LBT *lbtStrategy = static_cast<LBT *>(activeStrategy);
-  lbtStrategy->logJammingEvent();
-#endif
-
-  // No need to add transmission delay because the transmission strategies handle delays based on error states
-
   if (counters.uplink >= 50 && success)
   {
     CONSOLE_STREAM.println("Reached 50 uplink frame counters, halting Sodaq.");
     while (1)
       ;
   }
+
+  // No need to add transmission delay because the transmission strategies handle delays based on error states
 }
 
 // RGB LED control function
