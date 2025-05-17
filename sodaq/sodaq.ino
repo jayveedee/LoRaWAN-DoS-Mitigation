@@ -50,7 +50,7 @@
 #define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation              (lbt does not work)
 
 // Set the active transmission strategy here
-#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_LBT
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_RETRY
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
@@ -169,4 +169,29 @@ void setRgbColor(uint8_t red, uint8_t green, uint8_t blue)
   analogWrite(LED_RED, red);
   analogWrite(LED_GREEN, green);
   analogWrite(LED_BLUE, blue);
+}
+
+// Only use if device is in unrecoverable state after messing with radio commands
+void factoryReset()
+{
+  CONSOLE_STREAM.println("Sending system reset command...");
+  LORA_STREAM.println("sys factoryRESET");
+
+  // Wait for reset to complete
+  delay(1000);
+
+  // Read and print the response from the module
+  CONSOLE_STREAM.println("Response from module:");
+  unsigned long startTime = millis();
+  while (millis() - startTime < 3000)
+  {
+    if (LORA_STREAM.available())
+    {
+      char c = LORA_STREAM.read();
+      CONSOLE_STREAM.write(c);
+    }
+  }
+
+  CONSOLE_STREAM.println("\nReset completed.");
+  delay(2000);
 }
