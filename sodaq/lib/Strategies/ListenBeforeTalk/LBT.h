@@ -1,8 +1,8 @@
-#ifndef LBT_TRANSMISSION_H
-#define LBT_TRANSMISSION_H
+#ifndef LBT_H
+#define LBT_H
 
 #include <Arduino.h>
-#include "TransmissionStrategy.h"
+#include "../BaseStrategy.h"
 
 // Default configuration parameters
 #define DEFAULT_LORA_CHANNEL 0
@@ -21,7 +21,7 @@ struct JammingStats
   byte retryCount;
 };
 
-class LBTTransmission : public TransmissionStrategy
+class LBT : public BaseStrategy
 {
 private:
   // Configuration parameters
@@ -38,7 +38,7 @@ private:
   bool detectJamming();
 
 public:
-  LBTTransmission(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
+  LBT(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
 
   // Core functionality
   virtual bool sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count) override;

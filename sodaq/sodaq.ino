@@ -8,16 +8,21 @@
 #include "lib/Sodaq_RN2483/Utils.h"
 
 // Include all transmission strategies (have to include header and implementation)
-#include "lib/strategies/TransmissionStrategy.h"
-#include "lib/strategies/TransmissionStrategy.cpp"
-#include "lib/strategies/StandardTransmission.h"
-#include "lib/strategies/StandardTransmission.cpp"
-#include "lib/strategies/RetryTransmission.h"
-#include "lib/strategies/RetryTransmission.cpp"
-#include "lib/strategies/DynamicTransmission.h"
-#include "lib/strategies/DynamicTransmission.cpp"
-#include "lib/strategies/LBTTransmission.h"
-#include "lib/strategies/LBTTransmission.cpp"
+#include "lib/Strategies/BaseStrategy.h"
+#include "lib/Strategies/BaseStrategy.cpp"
+#include "lib/Strategies/Standard/Standard.h"
+#include "lib/Strategies/Standard/Standard.cpp"
+#include "lib/Strategies/Retry/Retry.h"
+#include "lib/Strategies/Retry/Retry.cpp"
+#include "lib/Strategies/Dynamic/BaseDynamic.h"
+#include "lib/Strategies/Dynamic/BaseDynamic.cpp"
+#include "lib/Strategies/Dynamic/DynamicCR.h"
+#include "lib/Strategies/Dynamic/DynamicCR.cpp"
+#include "lib/Strategies/Dynamic/DynamicSF.h"
+#include "lib/Strategies/Dynamic/DynamicSF.cpp"
+#include "lib/Strategies/Dynamic/DynamicRetry.h"
+#include "lib/Strategies/ListenBeforeTalk/LBT.h"
+#include "lib/Strategies/ListenBeforeTalk/LBT.cpp"
 
 // ---------------------------------------------------------------------------------------------------------
 // Declarations
@@ -36,13 +41,16 @@
 #define LORA_PORT 1
 
 // Transmission strategy types
-#define STRATEGY_STANDARD 0 // No ACK, standard transmission
-#define STRATEGY_RETRY 1    // With ACK and fixed retries
-#define STRATEGY_DYNAMIC 2  // Dynamic spreading factor / coding rate / etc adjustment
-#define STRATEGY_LBT 3      // Listen Before Talk jamming mitigation
+#define STRATEGY_STANDARD 0         // No ACK, standard transmission
+#define STRATEGY_RETRY 1            // With ACK and fixed retries
+#define STRATEGY_DYNAMIC_SF 2       // Dynamic spreading factor adjustment
+#define STRATEGY_DYNAMIC_CR 3       // Dynamic coding rate adjustment                     (cr does not work)
+#define STRATEGY_DYNAMIC_SF_RETRY 4 // Dynamic spreading adjustment with 3 retries
+#define STRATEGY_DYNAMIC_CR_RETRY 5 // Dynamic coding rate adjustment with 3 retries      (cr does not work)
+#define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation              (lbt does not work)
 
 // Set the active transmission strategy here
-#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_DYNAMIC
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_DYNAMIC_CR
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
@@ -50,7 +58,7 @@ static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x
 uint8_t count = 0;
 
 // Pointer to the active transmission strategy
-TransmissionStrategy *activeStrategy = nullptr;
+BaseStrategy *activeStrategy = nullptr;
 
 // ---------------------------------------------------------------------------------------------------------
 // Init Methods
@@ -93,20 +101,29 @@ void setup()
 
 // Initialize the selected transmission strategy
 #if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_STANDARD
-  activeStrategy = new StandardTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new Standard(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Standard transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_RETRY
-  activeStrategy = new RetryTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor, 3);
+  activeStrategy = new Retry(&CONSOLE_STREAM, &LoRaBee, setRgbColor, 3);
   CONSOLE_STREAM.println("Retry transmission strategy initialized");
-#elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC
-  activeStrategy = new DynamicTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+#elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_SF
+  activeStrategy = new DynamicSF(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic SF transmission strategy initialized");
+#elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_CR
+  activeStrategy = new DynamicCR(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  CONSOLE_STREAM.println("Dynamic CR transmission strategy initialized");
+#elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_SF_RETRY
+  activeStrategy = new DynamicRetrySF(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  CONSOLE_STREAM.println("Dynamic SF Retry transmission strategy initialized");
+#elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_CR_ReTRY
+  activeStrategy = new DynamicRetryCR(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  CONSOLE_STREAM.println("Dynamic CR Retry transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
-  activeStrategy = new LBTTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new LBT(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("LBTTransmission strategy initialized");
 #else
   // Default to standard transmission if no valid strategy is selected
-  activeStrategy = new StandardTransmission(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new Standard(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Default to standard transmission strategy");
 #endif
 
