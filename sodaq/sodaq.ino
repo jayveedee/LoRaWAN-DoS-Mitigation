@@ -7,6 +7,10 @@
 #include "lib/Sodaq_RN2483/Sodaq_RN2483.cpp"
 #include "lib/Sodaq_RN2483/Utils.h"
 
+// Include custom made sodaq_RN2483 library for common radio commands
+#include "lib/Sodaq_RN2483_Radio/Sodaq_RN2483_Radio.h"
+#include "lib/Sodaq_RN2483_Radio/Sodaq_RN2483_Radio.cpp"
+
 // Include all transmission strategies (have to include header and implementation)
 #include "lib/Strategies/BaseStrategy.h"
 #include "lib/Strategies/BaseStrategy.cpp"
@@ -50,7 +54,7 @@
 #define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation              (lbt does not work)
 
 // Set the active transmission strategy here
-#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_RETRY
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_LBT
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
@@ -73,6 +77,7 @@ void setup()
   LORA_STREAM.begin(LoRaBee.getDefaultBaudRate());
 
   setRgbColor(0x00, 0xFF, 0x7F);
+  factoryReset();
 
   CONSOLE_STREAM.println("------------------------------------");
   CONSOLE_STREAM.println("Booting...");
