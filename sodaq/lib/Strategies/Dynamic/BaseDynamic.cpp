@@ -42,12 +42,18 @@ bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uin
             {
                 break;
             }
-            else
+            else if (res == NoAcknowledgment)
             {
-                _console->print("Unsuccessful transmission, retrying with same configuration up to a maxium of ");
+                _console->print("Unsuccessful transmission because of NoAcknowledgement, retrying with same configuration up to a maxium of ");
                 _console->print(transmissionAmount);
                 _console->println(" retries.");
                 fetchFrameCounters();
+            }
+            else
+            {
+                _console->println("Unsuccessful transmission because of other errors, retrying with same configuration without a max retry");
+                fetchFrameCounters();
+                i = i - 1;
             }
         }
 

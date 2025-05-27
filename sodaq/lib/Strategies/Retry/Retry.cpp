@@ -31,12 +31,18 @@ bool Retry::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &co
     {
       break;
     }
-    else
+    else if (res == NoAcknowledgment)
     {
-      _console->print("Unsuccessful transmission, retrying with same configuration up to a maxium of ");
+      _console->print("Unsuccessful transmission because of NoAcknowledgement, retrying with same configuration up to a maxium of ");
       _console->print(_maxRetries);
       _console->println(" retries.");
       fetchFrameCounters();
+    }
+    else
+    {
+      _console->println("Unsuccessful transmission because of other errors, retrying with same configuration without a max");
+      fetchFrameCounters();
+      i = i - 1;
     }
   }
 
