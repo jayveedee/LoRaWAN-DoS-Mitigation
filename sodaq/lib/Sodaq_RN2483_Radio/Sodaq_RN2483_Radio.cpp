@@ -259,9 +259,10 @@ Sodaq_RN2483_Radio::ReceiveResult Sodaq_RN2483_Radio::checkReceive(char *packetD
 }
 
 // Jammer detection methods that work without a receiver
+// Trigger-and-listen approach: Send signal then listen for jammer response
 bool Sodaq_RN2483_Radio::detectJammerOnFrequency(uint32_t frequencyHz, int timeoutMs)
 {
-    _console->print("Radio: No-receiver jammer detection on ");
+    _console->print("Radio: Trigger-and-listen jammer detection on ");
     _console->print(frequencyHz / 1000000.0, 1);
     _console->println(" MHz");
 
@@ -272,309 +273,105 @@ bool Sodaq_RN2483_Radio::detectJammerOnFrequency(uint32_t frequencyHz, int timeo
         return false;
     }
 
-    int jammerScore = 0;
-
-    // Method 1: Listen for unexpected activity/interference
-    _console->println("Radio: Method 1 - Listening for interference");
-    bool interferenceHeard = listenForInterference(3000);
-
-    if (interferenceHeard)
+    int jammerActivityDetected = 0;
+    int totalTests = 5;
+    
+    for (int test = 0; test < totalTests; test++)
     {
-        _console->println("Radio: DETECTED - Channel activity/interference");
-        jammerScore += 2; // Strong indicator
-    }
-    else
-    {
-        _console->println("Radio: Channel appears quiet");
-    }
-
-    // Method 2: Transmission timing analysis
-    _console->println("Radio: Method 2 - Analyzing transmission timing");
-    bool timingAnomalies = analyzeTransmissionTiming();
-
-    if (timingAnomalies)
-    {
-        _console->println("Radio: DETECTED - Transmission timing anomalies");
-        jammerScore += 1;
-    }
-    else
-    {
-        _console->println("Radio: Normal transmission timing");
-    }
-
-    // Method 3: Radio behavior consistency test
-    _console->println("Radio: Method 3 - Testing radio behavior consistency");
-    bool behaviorInconsistent = testRadioBehaviorConsistency();
-
-    if (behaviorInconsistent)
-    {
-        _console->println("Radio: DETECTED - Inconsistent radio behavior");
-        jammerScore += 1;
-    }
-    else
-    {
-        _console->println("Radio: Consistent radio behavior");
-    }
-
-    // Decision logic
-    bool jammerDetected = (jammerScore >= 2);
-
-    _console->print("Radio: Jammer score: ");
-    _console->print(jammerScore);
-    _console->print("/4 - ");
-    _console->println(jammerDetected ? "JAMMED" : "CLEAR");
-
-    return jammerDetected;
-}
-
-// Listen for any RF activity that might indicate jamming
-bool Sodaq_RN2483_Radio::listenForInterference(int durationMs)
-{
-    _console->println("Radio: Starting interference listening...");
-
-    int activityCount = 0;
-    int listenAttempts = 0;
-    unsigned long startTime = millis();
-
-    while (millis() - startTime < durationMs)
-    {
-        // Start a brief receive window
-        if (startReceive(3)) // Very short window - 3 symbols
+        _console->print("Radio: Test ");
+        _console->print(test + 1);
+        _console->print("/");
+        _console->print(totalTests);
+        _console->println(" - Trigger and listen");
+        
+        // Step 1: Send a trigger signal to potentially activate jammer
+        char triggerData[20];
+        sprintf(triggerData, "010203%02X%04X", test, (unsigned int)(millis() & 0xFFFF));
+        
+        _console->print("Radio: Sending trigger: ");
+        _console->println(triggerData);
+        
+        bool triggerSent = transmit(triggerData);
+        if (!triggerSent)
         {
-            listenAttempts++;
-
-            // Wait for the receive window
-            delay(300);
-
-            ReceiveResult result = checkReceive();
-
-            if (result == RX_PACKET)
-            {
-                activityCount++;
-                _console->println("Radio: Detected packet/activity");
-
-                // Try to get SNR of whatever we received
-                char response[32];
-                if (sendCommand("radio get snr", response, sizeof(response), 500))
-                {
-                    int snr = atoi(response);
-                    _console->print("Radio: Activity SNR: ");
-                    _console->println(snr);
-
-                    // Very high SNR might indicate strong local interference
-                    if (snr > 5)
-                    {
-                        _console->println("Radio: Strong local signal detected");
-                        activityCount += 2; // Bonus for strong signals
-                    }
-                }
-            }
-
-            stopReceive();
+            _console->println("Radio: Trigger transmission failed");
+            continue;
         }
-
+        
+        _console->println("Radio: Trigger sent successfully");
+        
+        // Step 2: Brief pause to let jammer react
         delay(200);
-    }
-
-    _console->print("Radio: Activity detected in ");
-    _console->print(activityCount);
-    _console->print(" out of ");
-    _console->print(listenAttempts);
-    _console->println(" listen attempts");
-
-    // If we detect activity when channel should be quiet, might be jammer
-    return (activityCount > 0 && listenAttempts > 5);
-}
-
-// Analyze if transmission timing is affected by interference
-bool Sodaq_RN2483_Radio::analyzeTransmissionTiming()
-{
-    _console->println("Radio: Analyzing transmission timing");
-
-    unsigned long timings[5];
-    bool timingValid[5];
-
-    for (int i = 0; i < 5; i++)
-    {
-        char testData[16];
-        sprintf(testData, "010203040%04X", (unsigned int)(millis() & 0xFFFF));
-
-        unsigned long startTime = millis();
-
-        // Send the transmission
-        char command[64];
-        char response[32];
-        sprintf(command, "radio tx %s", testData);
-
-        flushInput();
-        _loraStream->print(command);
-        _loraStream->print("\r\n");
-
-        // Time how long until we get the completion response
-        bool gotOk = false;
-        if (readLine(response, sizeof(response), 2000))
+        
+        // Step 3: Listen immediately for jammer activity
+        _console->println("Radio: Listening for jammer response...");
+        
+        if (startReceive(0)) // Continuous receive
         {
-            if (strcmp(response, "ok") == 0)
+            unsigned long listenStart = millis();
+            bool activityFound = false;
+            
+            // Listen for up to 2 seconds
+            while (millis() - listenStart < 2000 && !activityFound)
             {
-                gotOk = true;
-                // Now wait for completion
-                if (readLine(response, sizeof(response), 8000))
+                ReceiveResult result = checkReceive();
+                
+                if (result == RX_PACKET)
                 {
-                    unsigned long endTime = millis();
-                    timings[i] = endTime - startTime;
-                    timingValid[i] = true;
-
-                    _console->print("Radio: TX ");
-                    _console->print(i + 1);
-                    _console->print(" timing: ");
-                    _console->print(timings[i]);
-                    _console->print("ms (");
-                    _console->print(response);
-                    _console->println(")");
-                }
-                else
-                {
-                    timingValid[i] = false;
-                    _console->print("Radio: TX ");
-                    _console->print(i + 1);
-                    _console->println(" - timeout");
-                }
-            }
-            else
-            {
-                timingValid[i] = false;
-                _console->print("Radio: TX ");
-                _console->print(i + 1);
-                _console->print(" - ");
-                _console->println(response);
-            }
-        }
-        else
-        {
-            timingValid[i] = false;
-            _console->print("Radio: TX ");
-            _console->print(i + 1);
-            _console->println(" - no response");
-        }
-
-        delay(500);
-    }
-
-    // Analyze timing consistency
-    int validCount = 0;
-    unsigned long totalTime = 0;
-    unsigned long minTime = 20000;
-    unsigned long maxTime = 0;
-
-    for (int i = 0; i < 5; i++)
-    {
-        if (timingValid[i])
-        {
-            validCount++;
-            totalTime += timings[i];
-            if (timings[i] < minTime)
-                minTime = timings[i];
-            if (timings[i] > maxTime)
-                maxTime = timings[i];
-        }
-    }
-
-    if (validCount >= 3)
-    {
-        unsigned long avgTime = totalTime / validCount;
-        unsigned long timeSpread = maxTime - minTime;
-
-        _console->print("Radio: Timing analysis - avg: ");
-        _console->print(avgTime);
-        _console->print("ms, spread: ");
-        _console->print(timeSpread);
-        _console->print("ms, valid: ");
-        _console->print(validCount);
-        _console->println("/5");
-
-        // Large timing variations or many failures might indicate interference
-        return (timeSpread > 2000 || validCount < 4);
-    }
-    else
-    {
-        _console->println("Radio: Too many timing failures - possible interference");
-        return true;
-    }
-}
-
-// Test if radio behavior is consistent (interference can cause erratic behavior)
-bool Sodaq_RN2483_Radio::testRadioBehaviorConsistency()
-{
-    _console->println("Radio: Testing radio behavior consistency");
-
-    int inconsistencies = 0;
-
-    // Test 1: Multiple identical transmissions should behave similarly
-    for (int i = 0; i < 3; i++)
-    {
-        const char *testData = "01020304";
-
-        char command[64];
-        char response[32];
-        sprintf(command, "radio tx %s", testData);
-
-        flushInput();
-        _loraStream->print(command);
-        _loraStream->print("\r\n");
-
-        // First response
-        bool gotOk = false;
-        if (readLine(response, sizeof(response), 2000))
-        {
-            if (strcmp(response, "ok") == 0)
-            {
-                gotOk = true;
-                // Second response
-                if (readLine(response, sizeof(response), 8000))
-                {
-                    _console->print("Radio: Consistency test ");
-                    _console->print(i + 1);
-                    _console->print(": ");
-                    _console->println(response);
-
-                    if (strcmp(response, "radio_tx_ok") != 0)
+                    _console->println("Radio: ACTIVITY DETECTED after trigger!");
+                    activityFound = true;
+                    jammerActivityDetected++;
+                    
+                    // Get SNR of the detected activity
+                    char response[32];
+                    if (sendCommand("radio get snr", response, sizeof(response), 500))
                     {
-                        inconsistencies++;
+                        _console->print("Radio: Activity SNR: ");
+                        _console->println(response);
                     }
+                    
+                    break;
                 }
-                else
+                else if (result == RX_TIMEOUT)
                 {
-                    _console->print("Radio: Consistency test ");
-                    _console->print(i + 1);
-                    _console->println(": timeout");
-                    inconsistencies++;
+                    // Restart listening
+                    stopReceive();
+                    delay(50);
+                    startReceive(0);
                 }
+                
+                delay(100);
             }
-            else
+            
+            stopReceive();
+            
+            if (!activityFound)
             {
-                _console->print("Radio: Consistency test ");
-                _console->print(i + 1);
-                _console->print(": ");
-                _console->println(response);
-                inconsistencies++;
+                _console->println("Radio: No activity detected after trigger");
             }
         }
         else
         {
-            _console->print("Radio: Consistency test ");
-            _console->print(i + 1);
-            _console->println(": no response");
-            inconsistencies++;
+            _console->println("Radio: Failed to start listening");
         }
-
-        delay(400);
+        
+        // Pause between tests
+        delay(1000);
     }
-
-    _console->print("Radio: Behavior inconsistencies: ");
-    _console->print(inconsistencies);
-    _console->println("/3");
-
-    return (inconsistencies >= 2);
+    
+    _console->print("Radio: Jammer activity detected in ");
+    _console->print(jammerActivityDetected);
+    _console->print(" out of ");
+    _console->print(totalTests);
+    _console->println(" tests");
+    
+    // If we detect activity after triggers in multiple tests, likely jammer
+    bool jammerDetected = (jammerActivityDetected >= 2);
+    
+    _console->print("Radio: Jammer detection result: ");
+    _console->println(jammerDetected ? "JAMMED (reactive activity detected)" : "CLEAR (no reactive activity)");
+    
+    return jammerDetected;
 }
 
 bool Sodaq_RN2483_Radio::configureEU868Channel(uint8_t channelId, uint32_t frequencyHz)

@@ -12,9 +12,6 @@ private:
     bool sendCommand(const char *command, char *response = nullptr, size_t responseSize = 0, unsigned long timeout = 1000);
     bool readLine(char *buffer, size_t size, unsigned long timeout = 1000);
     void flushInput();
-    bool listenForInterference(int durationMs = 1000);
-    bool analyzeTransmissionTiming();
-    bool testRadioBehaviorConsistency();
 
 public:
     Sodaq_RN2483_Radio(Stream *console, Stream *loraStream);
