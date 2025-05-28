@@ -32,12 +32,8 @@ jobs:
 
       - name: Install required libraries
         run: |
-          arduino-cli lib install "ArduinoBLE"
-          arduino-cli lib install "BLEPeripheral"
           arduino-cli lib install "LoRa"
-          arduino-cli lib install "Microchip_RN487x"
           arduino-cli lib install "RadioLib"
-          arduino-cli lib install "Sodaq_wdt"
 
       - name: Install custom libraries from lib folder
         run: |
