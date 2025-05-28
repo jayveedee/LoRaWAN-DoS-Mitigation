@@ -685,18 +685,6 @@ bool Sodaq_RN2483::setPowerIndex(uint8_t powerIndex)
     return setMacParam(STR_PWR_IDX, powerIndex);
 }
 
-// Sets the coding rate.
-// Returns true if successful.
-bool Sodaq_RN2483::setCodingRate(const char *codingRate)
-{
-    debugPrintLn("[setCodingRate]");
-
-    print("radio set cr ");
-    println(codingRate);
-
-    return expectOK();
-}
-
 // Sends the command together with the given paramValue (optional)
 // to the device and awaits for the response.
 // Returns true on success.
