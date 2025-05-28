@@ -1,4 +1,4 @@
-// Include the aurduino library
+// Include the aurduino libraries
 #include <Arduino.h>
 
 // Include the sodaq_RN2483 library for common utils
@@ -6,6 +6,10 @@
 #include "lib/Sodaq_RN2483/Sodaq_RN2483.h"
 #include "lib/Sodaq_RN2483/Sodaq_RN2483.cpp"
 #include "lib/Sodaq_RN2483/Utils.h"
+
+// Include custom made sodaq_RN2483 library for common radio commands
+#include "lib/Sodaq_RN2483_Radio/Sodaq_RN2483_Radio.h"
+#include "lib/Sodaq_RN2483_Radio/Sodaq_RN2483_Radio.cpp"
 
 // Include all transmission strategies (have to include header and implementation)
 #include "lib/Strategies/BaseStrategy.h"
@@ -50,7 +54,7 @@
 #define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation              (lbt does not work)
 
 // Set the active transmission strategy here
-#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_DYNAMIC_CR
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_LBT
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
@@ -73,6 +77,7 @@ void setup()
   LORA_STREAM.begin(LoRaBee.getDefaultBaudRate());
 
   setRgbColor(0x00, 0xFF, 0x7F);
+  factoryReset();
 
   CONSOLE_STREAM.println("------------------------------------");
   CONSOLE_STREAM.println("Booting...");
@@ -101,29 +106,29 @@ void setup()
 
 // Initialize the selected transmission strategy
 #if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_STANDARD
-  activeStrategy = new Standard(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new Standard(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Standard transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_RETRY
-  activeStrategy = new Retry(&CONSOLE_STREAM, &LoRaBee, setRgbColor, 3);
+  activeStrategy = new Retry(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor, 3);
   CONSOLE_STREAM.println("Retry transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_SF
-  activeStrategy = new DynamicSF(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicSF(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic SF transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_CR
-  activeStrategy = new DynamicCR(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicCR(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic CR transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_SF_RETRY
-  activeStrategy = new DynamicRetrySF(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicRetrySF(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic SF Retry transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_DYNAMIC_CR_ReTRY
-  activeStrategy = new DynamicRetryCR(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new DynamicRetryCR(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Dynamic CR Retry transmission strategy initialized");
 #elif ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
-  activeStrategy = new LBT(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new LBT(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("LBTTransmission strategy initialized");
 #else
   // Default to standard transmission if no valid strategy is selected
-  activeStrategy = new Standard(&CONSOLE_STREAM, &LoRaBee, setRgbColor);
+  activeStrategy = new Standard(&CONSOLE_STREAM, &LORA_STREAM, &LoRaBee, setRgbColor);
   CONSOLE_STREAM.println("Default to standard transmission strategy");
 #endif
 
@@ -148,21 +153,14 @@ void loop()
   // Send using the active transmission strategy
   bool success = activeStrategy->sendMessage(LORA_PORT, buf, sizeof(buf), count);
 
-// Additional actions for specific strategies
-#if ACTIVE_TRANSMISSION_STRATEGY == STRATEGY_LBT
-  // Cast to LBTTransmission to access LBT-specific methods
-  LBTTransmission *lbtStrategy = static_cast<LBTTransmission *>(activeStrategy);
-  lbtStrategy->logJammingEvent();
-#endif
-
-  // No need to add transmission delay because the transmission strategies handle delays based on error states
-
   if (counters.uplink >= 50 && success)
   {
     CONSOLE_STREAM.println("Reached 50 uplink frame counters, halting Sodaq.");
     while (1)
       ;
   }
+
+  // No need to add transmission delay because the transmission strategies handle delays based on error states
 }
 
 // RGB LED control function
@@ -176,4 +174,29 @@ void setRgbColor(uint8_t red, uint8_t green, uint8_t blue)
   analogWrite(LED_RED, red);
   analogWrite(LED_GREEN, green);
   analogWrite(LED_BLUE, blue);
+}
+
+// Only use if device is in unrecoverable state after messing with radio commands
+void factoryReset()
+{
+  CONSOLE_STREAM.println("Sending system reset command...");
+  LORA_STREAM.println("sys factoryRESET");
+
+  // Wait for reset to complete
+  delay(1000);
+
+  // Read and print the response from the module
+  CONSOLE_STREAM.println("Response from module:");
+  unsigned long startTime = millis();
+  while (millis() - startTime < 3000)
+  {
+    if (LORA_STREAM.available())
+    {
+      char c = LORA_STREAM.read();
+      CONSOLE_STREAM.write(c);
+    }
+  }
+
+  CONSOLE_STREAM.println("\nReset completed.");
+  delay(2000);
 }

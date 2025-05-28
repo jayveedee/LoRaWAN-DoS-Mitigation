@@ -1,158 +1,259 @@
 #include "LBT.h"
 
-LBT::LBT(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
-    : BaseStrategy(console, loRaBee, setRgbColorCallback)
+LBT::LBT(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+    : BaseStrategy(console, loraStream, loRaBee, setRgbColorCallback)
 {
-  _rssiThreshold = DEFAULT_RSSI_THRESHOLD;
-  _listenTimeout = DEFAULT_LISTEN_TIMEOUT;
-  _maxRetryCount = DEFAULT_MAX_RETRY_COUNT;
-  _dummyPayloadSize = DEFAULT_DUMMY_PAYLOAD_SIZE;
-
-  // Initialize jamming stats
-  _jammingStats.totalTransmissions = 0;
-  _jammingStats.jammingDetected = 0;
-  _jammingStats.lastJammingTime = 0;
-  _jammingStats.currentChannel = DEFAULT_LORA_CHANNEL;
-  _jammingStats.retryCount = 0;
+    _radio = new Sodaq_RN2483_Radio(console, loraStream);
+    _console->println("LBT: Initialized for EU868 (8 individual channels)");
 }
 
-bool LBT::detectJamming()
+LBT::~LBT()
 {
-  _console->println("Using channel activity detection method");
-
-  // Instead of listening with receive mode, we'll use the MAC state to infer channel activity
-  // We'll attempt to do a very quick check of the channel
-
-  // Attempt to get general MAC status
-  char statusBuffer[16];
-  _loRaBee->getMacParam("status", statusBuffer, sizeof(statusBuffer));
-  _console->print("MAC status: ");
-  _console->println(statusBuffer);
-
-  // Use get SNR to estimate if the channel is jammed
-  int8_t snr = _loRaBee->getSNR();
-  int16_t rssi = _loRaBee->getRSSI();
-
-  _console->print("Current RSSI: ");
-  _console->println(rssi);
-  _console->print("Current SNR: ");
-  _console->println(snr);
-
-  // Consider the channel jammed if the RSSI is higher than threshold
-  bool jammingDetected = (rssi > _rssiThreshold);
-
-  // Update jamming statistics
-  _jammingStats.totalTransmissions++;
-
-  if (jammingDetected)
-  {
-    _console->println("Channel appears to be jammed");
-    _setRgbColor(0xFF, 0x00, 0x00); // Red
-    _jammingStats.jammingDetected++;
-    _jammingStats.lastJammingTime = millis();
-  }
-  else
-  {
-    _console->println("Channel appears to be clear");
-    _setRgbColor(0x00, 0xFF, 0x00); // Green
-  }
-
-  return jammingDetected;
-}
-
-void LBT::implementMitigationStrategy()
-{
-  _console->println("Implementing jamming mitigation strategy");
-  _setRgbColor(0xFF, 0xA5, 0x00); // Orange - Implementing mitigation
-
-  // Strategy 1: Wait for a random backoff time
-  int backoffTime = random(500, 3000); // Random backoff between 0.5-3 seconds
-  _console->print("Backing off for ");
-  _console->print(backoffTime);
-  _console->println(" ms");
-  delay(backoffTime);
-
-  // Strategy 2: Try to change channel if possible
-  byte newChannel = (_jammingStats.currentChannel + 1) % 8;
-  uint32_t baseFrequency = 868100000;                            // Base frequency for 868MHz band
-  uint32_t newFrequency = baseFrequency + (newChannel * 200000); // 200kHz spacing
-
-  _console->print("Attempting to switch to channel ");
-  _console->println(newChannel);
-
-  if (_loRaBee->setChannel(newChannel, newFrequency))
-  {
-    _jammingStats.currentChannel = newChannel;
-    _console->print("Successfully switched to channel: ");
-    _console->println(newChannel);
-  }
-  else
-  {
-    _console->println("Channel change not possible at this time");
-  }
+    delete _radio;
 }
 
 bool LBT::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
-  bool sentMessageSucessfully = true;
+    _console->println("LBT: Starting transmission with channel-specific jammer detection");
 
-  _jammingStats.retryCount = 0;
-
-  _console->print("Sending message with LBT strategy... : ");
-  for (int i = 0; i < size - 1; i++)
-  {
-    _console->print((char)buffer[i]);
-  }
-  _console->println(count);
-
-  configureTransmission("4/5", 9, 1, 0);
-
-  while (_jammingStats.retryCount < _maxRetryCount)
-  {
-    bool isJamming = detectJamming();
-
-    if (!isJamming)
+    // Try channels until we find a clear one
+    for (int attempt = 0; attempt < MAX_CHANNEL_ATTEMPTS; attempt++)
     {
-      _console->println("No interference detected, proceeding with transmission");
+        int channelIndex = selectBestChannel();
+        uint8_t channelId = channels[channelIndex].channelId;
+        uint32_t frequency = channels[channelIndex].frequency;
 
-      _setRgbColor(0x00, 0xFF, 0x7F);
-      uint8_t result = _loRaBee->send(port, buffer, size);
-      bool errorState = handleErrorState(result, count);
+        _console->print("LBT: Testing channel ");
+        _console->print(channelId);
+        _console->print(" (");
+        _console->print(frequency / 1000000.0, 1);
+        _console->println(" MHz)");
 
-      if (!errorState)
-      {
-        sentMessageSucessfully = true;
-        break;
-      }
+        // Pause MAC for radio operations
+        unsigned long pauseTime = 0;
+        if (!_radio->pauseMac(pauseTime))
+        {
+            _console->println("LBT: Failed to pause MAC, proceeding without LBT");
+            break;
+        }
+
+        if (pauseTime < 3000)
+        {
+            _console->println("LBT: Limited pause time, assuming channel is clear");
+            _radio->resumeMac();
+            break;
+        }
+
+        if (pauseTime > 4200000000UL)
+        {
+            _console->println("LBT: MAC in idle state - plenty of time for detection");
+        }
+
+        // Check if this specific channel is jammed
+        bool jammed = isChannelJammed(channelId);
+
+        // Resume MAC layer BEFORE configuring channels
+        _radio->resumeMac();
+
+        if (!jammed)
+        {
+            _console->print("LBT: Channel ");
+            _console->print(channelId);
+            _console->println(" is clear, configuring for transmission");
+
+            // Configure LoRaWAN to use only this specific channel
+            // Do this AFTER resuming MAC but BEFORE transmission attempts
+            if (configureChannelForTransmission(channelId))
+            {
+
+                // Verify configuration took effect
+                _radio->verifyChannelConfiguration(channelId);
+
+                // Now attempt transmission with proper error handling
+                _console->println("LBT: Starting transmission attempts...");
+
+                for (int retry = 0; retry < MAX_RETRIES_PER_CHANNEL; retry++)
+                {
+                    _console->print("LBT: Transmission attempt ");
+                    _console->print(retry + 1);
+                    _console->print("/");
+                    _console->println(MAX_RETRIES_PER_CHANNEL);
+
+                    uint8_t result = _loRaBee->send(port, buffer, size);
+                    bool isError = handleErrorState(result, count);
+
+                    if (!isError)
+                    {
+                        _console->println("LBT: Message sent successfully!");
+                        return true;
+                    }
+
+                    _console->print("LBT: Transmission failed with error code: ");
+                    _console->println(result);
+
+                    // Add delay between retries
+                    if (retry < MAX_RETRIES_PER_CHANNEL - 1)
+                    {
+                        delay(random(1000, 2000)); // Longer delay for stability
+                    }
+                }
+
+                _console->println("LBT: Transmission failed despite clear channel");
+                recordChannelFailure(channelId);
+            }
+            else
+            {
+                _console->println("LBT: Failed to configure channel, trying next");
+                recordChannelFailure(channelId);
+            }
+        }
+        else
+        {
+            _console->print("LBT: Channel ");
+            _console->print(channelId);
+            _console->println(" is jammed, trying next channel");
+            recordChannelFailure(channelId);
+        }
+
+        delay(200);
     }
-    else
-    {
-      sentMessageSucessfully = false;
-      implementMitigationStrategy();
-    }
 
-    _jammingStats.retryCount++;
-    _console->print("Retry attempt: ");
-    _console->println(_jammingStats.retryCount);
-  }
-
-  _console->println("Max retry count reached, transmission failed");
-  return sentMessageSucessfully;
+    _console->println("LBT: Failed to send message - all EU channels appear jammed or unusable");
+    return false;
 }
 
-void LBT::logJammingEvent()
+bool LBT::configureChannelForTransmission(uint8_t channelId)
 {
-  _console->println("--- Jamming Statistics ---");
-  _console->print("Total transmissions: ");
-  _console->println(_jammingStats.totalTransmissions);
-  _console->print("Jamming events detected: ");
-  _console->println(_jammingStats.jammingDetected);
-  _console->print("Jamming rate: ");
-  float jammingRate = (float)_jammingStats.jammingDetected / _jammingStats.totalTransmissions * 100.0;
-  _console->print(jammingRate);
-  _console->println("%");
-  _console->print("Last jamming event: ");
-  _console->print((millis() - _jammingStats.lastJammingTime) / 1000);
-  _console->println(" seconds ago");
-  _console->println("-------------------------");
+    _console->print("LBT: Configuring LoRaWAN for transmission on channel ");
+    _console->println(channelId);
+
+    uint32_t frequency = channels[channelId].frequency;
+
+    // Use our radio wrapper to configure the channel properly
+    if (!_radio->configureEU868Channel(channelId, frequency))
+    {
+        _console->println("LBT: Failed to configure channel parameters");
+        return false;
+    }
+
+    // Enable only this channel for transmission
+    if (!_radio->enableOnlyChannel(channelId))
+    {
+        _console->println("LBT: Failed to enable only target channel");
+        return false;
+    }
+
+    // Give the module time to process channel configuration
+    delay(500);
+
+    // Configure basic LoRaWAN parameters using available Sodaq_RN2483 methods
+    // Set spreading factor to SF9 for good balance of range/speed
+    if (!_loRaBee->setSpreadingFactor(9))
+    {
+        _console->println("LBT: Failed to set spreading factor");
+        return false;
+    }
+
+    // Set power index to 1 (14 dBm for EU868)
+    if (!_loRaBee->setPowerIndex(1))
+    {
+        _console->println("LBT: Failed to set power index");
+        return false;
+    }
+
+    // Save the configuration to module's EEPROM
+    if (!_radio->saveConfiguration())
+    {
+        _console->println("LBT: Warning - failed to save configuration");
+        // Don't fail completely, just warn
+    }
+
+    // Additional delay to ensure configuration is fully applied
+    delay(200);
+
+    _console->println("LBT: Channel configuration completed successfully");
+    return true;
+}
+
+bool LBT::isChannelJammed(uint8_t channelId)
+{
+    uint32_t frequency = channels[channelId].frequency;
+
+    _console->print("LBT: Probing channel ");
+    _console->print(channelId);
+    _console->print(" for jamming activity...");
+
+    // Use the radio wrapper to detect jammer on this specific frequency
+    bool jammed = _radio->detectJammerOnFrequency(frequency, 4000);
+
+    _console->print(" Result: ");
+    _console->println(jammed ? "JAMMED" : "CLEAR");
+
+    return jammed;
+}
+
+int LBT::selectBestChannel()
+{
+    int bestChannel = 0;
+    uint8_t lowestFailures = UINT8_MAX;
+
+    _console->println("LBT: Channel failure history:");
+
+    for (int i = 0; i < MAX_CHANNEL_ATTEMPTS; i++)
+    {
+        // Reset old failures (older than 30 minutes)
+        if (channels[i].failures > 0 &&
+            (millis() - channels[i].lastFailureTime) > 1800000)
+        {
+            _console->print("LBT: Resetting old failures for channel ");
+            _console->println(channels[i].channelId);
+            channels[i].failures = 0;
+        }
+
+        _console->print("LBT:   Channel ");
+        _console->print(channels[i].channelId);
+        _console->print(" (");
+        _console->print(channels[i].frequency / 1000000.0, 1);
+        _console->print(" MHz): ");
+        _console->print(channels[i].failures);
+        _console->println(" failures");
+
+        if (channels[i].failures < lowestFailures)
+        {
+            lowestFailures = channels[i].failures;
+            bestChannel = i;
+        }
+    }
+
+    _console->print("LBT: Selected channel ");
+    _console->print(channels[bestChannel].channelId);
+    _console->print(" (");
+    _console->print(channels[bestChannel].frequency / 1000000.0, 1);
+    _console->print(" MHz, ");
+    _console->print(lowestFailures);
+    _console->println(" failures)");
+
+    return bestChannel;
+}
+
+void LBT::recordChannelFailure(uint8_t channelId)
+{
+    for (int i = 0; i < MAX_CHANNEL_ATTEMPTS; i++)
+    {
+        if (channels[i].channelId == channelId)
+        {
+            if (channels[i].failures < UINT8_MAX)
+            {
+                channels[i].failures++;
+            }
+            channels[i].lastFailureTime = millis();
+
+            _console->print("LBT: Recorded failure for channel ");
+            _console->print(channelId);
+            _console->print(" (total: ");
+            _console->print(channels[i].failures);
+            _console->println(")");
+            break;
+        }
+    }
 }

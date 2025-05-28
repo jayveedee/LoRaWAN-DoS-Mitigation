@@ -1,8 +1,9 @@
 #include "BaseStrategy.h"
 
-BaseStrategy::BaseStrategy(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+BaseStrategy::BaseStrategy(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
 {
   _console = console;
+  _loraStream = loraStream;
   _loRaBee = loRaBee;
   _setRgbColor = setRgbColorCallback;
 }
@@ -34,7 +35,7 @@ void BaseStrategy::configureTransmission(const char *cr, uint8_t sf, uint8_t frq
   _loRaBee->setSpreadingFactor(sf);
   _loRaBee->setPowerIndex(frq);
   _loRaBee->setFsbChannels(fsb);
-  _loRaBee->setCodingRate(cr);
+  //_loRaBee->setCodingRate(cr); TODO doesn't work like this
 }
 
 bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count)

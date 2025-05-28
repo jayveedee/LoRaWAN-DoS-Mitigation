@@ -43,7 +43,7 @@
 
 */
 
-//#define USE_DYNAMIC_BUFFER
+// #define USE_DYNAMIC_BUFFER
 
 #define DEFAULT_INPUT_BUFFER_SIZE 128
 #define DEFAULT_RECEIVED_PAYLOAD_BUFFER_SIZE 64
@@ -68,7 +68,8 @@ typedef Stream SerialType;
 #endif
 
 // Available error codes.
-enum MacTransmitErrorCodes {
+enum MacTransmitErrorCodes
+{
     NoError = 0,
     NoResponse = 1,
     Timeout = 2,
@@ -88,8 +89,8 @@ enum MacTransmitErrorCodes {
 // and not to create a new instance.
 class Sodaq_RN2483
 {
-  public:
-    typedef void(*ReceiveCallback)(const uint8_t* buffer, uint16_t size);
+public:
+    typedef void (*ReceiveCallback)(const uint8_t *buffer, uint16_t size);
 
     // Creates a new Sodaq_RN2483 instance.
     Sodaq_RN2483();
@@ -97,89 +98,58 @@ class Sodaq_RN2483
     // Returns the correct baudrate for the serial port that connects to the device.
     uint32_t getDefaultBaudRate() { return 57600; };
 
-    uint8_t getVersion(char* version, uint8_t size);
+    uint8_t getVersion(char *version, uint8_t size);
 
     // Takes care of the initialization tasks common to both initOTA() and initABP().
     // If hardware reset is available, the module is re-set, otherwise it is woken up if possible.
     // Returns true if the module replies to a device reset command.
-    bool init(SerialType& stream, int8_t resetPin = -1, bool needInitParams = true, bool needMacReset = false);
+    bool init(SerialType &stream, int8_t resetPin = -1, bool needInitParams = true, bool needMacReset = false);
 
     // Initializes the device and connects to the network using Over-The-Air Activation.
     // Returns true on successful connection.
-    bool initOTA(SerialType& stream, const uint8_t devEUI[8], const uint8_t appEUI[8], const uint8_t appKey[16], bool adr = true, int8_t resetPin = -1);
+    bool initOTA(SerialType &stream, const uint8_t devEUI[8], const uint8_t appEUI[8], const uint8_t appKey[16], bool adr = true, int8_t resetPin = -1);
     bool initOTA(const uint8_t devEUI[8], const uint8_t appEUI[8], const uint8_t appKey[16], bool adr = true);
 
     // Initializes the device and connects to the network using Activation By Personalization.
     // Returns true on successful connection.
-    bool initABP(SerialType& stream, const uint8_t devAddr[4], const uint8_t appSKey[16], const uint8_t nwkSKey[16], bool adr = true, int8_t resetPin = -1);
+    bool initABP(SerialType &stream, const uint8_t devAddr[4], const uint8_t appSKey[16], const uint8_t nwkSKey[16], bool adr = true, int8_t resetPin = -1);
     bool initABP(const uint8_t devAddr[4], const uint8_t appSKey[16], const uint8_t nwkSKey[16], bool adr = true);
 
     // Tries to initialize device with previously stored configuration parameters and state.
     // Returns true if initialization successful.
-    bool initResume(SerialType& stream, int8_t resetPin);
+    bool initResume(SerialType &stream, int8_t resetPin);
 
     // Saves the LoRaWAN Class A protocol configuration parameters to the user EEPROM.
     bool saveState();
 
     // Sets the optional "Diagnostics and Debug" stream.
-    void setDiag(Stream& stream) { _diagStream = &stream; };
+    void setDiag(Stream &stream) { _diagStream = &stream; };
 
     // Performs a hardware reset (using the reset pin -if available).
     void hardwareReset();
 
     // Sends the given payload without acknowledgement.
     // Returns 0 (NoError) when transmission is successful or one of the MacTransmitErrorCodes otherwise.
-    uint8_t send(uint8_t port, const uint8_t* payload, uint8_t size);
+    uint8_t send(uint8_t port, const uint8_t *payload, uint8_t size);
 
     // Sends the given payload with acknowledgement.
     // Returns 0 (NoError) when transmission is successful or one of the MacTransmitErrorCodes otherwise.
-    uint8_t sendReqAck(uint8_t port, const uint8_t* payload, uint8_t size, uint8_t maxRetries);
+    uint8_t sendReqAck(uint8_t port, const uint8_t *payload, uint8_t size, uint8_t maxRetries);
 
     // Copies the latest received packet (optionally starting from the "payloadStartPosition"
     // position of the payload) into the given "buffer", up to "size" number of bytes.
     // Returns the number of bytes written or 0 if no packet is received since last transmission.
-    uint16_t receive(uint8_t* buffer, uint16_t size, uint16_t payloadStartPosition = 0);
+    uint16_t receive(uint8_t *buffer, uint16_t size, uint16_t payloadStartPosition = 0);
 
     // Gets the preprogrammed EUI node address from the module.
     // Returns the number of bytes written or 0 in case of error.
-    uint8_t getHWEUI(uint8_t* buffer, uint8_t size);
+    uint8_t getHWEUI(uint8_t *buffer, uint8_t size);
 
     // Enables all the channels that belong to the given Frequency Sub-Band (FSB)
     // and disables the rest.
     // fsb is [1, 8] or 0 to enable all channels.
     // Returns true if all channels were set successfully.
     bool setFsbChannels(uint8_t fsb);
-
-    /**
-     * Puts the module into receive mode
-     * 
-     * @param timeout The time in milliseconds to stay in receive mode (0 for continuous mode)
-     * @return true if the command was successful, false otherwise
-     */
-    bool receive(uint32_t timeout = 0);
-    
-    /**
-     * Get the SNR (Signal-to-Noise Ratio) of the last received packet
-     * 
-     * @return The SNR value in dB, or -128 if no packet has been received
-     */
-    int8_t getSNR();
-
-    /**
-     * Estimate RSSI based on SNR and other parameters
-     * 
-     * @return The estimated RSSI value in dBm, or -200 if unable to estimate
-     */
-    int16_t getRSSI();
-
-    /**
-     * Sets the radio channel parameters
-     * 
-     * @param channel The channel number to set (0-15)
-     * @param frequency The frequency in Hz
-     * @return true if the channel was set successfully, false otherwise
-     */
-    bool setChannel(uint8_t channel, uint32_t frequency);
 
     // Sets the spreading factor.
     // In reality it sets the datarate of the module according to the
@@ -191,28 +161,24 @@ class Sodaq_RN2483
     // Returns true if successful.
     bool setPowerIndex(uint8_t powerIndex);
 
-    // Sets the coding rate.
-    // Returns true if successful.
-    bool setCodingRate(const char* codingRate);
-
     // Returns mac parameter.
-    void getMacParam(const char* paramName, char* buffer, uint8_t size);
+    void getMacParam(const char *paramName, char *buffer, uint8_t size);
 
     // Sends the command together with the given paramValue (optional)
     // to the device and awaits for the response.
     // Returns true on success.
     // NOTE: command should include a trailing space if paramValue is set
-    bool sendCommand(const char* command, const uint8_t* paramValue, uint16_t size);
-    bool sendCommand(const char* command, uint8_t paramValue);
-    bool sendCommand(const char* command, const char* paramValue = NULL);
+    bool sendCommand(const char *command, const uint8_t *paramValue, uint16_t size);
+    bool sendCommand(const char *command, uint8_t paramValue);
+    bool sendCommand(const char *command, const char *paramValue = NULL);
 
     // Sends the given mac command together with the given paramValue
     // to the device and awaits for the response.
     // Returns true on success.
     // NOTE: paramName should include a trailing space
-    bool setMacParam(const char* paramName, const uint8_t* paramValue, uint16_t size);
-    bool setMacParam(const char* paramName, uint8_t paramValue);
-    bool setMacParam(const char* paramName, const char* paramValue);
+    bool setMacParam(const char *paramName, const uint8_t *paramValue, uint16_t size);
+    bool setMacParam(const char *paramName, uint8_t paramValue);
+    bool setMacParam(const char *paramName, const char *paramValue);
 
     // Sets the (optional) callback to call when a reply is received
     void setReceiveCallback(ReceiveCallback callback) { _receiveCallback = callback; };
@@ -236,14 +202,14 @@ class Sodaq_RN2483
 #endif
 
     // Provides a quick test of several methods as a pseudo-unit test.
-    void runTestSequence(SerialType& loraStream, Stream& debugStream);
+    void runTestSequence(SerialType &loraStream, Stream &debugStream);
 
-  private:
+private:
     // The stream that communicates with the device.
-    SerialType* _loraStream;
+    SerialType *_loraStream;
 
     // The (optional) stream to show debug information.
-    Stream* _diagStream;
+    Stream *_diagStream;
 
     // The size of the input buffer. Equals DEFAULT_INPUT_BUFFER_SIZE
     // by default or (optionally) a user-defined value when using USE_DYNAMIC_BUFFER.
@@ -271,8 +237,8 @@ class Sodaq_RN2483
     // Flag to make sure the buffers are not allocated more than once.
     bool _isBufferInitialized;
 
-    char* _inputBuffer;
-    char* _receivedPayloadBuffer;
+    char *_inputBuffer;
+    char *_receivedPayloadBuffer;
 #else
     char _inputBuffer[DEFAULT_INPUT_BUFFER_SIZE];
     char _receivedPayloadBuffer[DEFAULT_RECEIVED_PAYLOAD_BUFFER_SIZE];
@@ -296,7 +262,7 @@ class Sodaq_RN2483
 
     // Reads a line from the device stream into the "buffer" starting at the "start" position of the buffer.
     // Returns the number of bytes read.
-    uint16_t readLn(char* buffer, uint16_t size, uint16_t start = 0);
+    uint16_t readLn(char *buffer, uint16_t size, uint16_t start = 0);
 
     // Reads a line from the device stream into the input buffer.
     // Returns the number of bytes read.
@@ -308,8 +274,8 @@ class Sodaq_RN2483
     // Write the command prolog (just for debugging
     void writeProlog();
 
-    size_t print(const __FlashStringHelper*);
-    size_t print(const String&);
+    size_t print(const __FlashStringHelper *);
+    size_t print(const String &);
     size_t print(const char[]);
     size_t print(char);
     size_t print(unsigned char, int = DEC);
@@ -318,10 +284,10 @@ class Sodaq_RN2483
     size_t print(long, int = DEC);
     size_t print(unsigned long, int = DEC);
     size_t print(double, int = 2);
-    size_t print(const Printable&);
+    size_t print(const Printable &);
 
-    size_t println(const __FlashStringHelper*);
-    size_t println(const String& s);
+    size_t println(const __FlashStringHelper *);
+    size_t println(const String &s);
     size_t println(const char[]);
     size_t println(char);
     size_t println(unsigned char, int = DEC);
@@ -330,12 +296,12 @@ class Sodaq_RN2483
     size_t println(long, int = DEC);
     size_t println(unsigned long, int = DEC);
     size_t println(double, int = 2);
-    size_t println(const Printable&);
+    size_t println(const Printable &);
     size_t println(void);
 
     // Waits for the given string. Returns true if the string is received before a timeout.
     // Returns false if a timeout occurs or if another string is received.
-    bool expectString(const char* str, uint16_t timeout = DEFAULT_TIMEOUT);
+    bool expectString(const char *str, uint16_t timeout = DEFAULT_TIMEOUT);
     bool expectOK();
 
     // Sends a reset command to the module and waits for the success response (or timeout).
@@ -344,14 +310,14 @@ class Sodaq_RN2483
 
     // Sends a join network command to the device and waits for the response (or timeout).
     // Returns true on success.
-    bool joinNetwork(const char* type);
+    bool joinNetwork(const char *type);
 
     // Returns the enum that is mapped to the given "error" message.
-    uint8_t lookupMacTransmitError(const char* error);
+    uint8_t lookupMacTransmitError(const char *error);
 
     // Sends a a payload and blocks until there is a response back, or the receive windows have closed,
     // or the hard timeout has passed.
-    uint8_t macTransmit(const char* type, uint8_t port, const uint8_t* payload, uint8_t size);
+    uint8_t macTransmit(const char *type, uint8_t port, const uint8_t *payload, uint8_t size);
 
     // Parses the input buffer and copies the received payload into the "received payload" buffer
     // when a "mac rx" message has been received. It is called internally by macTransmit().

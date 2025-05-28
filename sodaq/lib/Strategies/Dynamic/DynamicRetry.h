@@ -7,8 +7,8 @@ template <typename BaseDynamicRetry>
 class DynamicRetry : public BaseDynamicRetry
 {
 public:
-    DynamicRetry(Stream *console, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
-        : BaseDynamicRetry(console, loRaBee, setRgbColorCallback)
+    DynamicRetry(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t))
+        : BaseDynamicRetry(console, loraStream, loRaBee, setRgbColorCallback)
     {
     }
 
