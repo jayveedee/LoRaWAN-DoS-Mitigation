@@ -25,13 +25,13 @@ jobs:
 
       - name: Install ESP32 platform
         run: |
-          arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json,https://resource.heltec.cn/download/package_heltec_esp32_index.json
           arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          arduino-cli core install heltec:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json,https://resource.heltec.cn/download/package_heltec_esp32_index.json
 
       - name: Install required libraries
         run: |
-          arduino-cli lib install "LoRa"
-          arduino-cli lib install "RadioLib"
+          arduino-cli lib install "Heltec ESP32 Dev-Boards"
 
       - name: Install custom libraries from lib folder
         run: |
