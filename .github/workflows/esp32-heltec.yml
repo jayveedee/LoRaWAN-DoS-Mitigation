@@ -25,10 +25,8 @@ jobs:
 
       - name: Install ESP32 platform
         run: |
-          arduino-cli config init
-          arduino-cli config add board_manager.additional_urls https://resource.heltec.cn/download/package_heltec_esp32_index.json
-          arduino-cli core update-index
-          arduino-cli core install heltec-esp32:esp32
+          arduino-cli core update-index --additional-urls https://resource.heltec.cn/download/package_heltec_esp32_index.json
+          arduino-cli core install heltec-esp32:esp32 --additional-urls https://resource.heltec.cn/download/package_heltec_esp32_index.json
 
       - name: Install required libraries
         run: |
