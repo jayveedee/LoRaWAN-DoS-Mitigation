@@ -43,7 +43,7 @@
 #define COMMON_ANODE
 #define FORCE_FULL_JOIN 1
 #define LORA_PORT 1
-
+ 
 // Transmission strategy types
 #define STRATEGY_STANDARD 0         // No ACK, standard transmission
 #define STRATEGY_RETRY 1            // With ACK and fixed retries

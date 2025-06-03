@@ -10,7 +10,7 @@
 
 #define DEFAULT_JAMMING 0
 #define DYNAMIC_JAMMING 1
-
+ 
 #define JAMMING_STRATEGY DEFAULT_JAMMING
 
 // Enhanced jammer with better coverage
