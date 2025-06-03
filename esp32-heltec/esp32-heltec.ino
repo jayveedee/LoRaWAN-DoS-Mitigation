@@ -35,7 +35,7 @@ void setup() {
     0,      // Hop period
     false,  // IQ inversion
     3000    // Timeout
-  );
+  ); 
 
   Serial.println("LoRa ready. Sending packets...");
 }
