@@ -1,17 +1,15 @@
-name: Compile ESP32 Sketch
+name: Compile ESP32 Lilygo Sketch
 
 on:
   push:
     branches: [main, develop]
     paths:
-      - "esp32/**"
-      - "lib/**"
+      - "esp32-lilygo/**"
       - ".github/workflows/compile-esp32.yml"
   pull_request:
     branches: [main]
     paths:
-      - "esp32/**"
-      - "lib/**"
+      - "esp32-lilygo/**"
       - ".github/workflows/compile-esp32.yml"
 
 jobs:
@@ -38,8 +36,8 @@ jobs:
       - name: Install custom libraries from lib folder
         run: |
           mkdir -p ~/Arduino/libraries
-          if [ -d "./esp32/lib" ]; then
-            for dir in ./esp32/lib/*/; do
+          if [ -d "./esp32-lilygo/lib" ]; then
+            for dir in ./esp32-lilygo/lib/*/; do
               if [ -d "$dir" ]; then
                 lib_name=$(basename "$dir")
                 echo "Installing custom library: $lib_name"
@@ -53,21 +51,21 @@ jobs:
 
       - name: Compile ESP32 sketch
         run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32 ./esp32/esp32.ino --verbose
+          arduino-cli compile --fqbn esp32:esp32:esp32 ./esp32-lilygo/esp32-lilygo.ino --verbose
 
       - name: Upload compilation artifacts
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: esp32-build
+          name: esp32-lilygo-build
           path: |
-            esp32/**/*.bin
-            esp32/**/*.hex
-            esp32/**/*.elf
+            esp32-lilygo/**/*.bin
+            esp32-lilygo/**/*.hex
+            esp32-lilygo/**/*.elf
 
       - name: Check binary size
         run: |
-          if [ -f "./esp32/esp32.ino.bin" ]; then
-            size=$(stat -c%s "./esp32/esp32.ino.bin" 2>/dev/null || stat -f%z "./esp32/esp32.ino.bin")
+          if [ -f "./esp32-lilygo/esp32-lilygo.ino.bin" ]; then
+            size=$(stat -c%s "./esp32-lilygo/esp32-lilygo.ino.bin" 2>/dev/null || stat -f%z "./esp32-lilygo/esp32-lilygo.ino.bin")
             echo "ESP32 binary size: $size bytes"
           fi
