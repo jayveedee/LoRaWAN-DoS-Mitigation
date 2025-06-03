@@ -1,17 +1,15 @@
-name: Compile SODAQ Sketch
+name: Compile SODAQ ExpLorRer Sketch
 
 on:
   push:
     branches: [main, develop]
     paths:
-      - "sodaq/**"
-      - "lib/**"
+      - "sodaq-explorer/**"
       - ".github/workflows/compile-sodaq.yml"
   pull_request:
     branches: [main]
     paths:
-      - "sodaq/**"
-      - "lib/**"
+      - "sodaq-explorer/**"
       - ".github/workflows/compile-sodaq.yml"
 
 jobs:
@@ -41,8 +39,8 @@ jobs:
       - name: Install custom libraries from lib folder
         run: |
           mkdir -p ~/Arduino/libraries
-          if [ -d "./sodaq/lib" ]; then
-            for dir in ./sodaq/lib/*/; do
+          if [ -d "./sodaq-explorer/lib" ]; then
+            for dir in ./sodaq-explorer/lib/*/; do
               if [ -d "$dir" ]; then
                 lib_name=$(basename "$dir")
                 echo "Installing custom library: $lib_name"
@@ -56,7 +54,7 @@ jobs:
 
       - name: Compile SODAQ sketch
         run: |
-          arduino-cli compile --fqbn SODAQ:samd:sodaq_explorer ./sodaq/sodaq.ino --verbose
+          arduino-cli compile --fqbn SODAQ:samd:sodaq_explorer ./sodaq-explorer/sodaq-explorer.ino --verbose
 
       - name: Upload compilation artifacts
         uses: actions/upload-artifact@v4
@@ -64,13 +62,13 @@ jobs:
         with:
           name: sodaq-build
           path: |
-            sodaq/**/*.bin
-            sodaq/**/*.hex
-            sodaq/**/*.elf
+            sodaq-explorer/**/*.bin
+            sodaq-explorer/**/*.hex
+            sodaq-explorer/**/*.elf
 
       - name: Check binary size
         run: |
-          if [ -f "./sodaq/sodaq.ino.bin" ]; then
-            size=$(stat -c%s "./sodaq/sodaq.ino.bin" 2>/dev/null || stat -f%z "./sodaq/sodaq.ino.bin")
+          if [ -f "./sodaq-explorer/sodaq-explorer.ino.bin" ]; then
+            size=$(stat -c%s "./sodaq-explorer/sodaq-explorer.ino.bin" 2>/dev/null || stat -f%z "./sodaq-explorer/sodaq-explorer.ino.bin")
             echo "SODAQ binary size: $size bytes"
           fi
