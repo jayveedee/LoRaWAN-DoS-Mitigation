@@ -56,8 +56,7 @@ In the code for the legitimate devices and the jammer, there are some configurai
 // Transmission strategy types
 #define STRATEGY_STANDARD 0         // No ACK, standard transmission
 #define STRATEGY_RETRY 1            // With ACK and fixed retries
-#define STRATEGY_DYNAMIC_SF 2       // With ACK Dynamic spreading factor adjustment               
-#define STRATEGY_DYNAMIC_SF_RETRY 3 // With ACK Dynamic spreading adjustment and fixed retries
+#define STRATEGY_DYNAMIC_SF 2       // Dynamic spreading factor adjustment
 
 // Set the active transmission strategy here
 #define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_STANDARD // swap out the STRATEGY_STANDARD
