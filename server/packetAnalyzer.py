@@ -180,16 +180,35 @@ class UplinkAnalyzer:
         alerts = []
         state = self.device_states[dev_eui]
         
-        # Check for repeated identical payloads
-        if decoded_string == state.last_string and decoded_string != "":
-            alerts.append("⚠️ Identical payload repeated - possible device malfunction")
+        # Check for repeated identical payload + count combination
+        if (decoded_string == state.last_string and 
+            count == state.last_count and 
+            decoded_string != "" and 
+            count is not None):
+            alerts.append("⚠️ Identical payload+count combination repeated - possible replay attack or device malfunction")
+        
+        # Check for payload string repeated with same count (but different FCnt)
+        elif (decoded_string == state.last_string and 
+              count == state.last_count and 
+              decoded_string != ""):
+            alerts.append("⚠️ Same payload+count with different FCnt - likely retry or duplicate")
             
         # Check counter progression if available
         if count is not None and state.last_count is not None:
-            if count == state.last_count:
-                alerts.append("⚠️ Payload counter unchanged")
+            if count == state.last_count and decoded_string != state.last_string:
+                alerts.append("⚠️ Payload counter unchanged but content changed - unexpected")
             elif count < state.last_count:
-                alerts.append("⚠️ Payload counter decreased")
+                count_diff = state.last_count - count
+                if count_diff > 100:  # Handle potential counter rollover
+                    alerts.append("ℹ️ Payload counter rollover detected")
+                else:
+                    alerts.append(f"⚠️ Payload counter decreased by {count_diff}")
+            elif count == state.last_count + 1:
+                # Normal increment - no alert needed
+                pass
+            elif count > state.last_count + 1:
+                gap = count - state.last_count
+                alerts.append(f"⚠️ Payload counter gap of {gap} - possible missed messages")
                 
         # Check for empty or minimal content
         if len(decoded_string.strip()) == 0:
