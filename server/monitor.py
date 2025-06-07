@@ -340,13 +340,24 @@ class UplinkAnalyzer:
         state = self.device_states[dev_eui]
         
         # Check for repeated identical payloads
-        if decoded_string == state.last_string and decoded_string != "":
+        if (decoded_string == state.last_string and 
+            count == state.last_count and 
+            decoded_string != "" and 
+            count is not None):
             state.stats.payload_repeated += 1
-            alerts.append("⚠️ Identical payload repeated - possible device malfunction")
-            
+            alerts.append("⚠️ Identical payload+count combination repeated - possible device malfunction")
+
+         # Check for payload string repeated with same count (but different FCnt)
+        elif (decoded_string == state.last_string and 
+              count == state.last_count and 
+              decoded_string != ""):
+            alerts.append("⚠️ Same payload+count with different FCnt - likely retry or duplicate")
+          
         # Check counter progression if available
         if count is not None and state.last_count is not None:
-            if count == state.last_count:
+            if count == state.last_count and decoded_string != state.last_string:
+                alerts.append("⚠️ Payload counter unchanged but content changed - unexpected")
+            elif count == state.last_count:
                 alerts.append("⚠️ Payload counter unchanged")
             elif count < state.last_count:
                 state.stats.payload_count_gaps += 1
