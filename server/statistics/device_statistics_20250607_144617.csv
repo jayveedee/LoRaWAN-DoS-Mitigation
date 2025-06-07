@@ -1,2 +1,0 @@
-dev_eui,total_messages,duplicate_count,fcnt_gaps_count,fcnt_gaps_total,payload_count_gaps,timing_anomalies,rf_quality_good,rf_quality_poor,rf_quality_bad,payload_empty,payload_repeated,payload_corruption,timestamp_errors,first_seen,last_seen,avg_rssi,avg_snr,min_rssi,max_rssi,min_snr,max_snr,gateway_count_total,messages_last_hour,messages_last_day
-0004A30B00202875,6,0,0,0,0,0,6,0,0,0,5,0,0,2025-06-07T14:44:42.626296+00:00,2025-06-07T14:46:17.482550+00:00,-93.0,1.9000000000000004,-95,-90,0.2,5.2,6,6,6
