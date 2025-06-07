@@ -1,0 +1,28 @@
+============================================================
+LORA NETWORK STATISTICS REPORT
+============================================================
+Generated: 2025-06-07 14:29:55
+Total Devices: 2
+
+NETWORK OVERVIEW
+--------------------
+Total Messages Received: 9
+Total Duplicate Messages: 0
+Total Frame Count Gaps: 0
+Overall Duplicate Rate: 0.00%
+
+RF QUALITY SUMMARY
+--------------------
+Good Quality Messages: 9 (100.0%)
+Poor Quality Messages: 0 (0.0%)
+Bad Quality Messages: 0 (0.0%)
+Average RSSI: -85.1 dBm
+RSSI Range: -85.1 to -85.0 dBm
+Average SNR: 10.7 dB
+SNR Range: 7.5 to 14.0 dB
+
+TOP PROBLEMATIC DEVICES
+-------------------------
+
+RECOMMENDATIONS
+---------------
