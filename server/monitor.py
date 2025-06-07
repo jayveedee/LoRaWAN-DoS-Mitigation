@@ -99,7 +99,7 @@ class UplinkAnalyzer:
         """Start background thread to save statistics periodically"""
         def save_periodically():
             while True:
-                time.sleep(300)  # Save every 5 minutes
+                time.sleep(30)  # Save every 30 seconds
                 self.save_statistics_to_csv()
                 
         thread = Thread(target=save_periodically, daemon=True)
