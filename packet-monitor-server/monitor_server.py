@@ -1,28 +1,35 @@
+"""
+Flask server for monitoring LoRaWAN uplinks.
+"""
 import logging
-from uplink_analyzer import UplinkAnalyzer
 from flask import Flask, request, jsonify
-from dataclasses import dataclass
+from uplink_analyzer import UplinkAnalyzer
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+# ── basic, consistent logging ──────────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s │ %(levelname)-8s │ %(name)s │ %(message)s",
+)
+logger = logging.getLogger("monitor_server")
 
+# ── flask app ------------------------------------------------------------------
 app = Flask(__name__)
 analyzer = UplinkAnalyzer(logger)
 
 @app.route("/uplink", methods=["POST"])
 def uplink():
-    """Handle TTN uplink webhook"""
+    """Handle TTN uplink web-hooks (the only endpoint we keep)."""
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "No JSON data received"}), 400
+
     try:
-        data = request.json
-        if not data:
-            return jsonify({"error": "No JSON data received"}), 400
-            
         result = analyzer.analyze_uplink(data)
-        return jsonify(result), 200
-        
-    except Exception as e:
-        logger.error(f"Error processing uplink: {e}")
+        return jsonify(result)
+    except Exception:
+        logger.exception("Unexpected error while processing /uplink")
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == "__main__":
+    # bind to all interfaces so the test script can reach us
     app.run(host="0.0.0.0", port=5000, debug=False)
