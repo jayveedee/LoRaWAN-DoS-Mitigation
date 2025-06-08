@@ -44,6 +44,6 @@ for pk in cases:
     print("\n", json.dumps(res.json(), indent=2))
     time.sleep(0.5)      # keep the demo visible
 
-for n in range(50 + len(cases)):
+for n in range(50 - len(cases)):
     payload = make_payload(n, "ping", n % 256, -90, 0)
     requests.post(URL, json=payload, timeout=2)
