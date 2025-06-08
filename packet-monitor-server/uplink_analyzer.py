@@ -1,13 +1,15 @@
-import base64
-import logging
+"""
+UplinkAnalyzer: A simple LoRaWAN uplink sanity checker.
+"""
+import logging, base64, csv, os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Tuple, Optional
-
 from device_state import DeviceState
 
-
 class UplinkAnalyzer:
-    """Light but opinionated LoRaWAN uplink sanity checker."""
+    # ── statistics ─────────────────────────────────────────────────────────
+    WINDOW = 50
+    SCV_DIR = "stats"
 
     # ── tune these to taste ────────────────────────────────────────────────
     EXPECTED_INTERVAL = 10          # s, what “normal” looks like
@@ -26,6 +28,7 @@ class UplinkAnalyzer:
     def __init__(self, logger: logging.Logger) -> None:
         self._log      = logger.getChild("analyzer")
         self._devices: Dict[str, DeviceState] = {}
+        os.makedirs(self.CSV_DIR, exist_ok=True)
 
     # ------------------------------------------------------------------ API
     def analyze_uplink(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -67,6 +70,12 @@ class UplinkAnalyzer:
         )
         for a in alerts:
             self._log.warning("  %s", a)
+
+        # ----- save statistics ----------------------------------------------
+        self._update_window(state, alerts, rssi, snr, ts)   
+        if state.window.msgs >= self.WINDOW:                
+            self._export_window_csv(dev_eui, state)
+            state.window = WindowStats()                    
 
         return {
             "status":      "ok",
@@ -121,6 +130,62 @@ class UplinkAnalyzer:
             s.fcnt_sequence.pop(0)
 
         return a
+
+    def _update_window(self, s, alerts, rssi, snr, ts):
+        """Increment counters used for the 50-message roll-up."""
+        w = s.window
+        w.msgs += 1
+
+        if any("Duplicate FCnt" in al for al in alerts):
+            w.dup_fcnt += 1
+        if any("FCnt gap" in al for al in alerts):
+            w.fcnt_gap += 1
+        if any("Long delay" in al for al in alerts):
+            w.long_delay += 1
+
+        # delay stats
+        if s.last_time:
+            w.total_delay += (ts - s.last_time).total_seconds()
+
+        # RF quality
+        if rssi < self.RSSI_THRESHOLD or snr < self.SNR_THRESHOLD:
+            w.poor_rf += 1
+        elif rssi > self.RSSI_GOOD and snr > self.SNR_GOOD:
+            w.good_rf += 1
+
+        # payload quirks
+        if any("Payload+count repeated" in al for al in alerts):
+            w.same_payload += 1
+        if any("counter decreased" in al for al in alerts):
+            w.counter_decrease += 1
+
+    # ......................................... CSV serializer
+    def _export_window_csv(self, dev_eui: str, s: DeviceState):
+        w = s.window
+        avg_delay = (w.total_delay / w.msgs) if w.msgs else 0
+        row = {
+            "dev_eui"        : dev_eui,
+            "window_size"    : w.msgs,
+            "dup_fcnt_pct"   : round(100 * w.dup_fcnt / w.msgs, 2),
+            "fcnt_gap_pct"   : round(100 * w.fcnt_gap / w.msgs, 2),
+            "long_delay_pct" : round(100 * w.long_delay / w.msgs, 2),
+            "avg_delay_s"    : round(avg_delay, 2),
+            "poor_rf_pct"    : round(100 * w.poor_rf / w.msgs, 2),
+            "good_rf_pct"    : round(100 * w.good_rf / w.msgs, 2),
+            "same_payload_pct": round(100 * w.same_payload / w.msgs, 2),
+            "counter_dec_pct": round(100 * w.counter_decrease / w.msgs, 2),
+            "timestamp"      : datetime.utcnow().isoformat(),
+        }
+
+        file = os.path.join(self.CSV_DIR, f"{dev_eui}.csv")
+        write_header = not os.path.exists(file)
+        with open(file, "a", newline="") as fp:
+            wcsv = csv.DictWriter(fp, fieldnames=row.keys())
+            if write_header:
+                wcsv.writeheader()
+            wcsv.writerow(row)
+
+        self._log.info("📄 50-msg stats appended to %s", file)
 
     # .......................................... Timing
     def _analyze_timing(self, s: DeviceState, ts: datetime) -> List[str]:
