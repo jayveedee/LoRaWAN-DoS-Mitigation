@@ -68,6 +68,13 @@ class UplinkAnalyzer:
             rssi,
             snr,
         )
+
+        self._log.info(
+            "  Payload='%s' │ Counter=%s",
+            state.last_string,
+            state.last_count,
+        )
+
         for a in alerts:
             self._log.warning("  %s", a)
 
@@ -89,14 +96,29 @@ class UplinkAnalyzer:
 
     # ---------------------------------------------------------------- helpers
     def _parse_timestamp(self, raw: str) -> Tuple[datetime, List[str]]:
-        if not raw:
-            return datetime.now(timezone.utc), ["⚠️ Missing timestamp"]
+    if not raw:
+        return datetime.now(timezone.utc), ["⚠️ Missing timestamp"]
 
-        try:
-            ts = datetime.fromisoformat(raw.rstrip("Z")).replace(tzinfo=timezone.utc)
-            return ts, []
-        except Exception:
-            return datetime.now(timezone.utc), [f"⚠️ Bad timestamp: {raw!r}"]
+    try:
+        # Strip trailing 'Z'
+        if raw.endswith("Z"):
+            raw = raw[:-1]
+
+        # Split date/time and fractional seconds if present
+        if '.' in raw:
+            date_part, frac = raw.split('.', 1)
+            # Truncate fractional part to max 6 digits (microseconds)
+            # Pad with zeros if less than 6 digits
+            frac = (frac + "000000")[:6]
+            raw_fixed = f"{date_part}.{frac}"
+            ts = datetime.fromisoformat(raw_fixed).replace(tzinfo=timezone.utc)
+        else:
+            ts = datetime.fromisoformat(raw).replace(tzinfo=timezone.utc)
+
+        return ts, []
+
+    except Exception:
+        return datetime.now(timezone.utc), [f"⚠️ Bad timestamp: {raw!r}"]
 
     # .......................................... FCnt
     def _analyze_fcnt(self, s: DeviceState, fcnt: Any) -> List[str]:
@@ -162,7 +184,7 @@ class UplinkAnalyzer:
     # ......................................... CSV serializer
     def _export_window_csv(self, dev_eui: str, s: DeviceState):
         os.makedirs(self.CSV_DIR, exist_ok=True)
-        
+
         w = s.window
         avg_delay = (w.total_delay / w.msgs) if w.msgs else 0
         row = {
