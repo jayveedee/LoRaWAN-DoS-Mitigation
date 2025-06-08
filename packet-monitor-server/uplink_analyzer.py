@@ -4,7 +4,7 @@ UplinkAnalyzer: A simple LoRaWAN uplink sanity checker.
 import logging, base64, csv, os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Tuple, Optional
-from device_state import DeviceState
+from device_state import DeviceState, WindowStats
 
 class UplinkAnalyzer:
     # ── statistics ─────────────────────────────────────────────────────────
