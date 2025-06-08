@@ -45,11 +45,11 @@ class UplinkAnalyzer:
         ts, time_alert = self._parse_timestamp(ttn_ts)
         alerts: List[str] = time_alert
 
+        state = self._devices.setdefault(dev_eui, DeviceState(dev_eui))
+
         delta_seconds = None
         if state.last_time:
             delta_seconds = round((ts - state.last_time).total_seconds(), 1)
-
-        state = self._devices.setdefault(dev_eui, DeviceState(dev_eui))
 
         alerts += self._analyze_fcnt(state, fcnt)
         alerts += self._analyze_timing(state, ts)
