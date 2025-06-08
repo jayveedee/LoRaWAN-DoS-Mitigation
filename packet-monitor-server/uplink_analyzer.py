@@ -161,6 +161,8 @@ class UplinkAnalyzer:
 
     # ......................................... CSV serializer
     def _export_window_csv(self, dev_eui: str, s: DeviceState):
+        os.makedirs(self.CSV_DIR, exist_ok=True)
+        
         w = s.window
         avg_delay = (w.total_delay / w.msgs) if w.msgs else 0
         row = {
