@@ -67,7 +67,7 @@ class UplinkAnalyzer:
             "DevEUI=%s │ FCnt=%s │ Δt=%s s │ RSSI=%s dBm │ SNR=%s dB",
             dev_eui,
             fcnt,
-            delta_seconds if delta_seconds is not None else "-",
+            delta_seconds if delta_seconds is not None else "0",
             rssi,
             snr,
         )
