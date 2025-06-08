@@ -96,29 +96,28 @@ class UplinkAnalyzer:
 
     # ---------------------------------------------------------------- helpers
     def _parse_timestamp(self, raw: str) -> Tuple[datetime, List[str]]:
-    if not raw:
-        return datetime.now(timezone.utc), ["⚠️ Missing timestamp"]
+        if not raw:
+            return datetime.now(timezone.utc), ["⚠️ Missing timestamp"]
+        try:
+            # Strip trailing 'Z'
+            if raw.endswith("Z"):
+                raw = raw[:-1]
 
-    try:
-        # Strip trailing 'Z'
-        if raw.endswith("Z"):
-            raw = raw[:-1]
+            # Split date/time and fractional seconds if present
+            if '.' in raw:
+                date_part, frac = raw.split('.', 1)
+                # Truncate fractional part to max 6 digits (microseconds)
+                # Pad with zeros if less than 6 digits
+                frac = (frac + "000000")[:6]
+                raw_fixed = f"{date_part}.{frac}"
+                ts = datetime.fromisoformat(raw_fixed).replace(tzinfo=timezone.utc)
+            else:
+                ts = datetime.fromisoformat(raw).replace(tzinfo=timezone.utc)
 
-        # Split date/time and fractional seconds if present
-        if '.' in raw:
-            date_part, frac = raw.split('.', 1)
-            # Truncate fractional part to max 6 digits (microseconds)
-            # Pad with zeros if less than 6 digits
-            frac = (frac + "000000")[:6]
-            raw_fixed = f"{date_part}.{frac}"
-            ts = datetime.fromisoformat(raw_fixed).replace(tzinfo=timezone.utc)
-        else:
-            ts = datetime.fromisoformat(raw).replace(tzinfo=timezone.utc)
+            return ts, []
 
-        return ts, []
-
-    except Exception:
-        return datetime.now(timezone.utc), [f"⚠️ Bad timestamp: {raw!r}"]
+        except Exception:
+            return datetime.now(timezone.utc), [f"⚠️ Bad timestamp: {raw!r}"]
 
     # .......................................... FCnt
     def _analyze_fcnt(self, s: DeviceState, fcnt: Any) -> List[str]:
