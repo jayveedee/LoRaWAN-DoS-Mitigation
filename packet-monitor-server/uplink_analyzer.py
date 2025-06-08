@@ -9,7 +9,7 @@ from device_state import DeviceState
 class UplinkAnalyzer:
     # ── statistics ─────────────────────────────────────────────────────────
     WINDOW = 50
-    SCV_DIR = "stats"
+    CSV_DIR = "stats"
 
     # ── tune these to taste ────────────────────────────────────────────────
     EXPECTED_INTERVAL = 10          # s, what “normal” looks like
