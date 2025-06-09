@@ -22,14 +22,14 @@ class DeviceState:
     dev_eui: str
 
     last_fcnt:  Optional[int]       = None
-    last_string: str               = ""
+    last_string: str                = ""
     last_count:  Optional[int]      = None
     last_time:   Optional[datetime] = None
     last_rssi:   Optional[float]    = None
     last_snr:    Optional[float]    = None
 
-    fcnt_sequence: List[int]   = field(default_factory=list)
-    rssi_history:  List[float] = field(default_factory=list)
-    snr_history:   List[float] = field(default_factory=list)
+    fcnt_sequence: List[int]   = field(default_factory=list[int])
+    rssi_history:  List[float] = field(default_factory=list[float])
+    snr_history:   List[float] = field(default_factory=list[float])
 
-    window: WindowStats            = field(default_factory=WindowStats)
+    window: WindowStats        = field(default_factory=WindowStats)
