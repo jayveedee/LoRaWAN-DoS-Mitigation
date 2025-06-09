@@ -11,8 +11,6 @@ uint8_t nwkSKey[] = { 0 };
 uint8_t appSKey[] = { 0 };
 uint32_t devAddr =  0;
 
-RTC_DATA_ATTR uint8_t counter = 0;
-
 /*LoraWan channelsmask, default channels 0-7*/ 
 uint16_t userChannelsMask[6]={ 0x00FF,0x0000,0x0000,0x0000,0x0000,0x0000 };
 
@@ -65,6 +63,8 @@ uint32_t eu868Frequencies[] = {
   867700000, 867900000
 };
 
+RTC_DATA_ATTR uint8_t counter = 0;
+
 /* Prepare real data */
 static void prepareTxFrame(uint8_t port, uint8_t count) {
   appDataSize = 5;
@@ -89,16 +89,17 @@ void sendProbePacket(uint32_t frequencyHz) {
 /* Check RSSI after baiting */
 bool isLikelyJammed(uint32_t frequencyHz) {
   delay(100);  // let the jammer react
+  Radio.Sleep();                     // ensure radio is idle
+  Radio.SetChannel(frequencyHz);    // set channel
+  Radio.Rx(0);                       // enable continuous RX mode
+  delay(50);                         // short listen duration
 
+  int16_t rssi = Radio.Rssi(MODEM_LORA);  // ✅ use RadioRssi()
   Radio.Sleep();
-  Radio.SetChannel(frequencyHz);
-  Radio.Rx(0);
-  delay(50);  // listen window
 
-  int16_t rssi = Radio.Rssi(MODEM_LORA);
-  Radio.Sleep();
+  Serial.printf("📶 RSSI: %d dBm\n", rssi);
 
-  Serial.printf("📶 RSSI after probe: %d dBm\n", rssi);
+  // Threshold can be tuned. Jammed if signal power is too strong
   return rssi > -85;
 }
 
