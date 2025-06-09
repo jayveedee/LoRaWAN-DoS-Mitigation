@@ -20,8 +20,6 @@ uint8_t appEui[]    = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 };
 uint8_t appKey[]    = { 0x7E, 0xAB, 0x4C, 0x95, 0xCF, 0x55, 0xAB, 0xE5,
                  0xDF, 0x81, 0x27, 0xCF, 0x6D, 0x0A, 0xD6, 0x18 };
 
-RTC_DATA_ATTR uint8_t counter = 0;
-
 /* ABP para*/
 uint8_t nwkSKey[] = { 0 };
 uint8_t appSKey[] = { 0 };
@@ -78,6 +76,8 @@ uint32_t eu868Frequencies[] = {
   867100000, 867300000, 867500000,
   867700000, 867900000
 };
+
+RTC_DATA_ATTR uint8_t counter = 0;
 
 /* Prepares the payload of the frame */
 static void prepareTxFrame( uint8_t port, uint8_t count)
@@ -151,7 +151,6 @@ void loop()
                 LoRaWAN.send();
                 sent = true;
                 counter++;
-                Serial.println(counter);
                 break;
             } else {
                 Serial.printf("Channel %.1f MHz is jammed.\n", freq / 1e6);
