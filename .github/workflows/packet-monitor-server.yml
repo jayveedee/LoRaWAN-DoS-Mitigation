@@ -1,0 +1,43 @@
+name: Compile Packet Monitor Server
+
+on:
+  push:
+    paths:
+      - "packet-monitor-server/**"
+  pull_request:
+    paths:
+      - "packet-monitor-server/**"
+
+jobs:
+  flask-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: packet-monitor-server
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Flask requests
+
+      - name: Start Flask server in background
+        run: |
+          nohup python monitor_server.py > flask.log 2>&1 &
+          sleep 3  # Give it time to start
+
+      - name: Run test client
+        run: python test.py
+
+      - name: Output Flask server logs (on failure)
+        if: failure()
+        run: cat flask.log
