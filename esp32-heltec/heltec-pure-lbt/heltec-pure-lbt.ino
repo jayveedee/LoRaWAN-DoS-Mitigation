@@ -12,7 +12,12 @@
  *
  * */
 
-#include "LoRaWan_APP.h"
+#include "../lib/CustomLoRa/LoRaWan_APP.h"
+
+// #define HELTEC_BOARD 1
+// #define SLOW_CLK_TYPE RTC_SLOW_CLK_RC
+
+
 
 /* OTAA para*/
 uint8_t devEui[] = { 0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x07, 0x13, 0x09 };
