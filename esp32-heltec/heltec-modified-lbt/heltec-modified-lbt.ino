@@ -1,4 +1,4 @@
-#include "LoRaWan_APP.h"
+#include "../lib/CustomLoRa/LoRaWan_APP.h"
 
 /* OTAA para*/
 uint8_t devEui[] = { 0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x07, 0x13, 0x09 };
@@ -106,8 +106,8 @@ bool isLikelyJammed(uint32_t frequencyHz) {
 
 void setup() {
   Serial.begin(115200);
-  Mcu.begin(HELTEC_BOARD, SLOW_CLK_TPYE);
   randomSeed(analogRead(A0));
+  Mcu.begin(HELTEC_BOARD,SLOW_CLK_TPYE);
 }
 
 void loop() {
