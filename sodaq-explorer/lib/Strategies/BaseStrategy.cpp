@@ -8,6 +8,26 @@ BaseStrategy::BaseStrategy(Stream *console, Stream *loraStream, Sodaq_RN2483 *lo
   _setRgbColor = setRgbColorCallback;
 }
 
+void BaseStrategy::incrementTransmissionCount(int sf)
+{
+  if (sf >= MIN_SF && sf <= MAX_SF)
+  {
+    transmissionCounters[sf - MIN_SF]++;
+  }
+}
+
+void BaseStrategy::printTransmissionCounters()
+{
+  _console->println("Transmission counters:");
+  for (int i = MIN_SF; i <= MAX_SF; i++)
+  {
+    _console->print("SF");
+    _console->print(i);
+    _console->print(": ");
+    _console->println(transmissionCounters[i - MIN_SF]);
+  }
+}
+
 FrameCounters BaseStrategy::fetchFrameCounters()
 {
   char dnbuf[16];

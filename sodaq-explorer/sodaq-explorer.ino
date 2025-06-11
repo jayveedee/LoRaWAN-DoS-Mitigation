@@ -43,7 +43,7 @@
 #define COMMON_ANODE
 #define FORCE_FULL_JOIN 1
 #define LORA_PORT 1
- 
+
 // Transmission strategy types
 #define STRATEGY_STANDARD 0         // No ACK, standard transmission
 #define STRATEGY_RETRY 1            // With ACK and fixed retries
@@ -54,7 +54,7 @@
 #define STRATEGY_LBT 6              // Listen Before Talk jamming mitigation              (lbt does not work)
 
 // Set the active transmission strategy here
-#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_LBT
+#define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_STANDARD
 
 static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
@@ -155,6 +155,7 @@ void loop()
 
   if (counters.uplink >= 50 && success)
   {
+    activeStrategy->printTransmissionCounters();
     CONSOLE_STREAM.println("Reached 50 uplink frame counters, halting Sodaq.");
     while (1)
       ;

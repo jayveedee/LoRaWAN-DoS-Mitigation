@@ -24,6 +24,7 @@ bool Retry::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &co
   for (uint8_t i = 0; i < _maxRetries - 1; i++)
   {
     _setRgbColor(0x00, 0xFF, 0x7F);
+    incrementTransmissionCount(9);
     res = _loRaBee->sendReqAck(port, buffer, size, 0);
     isInErrorState = handleErrorState(res, count);
 

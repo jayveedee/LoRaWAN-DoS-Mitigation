@@ -20,12 +20,20 @@ protected:
 
   bool handleErrorState(uint8_t res, uint8_t &count);
   void configureTransmission(const char *cr, uint8_t sf, uint8_t frq, uint8_t fsb);
+  void incrementTransmissionCount(int sf);
 
 public:
   BaseStrategy(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
   virtual bool sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count) = 0;
   virtual FrameCounters fetchFrameCounters();
   virtual ~BaseStrategy() {}
+
+  void printTransmissionCounters();
+
+private:
+  const int MIN_SF = 9;
+  const int MAX_SF = 12;
+  int transmissionCounters[4] = {0};
 };
 
 #endif
