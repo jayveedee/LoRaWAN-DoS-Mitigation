@@ -18,9 +18,8 @@ protected:
   Sodaq_RN2483 *_loRaBee;
   void (*_setRgbColor)(uint8_t red, uint8_t green, uint8_t blue);
 
-  bool handleErrorState(uint8_t res, uint8_t &count);
+  bool handleErrorState(uint8_t res, uint8_t &count, int sf);
   void configureTransmission(const char *cr, uint8_t sf, uint8_t frq, uint8_t fsb);
-  void incrementTransmissionCount(int sf);
 
 public:
   BaseStrategy(Stream *console, Stream *loraStream, Sodaq_RN2483 *loRaBee, void (*setRgbColorCallback)(uint8_t, uint8_t, uint8_t));
@@ -34,6 +33,8 @@ private:
   const int MIN_SF = 9;
   const int MAX_SF = 12;
   int transmissionCounters[4] = {0};
+
+  void incrementTransmissionCount(int sf);
 };
 
 #endif

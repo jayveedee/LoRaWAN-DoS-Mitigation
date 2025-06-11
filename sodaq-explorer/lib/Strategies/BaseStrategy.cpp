@@ -58,7 +58,7 @@ void BaseStrategy::configureTransmission(const char *cr, uint8_t sf, uint8_t frq
   //_loRaBee->setCodingRate(cr); TODO doesn't work like this
 }
 
-bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count)
+bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count, int sf)
 {
   _console->print("LoRa transmission result: ");
   _console->println(res);
@@ -78,6 +78,7 @@ bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count)
     {
       count++;
     }
+    incrementTransmissionCount(sf);
     delay(10000);
     break;
   case NoResponse:
@@ -134,6 +135,7 @@ bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count)
   case NoAcknowledgment:
     _console->println("There was no acknowledgment sent back!");
     _setRgbColor(0xFF, 0xB0, 0x50);
+    incrementTransmissionCount(sf);
     delay(10000);
     break;
   default:
