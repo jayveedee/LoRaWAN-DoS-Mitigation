@@ -64,6 +64,7 @@ uint32_t eu868Frequencies[] = {
 };
 
 RTC_DATA_ATTR uint8_t counter = 0;
+int transmissionCount = 0;
 
 /* Prepare real data */
 static void prepareTxFrame(uint8_t port, uint8_t count) {
@@ -139,6 +140,7 @@ void loop() {
           LoRaWAN.setTxFrequency(freq);
           LoRaWAN.send();
 
+          transmissionCount++;
           Serial.printf("📤 Transmitting on %.1f MHz | Count: %d\n", freq / 1e6, counter);
           counter++;
           sent = true;
@@ -177,6 +179,9 @@ void loop() {
   }
 
   if (counter > 49) {
+    Selial.println("Transmission counters:");
+    Serial.print("SF9: ");
+    Serial.println(transmissionCount);
     Serial.println("Reached 50 transmissions. Halting.");
     while (true);
   }

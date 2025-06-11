@@ -78,6 +78,7 @@ uint32_t eu868Frequencies[] = {
 };
 
 RTC_DATA_ATTR uint8_t counter = 0;
+int transmissionCount = 0;
 
 /* Prepares the payload of the frame */
 static void prepareTxFrame( uint8_t port, uint8_t count)
@@ -152,6 +153,7 @@ void loop()
                 Serial.printf("\u2705 Transmitting on %.1f MHz\n", freq / 1e6);
                 LoRaWAN.setTxFrequency(freq); // You may need to implement this via MAC commands or lower-level modification
                 LoRaWAN.send();
+                transmissionCount++;
                 sent = true;
                 counter++;
                 break;
@@ -187,6 +189,9 @@ void loop()
     }
   }
   if (counter > 49) {
+    Selial.println("Transmission counters:");
+    Serial.print("SF9: ");
+    Serial.println(transmissionCount);
     Serial.println("Reached 50 uplink frame counters, halting Heltec.");
     while (1);
   }
