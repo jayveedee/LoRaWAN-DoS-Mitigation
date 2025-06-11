@@ -1,16 +1,16 @@
-name: Compile SODAQ ExpLorRer Sketch
+name: Compile SODAQ ExpLoRer Sketch
 
 on:
   push:
     branches: [main, develop]
     paths:
       - "sodaq-explorer/**"
-      - ".github/workflows/compile-sodaq.yml"
+      - ".github/workflows/sodaq-explorer.yml"
   pull_request:
     branches: [main]
     paths:
       - "sodaq-explorer/**"
-      - ".github/workflows/compile-sodaq.yml"
+      - ".github/workflows/sodaq-explorer.yml"
 
 jobs:
   compile-sodaq:

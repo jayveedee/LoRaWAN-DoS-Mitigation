@@ -4,13 +4,13 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - "esp32-heltec/**"
-      - ".github/workflows/compile-esp32.yml"
+      - "esp32-heltec/heltec-modified-lbt/**"
+      - ".github/workflows/esp32-heltec-modified-lbt.yml"
   pull_request:
     branches: [main]
     paths:
-      - "esp32-heltec/**"
-      - ".github/workflows/compile-esp32.yml"
+      - "esp32-heltec/heltec-modified-lbt/**"
+      - ".github/workflows/esp32-heltec-modified-lbt.yml"
 
 jobs:
   compile-esp32:
@@ -50,7 +50,7 @@ jobs:
 
       - name: Compile ESP32 sketch
         run: |
-          arduino-cli compile --fqbn Heltec-esp32:esp32:heltec_wifi_lora_32_V2 ./esp32-heltec/esp32-heltec.ino --verbose
+          arduino-cli compile --fqbn Heltec-esp32:esp32:heltec_wifi_lora_32_V2 ./esp32-heltec/heltec-modified-lbt/heltec-modified-lbt.ino --verbose
 
       - name: Upload compilation artifacts
         uses: actions/upload-artifact@v4
@@ -58,13 +58,13 @@ jobs:
         with:
           name: esp32-heltec-build
           path: |
-            esp32-heltec/**/*.bin
-            esp32-heltec/**/*.hex
-            esp32-heltec/**/*.elf
+            esp32-heltec/heltec-modified-lbt/**/*.bin
+            esp32-heltec/heltec-modified-lbt/**/*.hex
+            esp32-heltec/heltec-modified-lbt/**/*.elf
 
       - name: Check binary size
         run: |
-          if [ -f "./esp32-heltec/esp32-heltec.ino.bin" ]; then
-            size=$(stat -c%s "./esp32-heltec/esp32-heltec.ino.bin" 2>/dev/null || stat -f%z "./esp32-heltec/esp32-heltec.ino.bin")
+          if [ -f "./esp32-heltec/heltec-modified-lbt/heltec-modified-lbt.bin" ]; then
+            size=$(stat -c%s "./esp32-heltec/heltec-modified-lbt/heltec-modified-lbt.bin" 2>/dev/null || stat -f%z "./esp32-heltec/heltec-modified-lbt/heltec-modified-lbt.ino.bin")
             echo "ESP32 binary size: $size bytes"
           fi
