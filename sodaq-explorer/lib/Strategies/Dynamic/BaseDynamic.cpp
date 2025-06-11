@@ -36,7 +36,7 @@ bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uin
         {
             _setRgbColor(0x00, 0xFF, 0x7F);
             res = _loRaBee->sendReqAck(port, buffer, size, 0);
-            isInErrorState = handleErrorState(res, count);
+            isInErrorState = handleErrorState(res, count, sf);
 
             if (!isInErrorState)
             {

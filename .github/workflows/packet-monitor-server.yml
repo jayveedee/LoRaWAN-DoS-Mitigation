@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - "packet-monitor-server/**"
+      - ".github/workflows/packet-monitor-server.yml"
   pull_request:
     paths:
       - "packet-monitor-server/**"
+      - ".github/workflows/packet-monitor-server.yml"
 
 jobs:
   compile-packet-monitor:

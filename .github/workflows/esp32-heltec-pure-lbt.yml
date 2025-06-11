@@ -1,0 +1,70 @@
+name: Compile ESP32 Heltec Sketch LBT Pure
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "esp32-heltec/heltec-pure-lbt/**"
+      - ".github/workflows/esp32-heltec-pure-lbt.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "esp32-heltec/heltec-pure-lbt/**"
+      - ".github/workflows/esp32-heltec-pure-lbt.yml"
+
+jobs:
+  compile-esp32:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Install ESP32 platform
+        run: |
+          arduino-cli core update-index --additional-urls https://resource.heltec.cn/download/package_heltec_esp32_index.json
+          arduino-cli core install Heltec-esp32:esp32 --additional-urls https://resource.heltec.cn/download/package_heltec_esp32_index.json
+
+      - name: Install required libraries
+        run: |
+          arduino-cli lib install "Heltec ESP32 Dev-Boards"
+
+      - name: Install custom libraries from lib folder
+        run: |
+          mkdir -p ~/Arduino/libraries
+          if [ -d "./esp32-heltec/lib" ]; then
+            for dir in ./esp32-heltec/lib/*/; do
+              if [ -d "$dir" ]; then
+                lib_name=$(basename "$dir")
+                echo "Installing custom library: $lib_name"
+                cp -r "$dir" ~/Arduino/libraries/
+              fi
+            done
+          fi
+
+      - name: List installed libraries
+        run: arduino-cli lib list
+
+      - name: Compile ESP32 sketch
+        run: |
+          arduino-cli compile --fqbn Heltec-esp32:esp32:heltec_wifi_lora_32_V2 ./esp32-heltec/heltec-pure-lbt/heltec-pure-lbt.ino --verbose
+
+      - name: Upload compilation artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: esp32-heltec-build
+          path: |
+            esp32-heltec/heltec-pure-lbt/**/*.bin
+            esp32-heltec/heltec-pure-lbt/**/*.hex
+            esp32-heltec/heltec-pure-lbt/**/*.elf
+
+      - name: Check binary size
+        run: |
+          if [ -f "./esp32-heltec/heltec-pure-lbt/heltec-pure-lbt.bin" ]; then
+            size=$(stat -c%s "./esp32-heltec/heltec-pure-lbt/heltec-pure-lbt.bin" 2>/dev/null || stat -f%z "./esp32-heltec/heltec-pure-lbt/heltec-pure-lbt.ino.bin")
+            echo "ESP32 binary size: $size bytes"
+          fi

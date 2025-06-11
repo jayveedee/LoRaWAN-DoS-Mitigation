@@ -83,6 +83,7 @@ uint32_t eu868Frequencies[] = {
 };
 
 RTC_DATA_ATTR uint8_t counter = 0;
+int transmissionCount = 0;
 
 /* Prepares the payload of the frame */
 static void prepareTxFrame( uint8_t port, uint8_t count)
@@ -122,6 +123,7 @@ bool isLikelyJammed(uint32_t frequencyHz) {
 void setup() {
   Serial.begin(115200);
   Mcu.begin(HELTEC_BOARD,SLOW_CLK_TPYE);
+  randomSeed(analogRead(A0));
 }
 
 void loop()
@@ -147,6 +149,8 @@ void loop()
     {
         bool sent = false;
 
+        shuffleFrequencies(eu868Frequencies, sizeof(eu868Frequencies) / sizeof(eu868Frequencies[0]));
+        
         for (uint8_t i = 0; i < sizeof(eu868Frequencies) / sizeof(eu868Frequencies[0]); i++) {
             uint32_t freq = eu868Frequencies[i];
             if (!isLikelyJammed(freq)) {
@@ -154,6 +158,7 @@ void loop()
                 Serial.printf("\u2705 Transmitting on %.1f MHz\n", freq / 1e6);
                 LoRaWAN.setTxFrequency(freq); // You may need to implement this via MAC commands or lower-level modification
                 LoRaWAN.send();
+                transmissionCount++;
                 sent = true;
                 counter++;
                 break;
@@ -189,7 +194,19 @@ void loop()
     }
   }
   if (counter > 49) {
+    Selial.println("Transmission counters:");
+    Serial.print("SF9: ");
+    Serial.println(transmissionCount);
     Serial.println("Reached 50 uplink frame counters, halting Heltec.");
     while (1);
+  }
+}
+
+void shuffleFrequencies(uint32_t* freqs, size_t size) {
+  for (size_t i = size - 1; i > 0; i--) {
+      size_t j = random(i + 1); // random(0, i)
+      uint32_t temp = freqs[i];
+      freqs[i] = freqs[j];
+      freqs[j] = temp;
   }
 }

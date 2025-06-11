@@ -80,7 +80,7 @@ bool LBT::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &coun
                     _console->println(MAX_RETRIES_PER_CHANNEL);
 
                     uint8_t result = _loRaBee->send(port, buffer, size);
-                    bool isError = handleErrorState(result, count);
+                    bool isError = handleErrorState(result, count, 9);
 
                     if (!isError)
                     {

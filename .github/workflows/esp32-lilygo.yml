@@ -5,12 +5,12 @@ on:
     branches: [main, develop]
     paths:
       - "esp32-lilygo/**"
-      - ".github/workflows/compile-esp32.yml"
+      - ".github/workflows/esp32-lilygo.yml"
   pull_request:
     branches: [main]
     paths:
       - "esp32-lilygo/**"
-      - ".github/workflows/compile-esp32.yml"
+      - ".github/workflows/esp32-lilygo.yml"
 
 jobs:
   compile-esp32:

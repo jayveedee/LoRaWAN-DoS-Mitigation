@@ -20,7 +20,7 @@ bool Standard::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t 
 
   _setRgbColor(0x00, 0xFF, 0x7F);
   uint8_t res = _loRaBee->send(port, buffer, size);
-  bool isInErrorState = handleErrorState(res, count);
+  bool isInErrorState = handleErrorState(res, count, 9);
 
   if (isInErrorState)
   {

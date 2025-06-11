@@ -64,6 +64,7 @@ uint32_t eu868Frequencies[] = {
 };
 
 RTC_DATA_ATTR uint8_t counter = 0;
+int transmissionCount = 0;
 
 /* Prepare real data */
 static void prepareTxFrame(uint8_t port, uint8_t count) {
@@ -105,6 +106,7 @@ bool isLikelyJammed(uint32_t frequencyHz) {
 
 void setup() {
   Serial.begin(115200);
+  randomSeed(analogRead(A0));
   Mcu.begin(HELTEC_BOARD,SLOW_CLK_TPYE);
 }
 
@@ -125,6 +127,8 @@ void loop() {
     case DEVICE_STATE_SEND: {
       bool sent = false;
 
+      shuffleFrequencies(eu868Frequencies, sizeof(eu868Frequencies) / sizeof(eu868Frequencies[0]));
+
       for (uint8_t i = 0; i < sizeof(eu868Frequencies) / sizeof(eu868Frequencies[0]); i++) {
         uint32_t freq = eu868Frequencies[i];
 
@@ -136,6 +140,7 @@ void loop() {
           LoRaWAN.setTxFrequency(freq);
           LoRaWAN.send();
 
+          transmissionCount++;
           Serial.printf("📤 Transmitting on %.1f MHz | Count: %d\n", freq / 1e6, counter);
           counter++;
           sent = true;
@@ -174,7 +179,19 @@ void loop() {
   }
 
   if (counter > 49) {
+    Selial.println("Transmission counters:");
+    Serial.print("SF9: ");
+    Serial.println(transmissionCount);
     Serial.println("Reached 50 transmissions. Halting.");
     while (true);
+  }
+}
+
+void shuffleFrequencies(uint32_t* freqs, size_t size) {
+  for (size_t i = size - 1; i > 0; i--) {
+      size_t j = random(i + 1); // random(0, i)
+      uint32_t temp = freqs[i];
+      freqs[i] = freqs[j];
+      freqs[j] = temp;
   }
 }
