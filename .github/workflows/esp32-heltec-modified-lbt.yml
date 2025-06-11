@@ -1,4 +1,4 @@
-name: Compile ESP32 Heltec Sketch
+name: Compile ESP32 Heltec Sketch LBT Modified
 
 on:
   push:
