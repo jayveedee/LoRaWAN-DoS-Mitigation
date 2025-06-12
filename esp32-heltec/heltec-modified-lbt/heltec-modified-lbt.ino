@@ -31,7 +31,7 @@ bool overTheAirActivation = true;
 bool loraWanAdr = false;
 
 /* Indicates if the node is sending confirmed or unconfirmed messages */
-bool isTxConfirmed = true;
+bool isTxConfirmed = false;
 
 /* Application port */
 uint8_t appPort = 2;
@@ -55,25 +55,22 @@ uint8_t appPort = 2;
  * Note, that if NbTrials is set to 1 or 2, the MAC will not decrease
  * the datarate, in case the LoRaMAC layer did not receive an acknowledgment
  */
-uint8_t confirmedNbTrials = 4;
+// uint8_t confirmedNbTrials = 4;
 
 uint32_t eu868Frequencies[] = {
     868100000, 868300000, 868500000,
     867100000, 867300000, 867500000,
     867700000, 867900000};
 
-RTC_DATA_ATTR uint8_t counter = 0;
-int transmissionCount = 0;
-
 /* Prepare real data */
-static void prepareTxFrame(uint8_t port, uint8_t count)
+static void prepareTxFrame(uint8_t port)
 {
   appDataSize = 5;
   appData[0] = 't';
   appData[1] = 'e';
   appData[2] = 's';
   appData[3] = 't';
-  appData[4] = count;
+  appData[4] = getUplinkFrameCounter();
 }
 
 /* Send a meaningless probe packet to bait a reactive jammer */
@@ -103,25 +100,30 @@ void sendProbePacket(uint32_t frequencyHz)
   Radio.Send(dummyPayload, sizeof(dummyPayload)); // ⬅️ Raw radio transmit
 
   Serial.println("🧪 Raw probe LoRa packet sent.");
+  delay(50); // Optional: allow TX to complete before switching to RX
 }
 
-/* Check RSSI after baiting */
+/* Check RSSI and SNR after baiting */
 bool isLikelyJammed(uint32_t frequencyHz)
 {
-  delay(100);                    // let the jammer react
-  Radio.Sleep();                 // ensure radio is idle
-  Radio.SetChannel(frequencyHz); // set channel
-  Radio.Rx(0);                   // enable continuous RX mode
-  delay(50);                     // short listen duration
+  Radio.Sleep();
+  Radio.SetChannel(frequencyHz);
+  Radio.Rx(0);  // Continuous RX mode
 
-  int16_t rssi = Radio.Rssi(MODEM_LORA); // ✅ use RadioRssi()
+  delay(200); // Allow time for potential jammer to react
+
+  int16_t rssi;
+  int8_t snr;
+  getSnrRssi(&rssi, &snr);
+
   Radio.Sleep();
 
-  Serial.printf("📶 RSSI: %d dBm\n", rssi);
+  Serial.printf("📡 RSSI: %d dBm, SNR: %d dB\n", rssi, snr);
 
-  // Threshold can be tuned. Jammed if signal power is too strong
-  return rssi > -85;
+  // Custom jamming heuristic
+  return (rssi > -85 && snr < -7);
 }
+
 
 void setup()
 {
@@ -163,13 +165,11 @@ void loop()
 
       if (!isLikelyJammed(freq))
       {
-        prepareTxFrame(appPort, counter);
+        prepareTxFrame(appPort);
         setTxFrequency(freq);
         LoRaWAN.send();
 
-        transmissionCount++;
-        Serial.printf("📤 Transmitting on %.1f MHz | Count: %d\n", freq / 1e6, counter);
-        counter++;
+        Serial.printf("📤 Transmitting on %.1f MHz | Count: %d\n", freq / 1e6, getUplinkFrameCounter());
         sent = true;
         break;
       }
@@ -211,12 +211,9 @@ void loop()
   }
   }
 
-  if (counter > 49)
+  if (getUplinkFrameCounter() >= 51)
   {
-    Serial.println("Transmission counters:");
-    Serial.print("SF9: ");
-    Serial.println(transmissionCount);
-    Serial.println("Reached 50 transmissions. Halting.");
+    Serial.println("Reached 50 (actually 51) transmissions. Halting.");
     while (true)
       ;
   }
@@ -254,4 +251,19 @@ void setTxFrequency(uint32_t frequency)
   mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;
   mibReq.Param.ChannelsMask = userChannelsMask;
   LoRaMacMibSetRequestConfirm(&mibReq);
+}
+
+void getSnrRssi(int16_t* rssiOut, int8_t* snrOut)
+{
+  PacketStatus_t pktStatus;
+  SX126xGetPacketStatus(&pktStatus);
+  *rssiOut = pktStatus.Params.LoRa.RssiPkt;
+  *snrOut = pktStatus.Params.LoRa.SnrPkt;
+}
+
+uint32_t getUplinkFrameCounter() {
+    MibRequestConfirm_t mib;
+    mib.Type = MIB_UPLINK_COUNTER;
+    LoRaMacMibGetRequestConfirm(&mib);
+    return mib.Param.UpLinkCounter;
 }

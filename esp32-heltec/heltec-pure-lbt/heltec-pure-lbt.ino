@@ -48,7 +48,7 @@ bool overTheAirActivation = true;
 bool loraWanAdr = false;
 
 /* Indicates if the node is sending confirmed or unconfirmed messages */
-bool isTxConfirmed = true;
+bool isTxConfirmed = false;
 
 /* Application port */
 uint8_t appPort = 2;
@@ -72,7 +72,7 @@ uint8_t appPort = 2;
  * Note, that if NbTrials is set to 1 or 2, the MAC will not decrease
  * the datarate, in case the LoRaMAC layer did not receive an acknowledgment
  */
-uint8_t confirmedNbTrials = 4;
+// uint8_t confirmedNbTrials = 4;
 
 uint32_t eu868Frequencies[] = {
     868100000, 868300000, 868500000,
@@ -100,22 +100,25 @@ static void prepareTxFrame(uint8_t port, uint8_t count)
   appData[4] = count;
 }
 
+/* Check RSSI and SNR after baiting */
 bool isLikelyJammed(uint32_t frequencyHz)
 {
-  Serial.printf("\U0001F50D Probing %.1f MHz for jamming...\n", frequencyHz / 1e6);
+  Radio.Sleep();
+  Radio.SetChannel(frequencyHz);
+  Radio.Rx(0);  // Continuous RX mode
 
-  Radio.Sleep();                 // ensure radio is idle
-  Radio.SetChannel(frequencyHz); // set channel
-  Radio.Rx(0);                   // enable continuous RX mode
-  delay(50);                     // short listen duration
+  delay(200); // Allow time for potential jammer to react
 
-  int16_t rssi = Radio.Rssi(MODEM_LORA); // ✅ use RadioRssi()
+  int16_t rssi;
+  int8_t snr;
+  getSnrRssi(&rssi, &snr);
+
   Radio.Sleep();
 
-  Serial.printf("📶 RSSI: %d dBm\n", rssi);
+  Serial.printf("📡 RSSI: %d dBm, SNR: %d dB\n", rssi, snr);
 
-  // Threshold can be tuned. Jammed if signal power is too strong
-  return rssi > -85;
+  // Custom jamming heuristic
+  return (rssi > -85 && snr < -7);
 }
 
 void setup()
@@ -131,9 +134,9 @@ void loop()
   {
   case DEVICE_STATE_INIT:
   {
-#if (LORAWAN_DEVEUI_AUTO)
-    LoRaWAN.generateDeveuiByChipID();
-#endif
+    #if (LORAWAN_DEVEUI_AUTO)
+      LoRaWAN.generateDeveuiByChipID();
+    #endif
     LoRaWAN.init(loraWanClass, loraWanRegion);
     // both set join DR and DR when ADR off
     LoRaWAN.setDefaultDR(3); // 3 == SF9, 2 == SF10, 1 == SF11, 0 == SF12
@@ -197,13 +200,13 @@ void loop()
     break;
   }
   }
-  if (counter > 49)
+  
+  if (getUplinkFrameCounter() >= 51)
   {
     Serial.println("Transmission counters:");
-    Serial.print("SF9: ");
     Serial.println(transmissionCount);
-    Serial.println("Reached 50 uplink frame counters, halting Heltec.");
-    while (1)
+    Serial.println("Reached 50 transmissions. Halting.");
+    while (true)
       ;
   }
 }
@@ -241,4 +244,19 @@ void setTxFrequency(uint32_t frequency)
   mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;
   mibReq.Param.ChannelsMask = userChannelsMask;
   LoRaMacMibSetRequestConfirm(&mibReq);
+}
+
+void getSnrRssi(int16_t* rssiOut, int8_t* snrOut)
+{
+  PacketStatus_t pktStatus;
+  SX126xGetPacketStatus(&pktStatus);
+  *rssiOut = pktStatus.Params.LoRa.RssiPkt;
+  *snrOut = pktStatus.Params.LoRa.SnrPkt;
+}
+
+uint32_t getUplinkFrameCounter() {
+    MibRequestConfirm_t mib;
+    mib.Type = MIB_UPLINK_COUNTER;
+    LoRaMacMibGetRequestConfirm(&mib);
+    return mib.Param.UpLinkCounter;
 }
