@@ -22,7 +22,7 @@ bool BaseDynamic::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8
 bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &count)
 {
     bool sentMessageSuccessfully = true;
-    uint16_t transmissionAmount = withRetry ? MAX_RETRIES : 1;
+    uint16_t transmissionAmount = withRetry ? MAX_RETRIES : 2;
 
     resetParameter(); // Start with default value
     uint8_t res = 0xFF;
