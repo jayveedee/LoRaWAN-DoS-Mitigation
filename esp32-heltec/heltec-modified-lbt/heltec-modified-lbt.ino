@@ -78,13 +78,30 @@ static void prepareTxFrame(uint8_t port, uint8_t count) {
 
 /* Send a meaningless probe packet to bait a reactive jammer */
 void sendProbePacket(uint32_t frequencyHz) {
-  setTxFrequency(frequencyHz);  // Set channel
-  appDataSize = 1;
-  appData[0] = 0x00;                    // Dummy byte
-  LoRaWAN.send();                      // Transmit frame
+  Radio.Sleep();  // Reset state
 
-  Serial.println("🧪 Probe packet sent.");
-  delay(150);  // Allow jammer time to react
+  Radio.SetChannel(frequencyHz);
+
+  Radio.SetTxConfig(
+    MODEM_LORA,     // Use LoRa modulation
+    14,             // Power: +14 dBm (adjust as needed)
+    0,              // Frequency deviation: 0 (not used in LoRa)
+    0,              // Bandwidth: 0 = 125 kHz
+    9,              // Datarate: SF9 (512 chips/symbol)
+    1,              // Coding rate: 1 = 4/5
+    12,             // Preamble length: 12 symbols (longer preamble = better jammer detection)
+    false,          // Variable length packet (not fixed)
+    true,           // Enable CRC (optional, jammers don’t care)
+    false,          // No frequency hopping
+    0,              // Hop period (not used)
+    false,          // No IQ inversion (standard uplinks = false; can use true to *avoid* decoding)
+    3000            // Timeout in milliseconds
+  );
+
+  uint8_t dummyPayload[1] = { 0x42 };  // meaningless data
+  Radio.Send(dummyPayload, sizeof(dummyPayload));  // ⬅️ Raw radio transmit
+
+  Serial.println("🧪 Raw probe LoRa packet sent.");
 }
 
 /* Check RSSI after baiting */
@@ -117,7 +134,7 @@ void loop() {
         LoRaWAN.generateDeveuiByChipID();
       #endif
       LoRaWAN.init(loraWanClass, loraWanRegion);
-      LoRaWAN.setDefaultDR(3);
+      LoRaWAN.setDefaultDR(3); // 3 == SF9, 2 == SF10, 1 == SF11, 0 == SF12
       break;
     }
     case DEVICE_STATE_JOIN: {

@@ -137,7 +137,7 @@ void loop()
         #endif
         LoRaWAN.init(loraWanClass,loraWanRegion);
         //both set join DR and DR when ADR off 
-        LoRaWAN.setDefaultDR(5);
+        LoRaWAN.setDefaultDR(3); // 3 == SF9, 2 == SF10, 1 == SF11, 0 == SF12 
         break;
     }
     case DEVICE_STATE_JOIN:
