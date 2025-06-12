@@ -179,7 +179,7 @@ void loop() {
   }
 
   if (counter > 49) {
-    Selial.println("Transmission counters:");
+    Serial.println("Transmission counters:");
     Serial.print("SF9: ");
     Serial.println(transmissionCount);
     Serial.println("Reached 50 transmissions. Halting.");
