@@ -12,7 +12,7 @@
  *
  * */
 
-#include "../lib/CustomLoRa/LoRaWan_APP.h"
+#include <LoRaWan_APP.h>
 
 // #define HELTEC_BOARD 1
 // #define SLOW_CLK_TYPE RTC_SLOW_CLK_RC
@@ -156,7 +156,7 @@ void loop()
             if (!isLikelyJammed(freq)) {
                 prepareTxFrame(appPort, counter);
                 Serial.printf("\u2705 Transmitting on %.1f MHz\n", freq / 1e6);
-                LoRaWAN.setTxFrequency(freq); // You may need to implement this via MAC commands or lower-level modification
+                setTxFrequency(freq); 
                 LoRaWAN.send();
                 transmissionCount++;
                 sent = true;
@@ -209,4 +209,28 @@ void shuffleFrequencies(uint32_t* freqs, size_t size) {
       freqs[i] = freqs[j];
       freqs[j] = temp;
   }
+}
+
+void setTxFrequency(uint32_t frequency)
+{
+    ChannelParams_t customChannel;
+    customChannel.Frequency = frequency;
+    customChannel.Rx1Frequency = frequency;
+    customChannel.DrRange.Value = (DR_5 << 4) | DR_0; // DR_0 to DR_5
+    customChannel.Band = 0;
+
+    // Use channel index 3 (can be changed)
+    LoRaMacChannelAdd(3, customChannel);
+
+    // Enable only channel 3 (bitmask)
+    userChannelsMask[0] = 0x08; // binary 00001000 = channel 3 only
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_CHANNELS_MASK;
+    mibReq.Param.ChannelsMask = userChannelsMask;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+
+    // Also set default channel mask
+    mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;
+    mibReq.Param.ChannelsMask = userChannelsMask;
+    LoRaMacMibSetRequestConfirm(&mibReq);
 }

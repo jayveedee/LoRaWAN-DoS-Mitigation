@@ -1,4 +1,4 @@
-#include "../lib/CustomLoRa/LoRaWan_APP.h"
+#include <LoRaWan_APP.h>
 
 /* OTAA para*/
 uint8_t devEui[] = { 0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x07, 0x13, 0x09 };
@@ -78,7 +78,7 @@ static void prepareTxFrame(uint8_t port, uint8_t count) {
 
 /* Send a meaningless probe packet to bait a reactive jammer */
 void sendProbePacket(uint32_t frequencyHz) {
-  LoRaWAN.setTxFrequency(frequencyHz);  // Set channel
+  setTxFrequency(frequencyHz);  // Set channel
   appDataSize = 1;
   appData[0] = 0x00;                    // Dummy byte
   LoRaWAN.send();                      // Transmit frame
@@ -137,7 +137,7 @@ void loop() {
 
         if (!isLikelyJammed(freq)) {
           prepareTxFrame(appPort, counter);
-          LoRaWAN.setTxFrequency(freq);
+          setTxFrequency(freq);
           LoRaWAN.send();
 
           transmissionCount++;
@@ -194,4 +194,27 @@ void shuffleFrequencies(uint32_t* freqs, size_t size) {
       freqs[i] = freqs[j];
       freqs[j] = temp;
   }
+}
+void setTxFrequency(uint32_t frequency)
+{
+    ChannelParams_t customChannel;
+    customChannel.Frequency = frequency;
+    customChannel.Rx1Frequency = frequency;
+    customChannel.DrRange.Value = (DR_5 << 4) | DR_0; // DR_0 to DR_5
+    customChannel.Band = 0;
+
+    // Use channel index 3 (can be changed)
+    LoRaMacChannelAdd(3, customChannel);
+
+    // Enable only channel 3 (bitmask)
+    userChannelsMask[0] = 0x08; // binary 00001000 = channel 3 only
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_CHANNELS_MASK;
+    mibReq.Param.ChannelsMask = userChannelsMask;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+
+    // Also set default channel mask
+    mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;
+    mibReq.Param.ChannelsMask = userChannelsMask;
+    LoRaMacMibSetRequestConfirm(&mibReq);
 }
