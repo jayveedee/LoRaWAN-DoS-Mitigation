@@ -48,7 +48,7 @@ bool overTheAirActivation = true;
 bool loraWanAdr = false;
 
 /* Indicates if the node is sending confirmed or unconfirmed messages */
-bool isTxConfirmed = true;
+bool isTxConfirmed = false;
 
 /* Application port */
 uint8_t appPort = 2;
@@ -79,11 +79,8 @@ uint32_t eu868Frequencies[] = {
     867100000, 867300000, 867500000,
     867700000, 867900000};
 
-RTC_DATA_ATTR uint8_t counter = 0;
-int transmissionCount = 0;
-
 /* Prepares the payload of the frame */
-static void prepareTxFrame(uint8_t port, uint8_t count)
+static void prepareTxFrame(uint8_t port)
 {
   /*appData size is LORAWAN_APP_DATA_MAX_SIZE which is defined in "commissioning.h".
    *appDataSize max value is LORAWAN_APP_DATA_MAX_SIZE.
@@ -97,25 +94,44 @@ static void prepareTxFrame(uint8_t port, uint8_t count)
   appData[1] = 'e';
   appData[2] = 's';
   appData[3] = 't';
-  appData[4] = count;
+  appData[4] = getUplinkFrameCounter();
 }
 
+/* Check RSSI and SNR after baiting */
 bool isLikelyJammed(uint32_t frequencyHz)
 {
-  Serial.printf("\U0001F50D Probing %.1f MHz for jamming...\n", frequencyHz / 1e6);
+  Radio.Sleep();
+  Radio.SetChannel(frequencyHz);
+  Radio.Rx(0);  // Continuous RX mode
 
-  Radio.Sleep();                 // ensure radio is idle
-  Radio.SetChannel(frequencyHz); // set channel
-  Radio.Rx(0);                   // enable continuous RX mode
-  delay(50);                     // short listen duration
+  const uint32_t listenDuration = 2000;
+  int16_t maxRssi = -128;
 
-  int16_t rssi = Radio.Rssi(MODEM_LORA); // ✅ use RadioRssi()
+  uint32_t start = millis();
+  while (millis() - start < listenDuration) {
+    int16_t rssi = SX126xGetRssiInst();
+    if (rssi > maxRssi) {
+      maxRssi = rssi;
+    }
+    delay(50);
+  }
+
+  // Sample SNR once at the end
+  int8_t snr = -25;
+  getSnr(&snr);
+
   Radio.Sleep();
 
-  Serial.printf("📶 RSSI: %d dBm\n", rssi);
+  Serial.printf("📡 Max RSSI during window: %d dBm\n", maxRssi);
+  Serial.printf("📶 SNR snapshot: %d dB\n", snr);
 
-  // Threshold can be tuned. Jammed if signal power is too strong
-  return rssi > -85;
+  // Heuristic: High RSSI or very low SNR suggests jamming
+  bool jammed = (maxRssi > -85) || (snr < -7);
+  if (jammed) {
+    Serial.println("🚫 Channel likely jammed.");
+  }
+
+  return jammed;
 }
 
 void setup()
@@ -131,9 +147,9 @@ void loop()
   {
   case DEVICE_STATE_INIT:
   {
-#if (LORAWAN_DEVEUI_AUTO)
-    LoRaWAN.generateDeveuiByChipID();
-#endif
+    #if (LORAWAN_DEVEUI_AUTO)
+      LoRaWAN.generateDeveuiByChipID();
+    #endif
     LoRaWAN.init(loraWanClass, loraWanRegion);
     // both set join DR and DR when ADR off
     LoRaWAN.setDefaultDR(3); // 3 == SF9, 2 == SF10, 1 == SF11, 0 == SF12
@@ -142,6 +158,10 @@ void loop()
   case DEVICE_STATE_JOIN:
   {
     LoRaWAN.join();
+    // After OTAA join, remove all default channels (0-7)
+    for (int i = 0; i <= 7; i++) {
+        LoRaMacChannelRemove(i);
+    }
     break;
   }
   case DEVICE_STATE_SEND:
@@ -155,18 +175,17 @@ void loop()
       uint32_t freq = eu868Frequencies[i];
       if (!isLikelyJammed(freq))
       {
-        prepareTxFrame(appPort, counter);
-        Serial.printf("\u2705 Transmitting on %.1f MHz\n", freq / 1e6);
+        prepareTxFrame(appPort);
+        Serial.printf("📤 Transmitting on %.1f MHz | Count: %d\n", freq / 1e6, getUplinkFrameCounter());
         setTxFrequency(freq);
         LoRaWAN.send();
-        transmissionCount++;
+        
         sent = true;
-        counter++;
         break;
       }
       else
       {
-        Serial.printf("Channel %.1f MHz is jammed.\n", freq / 1e6);
+        Serial.printf("🚫 Jammed (possibly): %.1f MHz\n", freq / 1e6);
       }
     }
 
@@ -197,13 +216,11 @@ void loop()
     break;
   }
   }
-  if (counter > 49)
+  
+  if (getUplinkFrameCounter() >= 51)
   {
-    Serial.println("Transmission counters:");
-    Serial.print("SF9: ");
-    Serial.println(transmissionCount);
-    Serial.println("Reached 50 uplink frame counters, halting Heltec.");
-    while (1)
+    Serial.println("Reached 50 (actually 51) transmissions. Halting.");
+    while (true)
       ;
   }
 }
@@ -227,18 +244,36 @@ void setTxFrequency(uint32_t frequency)
   customChannel.DrRange.Value = (DR_5 << 4) | DR_0; // DR_0 to DR_5
   customChannel.Band = 0;
 
-  // Use channel index 3 (can be changed)
-  LoRaMacChannelAdd(3, customChannel);
+  // Use a custom, high index (above 8) to avoid clashing with TTN-managed channels
+  const uint8_t customIndex = 8;
+  LoRaMacChannelAdd(customIndex, customChannel);
 
-  // Enable only channel 3 (bitmask)
-  userChannelsMask[0] = 0x08; // binary 00001000 = channel 3 only
+  // Enable only your custom index
+  memset(userChannelsMask, 0, sizeof(userChannelsMask));
+  userChannelsMask[customIndex / 16] = (1 << (customIndex % 16));
+
+  // Apply mask to runtime channels
   MibRequestConfirm_t mibReq;
   mibReq.Type = MIB_CHANNELS_MASK;
   mibReq.Param.ChannelsMask = userChannelsMask;
   LoRaMacMibSetRequestConfirm(&mibReq);
 
-  // Also set default channel mask
+  // Apply mask to default channel set
   mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;
   mibReq.Param.ChannelsMask = userChannelsMask;
   LoRaMacMibSetRequestConfirm(&mibReq);
+}
+
+void getSnr(int8_t* snrOut)
+{
+  PacketStatus_t pktStatus;
+  SX126xGetPacketStatus(&pktStatus);
+  *snrOut = pktStatus.Params.LoRa.SnrPkt;
+}
+
+uint32_t getUplinkFrameCounter() {
+    MibRequestConfirm_t mib;
+    mib.Type = MIB_UPLINK_COUNTER;
+    LoRaMacMibGetRequestConfirm(&mib);
+    return mib.Param.UpLinkCounter;
 }
