@@ -96,11 +96,11 @@ class UplinkAnalyzer:
         }
 
     def export_window_state(self, dev_eui: str, force: bool = False) -> None:
+        state = self._devices.get(dev_eui)
         if state is None:
             self._log.error(f"[WARN] No state found for {dev_eui}")
             return  # or raise an exception
         
-        state = self._devices.get(dev_eui)
         if force or state.window.msgs >= self.WINDOW:
             self._export_window_csv(dev_eui, state)
             state.window = WindowStats()    
