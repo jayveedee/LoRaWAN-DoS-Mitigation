@@ -83,9 +83,7 @@ class UplinkAnalyzer:
 
         # ----- save statistics ----------------------------------------------
         self._update_window(state, alerts, rssi, snr, ts)   
-        if state.window.msgs >= self.WINDOW:                
-            self._export_window_csv(dev_eui, state)
-            state.window = WindowStats()                    
+        self.export_window_state(dev_eui, force=False)                 
 
         return {
             "status":      "ok",
@@ -96,6 +94,16 @@ class UplinkAnalyzer:
             "rssi":        rssi,
             "snr":         snr,
         }
+
+    def export_window_state(self, dev_eui: str, force: bool = False) -> None:
+        if state is None:
+            self._log.error(f"[WARN] No state found for {dev_eui}")
+            return  # or raise an exception
+        
+        state = self._devices.get(dev_eui)
+        if force or state.window.msgs >= self.WINDOW:
+            self._export_window_csv(dev_eui, state)
+            state.window = WindowStats()    
 
     # ---------------------------------------------------------------- helpers
     def _parse_timestamp(self, raw: str) -> Tuple[datetime, List[str]]:

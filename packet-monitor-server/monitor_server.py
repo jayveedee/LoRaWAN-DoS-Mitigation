@@ -30,6 +30,12 @@ def uplink():
         logger.exception("Unexpected error while processing /uplink")
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route("/save", methods=["POST"])
+def save():
+    """Save window state to CSV and return its contents as plain text."""
+    analyzer.export_window_state('0004A30B00202875', force=True)
+    return {"message": "Window flushed"}
+
 if __name__ == "__main__":
     # bind to all interfaces so the test script can reach us
     app.run(host="0.0.0.0", port=5000, debug=False)
