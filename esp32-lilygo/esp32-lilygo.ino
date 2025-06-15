@@ -48,7 +48,7 @@ void setup()
   Serial.println("Enhanced LoRa Jammer Started");
   Serial.println("Frequencies: 867.1-868.5 MHz");
   Serial.println("Spreading Factors: SF9-SF12");
-  Serial.printf("Current jamming strategy (0: Default, 1: Dynamic): %d", JAMMING_STRATEGY);
+  Serial.printf("Current jamming strategy (0: Default, 1: Dynamic): %d\n", JAMMING_STRATEGY);
 }
 
 void loop()
