@@ -132,7 +132,7 @@ bool isLikelyJammed(uint32_t frequencyHz)
   Serial.printf("📶 SNR snapshot: %d dB\n", snr);
 
   // Heuristic: High RSSI or very low SNR suggests jamming
-  bool jammed = (maxRssi > -85) || (snr < -7);
+  bool jammed = (maxRssi > -90) && (snr < -5);
   if (jammed) {
     Serial.println("🚫 Channel likely jammed.");
   }
