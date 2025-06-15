@@ -142,7 +142,7 @@ bool isLikelyJammed(uint32_t frequencyHz)
   Serial.printf("📶 Avg SNR over %d samples: %d dB\n", snrCount, avgSnr);
 
   // Use both max RSSI and average SNR to decide
-  bool jammed = (maxRssi > -90) && (avgSnr < -5);
+  bool jammed = (maxRssi > -80);
   if (jammed) {
     Serial.println("🚫 Channel likely jammed.");
   }
