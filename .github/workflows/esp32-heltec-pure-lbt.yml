@@ -50,7 +50,7 @@ jobs:
 
       - name: Compile ESP32 sketch
         run: |
-          arduino-cli compile --fqbn Heltec-esp32:esp32:heltec_wifi_lora_32_V2 ./esp32-heltec/heltec-pure-lbt/heltec-pure-lbt.ino --verbose
+          arduino-cli compile --fqbn Heltec-esp32:esp32:heltec_wifi_lora_32_V3 ./esp32-heltec/heltec-pure-lbt/heltec-pure-lbt.ino --verbose
 
       - name: Upload compilation artifacts
         uses: actions/upload-artifact@v4
