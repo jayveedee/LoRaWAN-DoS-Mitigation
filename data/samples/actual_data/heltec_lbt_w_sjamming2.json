@@ -1,0 +1,2171 @@
+[
+  {
+    "time": "2025-06-15T18:43:32.952Z",
+    "name": "synthetic.status.paused",
+    "isError": false,
+    "isSynthetic": true,
+    "unique_id": "synthetic.1750013012952"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:40:55.837162341Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QCHYqQGAFQ8Bxu/cNUP+ezmyL9b8TEWEGCUgZm1pv6hACMc3K8pr0anbCyMIBQcSWtUxKeoszVnX01elAx2a",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "pQMdmg==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "01A9D821",
+              "f_ctrl": {
+                "adr": true
+              },
+              "f_cnt": 3861
+            },
+            "f_port": 1,
+            "frm_payload": "xu/cNUP+ezmyL9b8TEWEGCUgZm1pv6hACMc3K8pr0anbCyMIBQcSWtUxKeoszVnX01c="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 12,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 2361518859,
+          "time": "2025-06-15T18:40:55.729043960Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:40:55.729043960Z",
+            "timestamp": 2361518859,
+            "rssi": -121,
+            "channel_rssi": -121,
+            "snr": -9,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEIvWh+YIGgwIt6e8wgYQgMWPjwMg+MX4q91E",
+            "received_at": "2025-06-15T18:40:55.770596190Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:40:55.837018240Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTEA1GXZ117GV7P84H0K4NR"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTEA1GXZ117GV7P84H0K4NR"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTEA1GX10Y8T08NKR582FWN"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:40:21.372610216Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYALQACZSIDgNBW+OSJ",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "VvjkiQ==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 45
+            },
+            "f_port": 2,
+            "frm_payload": "ZSIDgNA="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868300000",
+          "timestamp": 2326910833,
+          "time": "2025-06-15T18:40:21.108633041Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:40:21.108633041Z",
+            "timestamp": 2326910833,
+            "rssi": -36,
+            "channel_rssi": -36,
+            "snr": 12.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEPGux9UIGgwIlae8wgYQ4/HNsQEg6KLGtdxD",
+            "received_at": "2025-06-15T18:40:21.306049985Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:40:21.372472035Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTE8ZVWQMVJ0PVT10GF8R8J"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTE8ZVWQMVJ0PVT10GF8R8J"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTE8ZVW2ZTWPG9KKS1PXAVS"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:39:45.225237543Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAKwACjQeJgSh6AZv9",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "egGb/Q==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 43
+            },
+            "f_port": 2,
+            "frm_payload": "jQeJgSg="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867300000",
+          "timestamp": 2290926265,
+          "time": "2025-06-15T18:39:45.128058910Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:39:45.128058910Z",
+            "timestamp": 2290926265,
+            "rssi": -49,
+            "channel_rssi": -49,
+            "snr": 8.75,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQELmFs8QIGgsI8aa8wgYQ3rapayCoxeKu1kI=",
+            "received_at": "2025-06-15T18:39:45.158651964Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:39:45.225074014Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTE7WJ9ZP8AG87B8YBKDYV6"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTE7WJ9ZP8AG87B8YBKDYV6"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTE7WJ9EG4QH1N99KV8TR9G"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:39:11.834045597Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAKQACvlAgdECduGHl",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "nbhh5Q==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 41
+            },
+            "f_port": 2,
+            "frm_payload": "vlAgdEA="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 2257542956,
+          "time": "2025-06-15T18:39:11.734512090Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:39:11.734512090Z",
+            "timestamp": 2257542956,
+            "rssi": -33,
+            "channel_rssi": -33,
+            "snr": 11.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEKy+vbQIGgwIz6a8wgYQr5HSjQMg4IevgNpB",
+            "received_at": "2025-06-15T18:39:11.765112663Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:39:11.833915055Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTE6VYTAHNYCX0W4KJYNG82"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTE6VYTAHNYCX0W4KJYNG82"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTE6VYTZAJ4JM8BWZ0VKCYA"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:38:29.581067478Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QEcsASeARnJmg3LOaiigCDQ6MBOC",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "OjATgg==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "27012C47",
+              "f_ctrl": {
+                "adr": true
+              },
+              "f_cnt": 29254
+            },
+            "f_port": 102,
+            "frm_payload": "g3LOaiigCDQ="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 7,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868300000",
+          "timestamp": 2215300920,
+          "time": "2025-06-15T18:38:29.494689941Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:38:29.494689941Z",
+            "timestamp": 2215300920,
+            "rssi": -116,
+            "channel_rssi": -116,
+            "snr": -5.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQELieq6AIGgwIpaa8wgYQwPv+lAIgwOXl0bxA",
+            "received_at": "2025-06-15T18:38:29.515402231Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:38:29.580894144Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTE5JPDG3GE7NV4068VA82N"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTE5JPDG3GE7NV4068VA82N"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTE5JPDH79SEGSQ0PZ1E0X8"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:38:02.193469377Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAJQAClkc2GwRxiU/M",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "cYlPzA==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 37
+            },
+            "f_port": 2,
+            "frm_payload": "lkc2GwQ="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 2187889521,
+          "time": "2025-06-15T18:38:02.086544990Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:38:02.086544990Z",
+            "timestamp": 2187889521,
+            "rssi": -33,
+            "channel_rssi": -33,
+            "snr": 12.25,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEPGWopMIGgsIiqa8wgYQw46ZXCDo4oLD1j8=",
+            "received_at": "2025-06-15T18:38:02.128779017Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:38:02.193349443Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTE4QYHKXWZ47A4NJ9Q9GC4"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTE4QYHKXWZ47A4NJ9Q9GC4"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTE4QYH4WETJ7ZSKWTKQRCA"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:36:53.489257228Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAIQACPhyR2eLTRELe",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "00RC3g==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 33
+            },
+            "f_port": 2,
+            "frm_payload": "PhyR2eI="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867900000",
+          "timestamp": 2119044334,
+          "time": "2025-06-15T18:36:53.242484092Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:36:53.242484092Z",
+            "timestamp": 2119044334,
+            "rssi": -51,
+            "channel_rssi": -51,
+            "snr": 11,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEO6ZuPIHGgwIxaW8wgYQ+8qZ6QEgsIOKh9Y9",
+            "received_at": "2025-06-15T18:36:53.430759141Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:36:53.489055611Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTE2MVH9TA7GNK8N727E4N0"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTE2MVH9TA7GNK8N727E4N0"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTE2MVHQ53V15F30NT243BN"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:36:09.203918579Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAHwACu+OmoSZhIbob",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "YSG6Gw==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 31
+            },
+            "f_port": 2,
+            "frm_payload": "u+OmoSY="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867700000",
+          "timestamp": 2074901729,
+          "time": "2025-06-15T18:36:09.102320909Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:36:09.102320909Z",
+            "timestamp": 2074901729,
+            "rssi": -49,
+            "channel_rssi": -49,
+            "snr": 11.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEOH5sd0HGgsImaW8wgYQ84aTYSDonZ/OsTw=",
+            "received_at": "2025-06-15T18:36:09.147016517Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:36:09.203735923Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTE19KK74HWQ89P7AXZPN6H"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTE19KK74HWQ89P7AXZPN6H"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTE19KKGENM604SNV855N50"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:35:13.425114396Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAHAACaGCTIl0mzMCp",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "JszAqQ==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 28
+            },
+            "f_port": 2,
+            "frm_payload": "aGCTIl0="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867900000",
+          "timestamp": 2019127748,
+          "time": "2025-06-15T18:35:13.319694042Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:35:13.319694042Z",
+            "timestamp": 2019127748,
+            "rssi": -48,
+            "channel_rssi": -48,
+            "snr": 10.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEMTj5cIHGgwI4aS8wgYQuuPPygEgoMuR6+E6",
+            "received_at": "2025-06-15T18:35:13.368212364Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:35:13.424931770Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDZK4HKE04Y6JT2QTAA934"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDZK4HKE04Y6JT2QTAA934"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDZK4HCSZM0Z119AXJQ6VE"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:34:56.018897146Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAGwACOzI3dAvrc/IP",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "63PyDw==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 27
+            },
+            "f_port": 2,
+            "frm_payload": "OzI3dAs="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 2001722601,
+          "time": "2025-06-15T18:34:55.922027111Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:34:55.922027111Z",
+            "timestamp": 2001722601,
+            "rssi": -32,
+            "channel_rssi": -32,
+            "snr": 12.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEOm5v7oHGgsI0KS8wgYQmPn1CCCo3Nv/oDo=",
+            "received_at": "2025-06-15T18:34:55.961990250Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:34:56.018709656Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDZ24JHVV3CJ59XJKEC1A2"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDZ24JHVV3CJ59XJKEC1A2"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDZ24JGFCWJY1AGCVVX0TD"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:34:21.386250461Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAGQACq05gS0Pw1jd2",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "8NY3dg==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 25
+            },
+            "f_port": 2,
+            "frm_payload": "q05gS0M="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867700000",
+          "timestamp": 1967084940,
+          "time": "2025-06-15T18:34:21.283395051Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:34:21.283395051Z",
+            "timestamp": 1967084940,
+            "rssi": -48,
+            "channel_rssi": -48,
+            "snr": 11,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEIyr/akHGgwIraS8wgYQ7LaNuAEg4NWY+585",
+            "received_at": "2025-06-15T18:34:21.329376574Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:34:21.386095980Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDY0AAPJ96WFN24TG1FBNF"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDY0AAPJ96WFN24TG1FBNF"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDY0AABCXJT2KDQSW4QMPZ"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:32:22.246544516Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAEgACuEIuwe6Y7OKM",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "mOzijA==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 18
+            },
+            "f_port": 2,
+            "frm_payload": "uEIuwe4="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867300000",
+          "timestamp": 1847959034,
+          "time": "2025-06-15T18:32:22.156152009Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:32:22.156152009Z",
+            "timestamp": 1847959034,
+            "rssi": -47,
+            "channel_rssi": -47,
+            "snr": -3.75,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEPq7lvEGGgsItqO8wgYQ79a8dSCQscSX5DU=",
+            "received_at": "2025-06-15T18:32:22.188064473Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:32:22.246360943Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDTBZ6XDK0S6T2QRH7YQZH"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDTBZ6XDK0S6T2QRH7YQZH"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDTBZ6DMMAMRBX9WK84ES1"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:32:17.761350271Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QMNETwCAtxBmzkR5M7aXjbeROX9w",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "kTl/cA==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "004F44C3",
+              "f_ctrl": {
+                "adr": true
+              },
+              "f_cnt": 4279
+            },
+            "f_port": 102,
+            "frm_payload": "zkR5M7aXjbc="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 12,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867500000",
+          "timestamp": 1843445704,
+          "time": "2025-06-15T18:32:17.652430057Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:32:17.652430057Z",
+            "timestamp": 1843445704,
+            "rssi": -143,
+            "channel_rssi": -143,
+            "snr": -23.25,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEMj/gu8GGgwIsaO8wgYQ9bb76gIgwMq0r9M1",
+            "received_at": "2025-06-15T18:32:17.695057022Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:32:17.761191285Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDT7K188JT80G9W8NP15AB"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDT7K188JT80G9W8NP15AB"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDT7K14GH8NDT97VMJ0H2W"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:31:48.150064894Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAEAACyfFc3ZMZMIFx",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "GTCBcQ==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 16
+            },
+            "f_port": 2,
+            "frm_payload": "yfFc3ZM="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 1813889040,
+          "time": "2025-06-15T18:31:48.088677883Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:31:48.088677883Z",
+            "timestamp": 1813889040,
+            "rssi": -33,
+            "channel_rssi": -33,
+            "snr": 12,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEJCA9+AGGgsIlKO8wgYQ74e8RyCA/dih5TQ=",
+            "received_at": "2025-06-15T18:31:48.074417557Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:31:48.149881839Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDSANP32VE71Y899VNW89T"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDSANP32VE71Y899VNW89T"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDSANP9HSN6S7FG17J3GSB"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:31:29.622173976Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYADwAC3hlVjYWevgVd",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "nr4FXQ==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 15
+            },
+            "f_port": 2,
+            "frm_payload": "3hlVjYU="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 1795317247,
+          "time": "2025-06-15T18:31:29.514084100Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:31:29.514084100Z",
+            "timestamp": 1795317247,
+            "rssi": -31,
+            "channel_rssi": -31,
+            "snr": 11.25,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEP+7idgGGgwIgaO8wgYQ/eHMqAIgmNj8iaA0",
+            "received_at": "2025-06-15T18:31:29.543497179Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:31:29.622014717Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDRRJPD34VGEDXH1T6DK8M"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDRRJPD34VGEDXH1T6DK8M"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDRRJP51C7X54CX3S5YFR2"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:30:36.983370100Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYADAACtO84/RZHWWW9",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "R1llvQ==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 12
+            },
+            "f_port": 2,
+            "frm_payload": "tO84/RY="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867900000",
+          "timestamp": 1742687005,
+          "time": "2025-06-15T18:30:36.882641077Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:30:36.882641077Z",
+            "timestamp": 1742687005,
+            "rssi": -49,
+            "channel_rssi": -49,
+            "snr": 13.25,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEJ2W/b4GGgwIzKK8wgYQhJXp1AMgyNL1gdwy",
+            "received_at": "2025-06-15T18:30:36.901880307Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:30:36.983190148Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDQ55QJY4SVTP6PNB5KBVJ"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDQ55QJY4SVTP6PNB5KBVJ"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDQ55Q770DHCFHKF0P8VMF"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:30:23.770238898Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYACwAC/xkBBztE7wZP",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "RO8GTw==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 11
+            },
+            "f_port": 2,
+            "frm_payload": "/xkBBzs="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 1729258621,
+          "time": "2025-06-15T18:30:23.456886053Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:30:23.456886053Z",
+            "timestamp": 1729258621,
+            "rssi": -36,
+            "channel_rssi": -36,
+            "snr": 11.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEP3IybgGGgwIv6K8wgYQwdOa7wIgyJDi/qky",
+            "received_at": "2025-06-15T18:30:23.690838147Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:30:23.770091457Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDPR8TJW3RGYDXJD3BVNC7"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDPR8TJW3RGYDXJD3BVNC7"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDPR8TE2DMRRWETBAG1W3C"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:29:46.548091391Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYACQACcW3bXx0DqrGs",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "A6qxrA==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 9
+            },
+            "f_port": 2,
+            "frm_payload": "cW3bXx0="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 1692084042,
+          "time": "2025-06-15T18:29:46.285511016Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:29:46.285511016Z",
+            "timestamp": 1692084042,
+            "rssi": -34,
+            "channel_rssi": -34,
+            "snr": 11,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEMrO7KYGGgwImqK8wgYQ0J6khQIgkPLFwJ8x",
+            "received_at": "2025-06-15T18:29:46.468697106Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:29:46.547950416Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDNKXM4RZFGRGANGVCTS3W"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDNKXM4RZFGRGANGVCTS3W"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDNKXMHWKABSFDNSHC78YN"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:29:28.725308796Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYACAACz//M40FM5zM5",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "TOczOQ==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 8
+            },
+            "f_port": 2,
+            "frm_payload": "z//M40E="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867500000",
+          "timestamp": 1674425277,
+          "time": "2025-06-15T18:29:28.626439094Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:29:28.626439094Z",
+            "timestamp": 1674425277,
+            "rssi": -50,
+            "channel_rssi": -50,
+            "snr": 11,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEL3ntp4GGgwIiKK8wgYQ7pXl2QIgyLSY3N0w",
+            "received_at": "2025-06-15T18:29:28.646537986Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:29:28.725175022Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDN2GN4SKPXH35N8CFHM7Z"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDN2GN4SKPXH35N8CFHM7Z"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDN2GN9937DNP79Y6BCSN7"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:29:11.463320836Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYABwAC89BopPHXSJbU",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "10iW1A==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 7
+            },
+            "f_port": 2,
+            "frm_payload": "89BopPE="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 1657173754,
+          "time": "2025-06-15T18:29:11.372462987Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:29:11.372462987Z",
+            "timestamp": 1657173754,
+            "rssi": -34,
+            "channel_rssi": -34,
+            "snr": 12.25,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEPrtmZYGGgwI96G8wgYQra7u3AEgkIGDup0w",
+            "received_at": "2025-06-15T18:29:11.385280666Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:29:11.463181613Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDMHN78XJN83PX0GSQ67D9"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDMHN78XJN83PX0GSQ67D9"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDMHN7692F8N1R25S3TXXM"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:28:40.809283832Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYABQACWCHvaVXwyDzz",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "8Mg88w==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 5
+            },
+            "f_port": 2,
+            "frm_payload": "WCHvaVU="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867700000",
+          "timestamp": 1626518517,
+          "time": "2025-06-15T18:28:40.712282896Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:28:40.712282896Z",
+            "timestamp": 1626518517,
+            "rssi": -49,
+            "channel_rssi": -49,
+            "snr": 11.25,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEPXnyocGGgwI2KG8wgYQsoXpgQMgiOq7oKsv",
+            "received_at": "2025-06-15T18:28:40.731223583Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:28:40.809124530Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDKKQ991477CADWB8HSKXE"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDKKQ991477CADWB8HSKXE"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDKKQ9S3T2Q9RR2HCF7QCS"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:28:22.274253743Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYABAACfTXhtm6sLGMi",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "rCxjIg==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 4
+            },
+            "f_port": 2,
+            "frm_payload": "fTXhtm4="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "867300000",
+          "timestamp": 1607938196,
+          "time": "2025-06-15T18:28:22.136043071Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:28:22.136043071Z",
+            "timestamp": 1607938196,
+            "rssi": -49,
+            "channel_rssi": -49,
+            "snr": -3.25,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEJTh3P4FGgwIxqG8wgYQhJDaggEgoITXhOYu",
+            "received_at": "2025-06-15T18:28:22.196205425Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:28:22.274106372Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDK1M2J010FQGDSGSMKDD1"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDK1M2J010FQGDSGSMKDD1"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDK1M2TWX3HX9JZM390BKH"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:28:06.336986785Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAAwACmuj46COKohIA",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "iqISAA==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 3
+            },
+            "f_port": 2,
+            "frm_payload": "muj46CM="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868300000",
+          "timestamp": 1592067209,
+          "time": "2025-06-15T18:28:06.265327930Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:28:06.265327930Z",
+            "timestamp": 1592067209,
+            "rssi": -34,
+            "channel_rssi": -34,
+            "snr": 11.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEImJlPcFGgwItqG8wgYQ1fbNoAEgqO7m9Kou",
+            "received_at": "2025-06-15T18:28:06.261356795Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:28:06.336821077Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDJJ204R4MBZCRBWV0BNJA"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDJJ204R4MBZCRBWV0BNJA"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDJJ20NGB33QBQDBYF1MGB"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:27:47.764043821Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QJm6CyYAAgACDjn3N2HUiA+B",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "1IgPgQ==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "260BBA99",
+              "f_ctrl": {},
+              "f_cnt": 2
+            },
+            "f_port": 2,
+            "frm_payload": "Djn3N2E="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868100000",
+          "timestamp": 1573490049,
+          "time": "2025-06-15T18:27:47.692130088Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:27:47.692130088Z",
+            "timestamp": 1573490049,
+            "rssi": -38,
+            "channel_rssi": -38,
+            "snr": 12.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEIGbpu4FGgwIo6G8wgYQmKag7AIg6P/C2uUt",
+            "received_at": "2025-06-15T18:27:47.696201758Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:27:47.763892504Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDHZXMM69QGH04RJ63DDE1"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDHZXMM69QGH04RJ63DDE1"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDHZXMJE8WMAD210BMM1XB"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:27:29.554862914Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "QE0krQCBUIMCVU2aS4bAxYNrZx4C",
+        "payload": {
+          "m_hdr": {
+            "m_type": "UNCONFIRMED_UP"
+          },
+          "mic": "a2ceAg==",
+          "mac_payload": {
+            "f_hdr": {
+              "dev_addr": "00AD244D",
+              "f_ctrl": {
+                "adr": true
+              },
+              "f_cnt": 33616,
+              "f_opts": "Ag=="
+            },
+            "f_port": 85,
+            "frm_payload": "TZpLhsDFgw=="
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 12,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868300000",
+          "timestamp": 1555258816,
+          "time": "2025-06-15T18:27:29.468405961Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:27:29.468405961Z",
+            "timestamp": 1555258816,
+            "rssi": -133,
+            "channel_rssi": -133,
+            "snr": -21.5,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEMC7zeUFGgwIkaG8wgYQqM3AiAIggOyY5aEt",
+            "received_at": "2025-06-15T18:27:29.487015854Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:27:29.554706600Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDHE4JX8C5R2NGQ6QZAEBP"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDHE4JX8C5R2NGQ6QZAEBP"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDHE4JEPDRWCPS6940ECW0"
+  },
+  {
+    "name": "gs.down.send",
+    "time": "2025-06-15T18:26:50.853323301Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.DownlinkMessage",
+      "raw_payload": "IBR6SAiCI0UozX21PMlBKj3emCVsecNoaLP6HP00tTve",
+      "scheduled": {
+        "data_rate": {
+          "lora": {
+            "bandwidth": 125000,
+            "spreading_factor": 9,
+            "coding_rate": "4/5"
+          }
+        },
+        "frequency": "868300000",
+        "timestamp": 1519752401,
+        "downlink": {
+          "tx_power": 16.15,
+          "invert_polarization": true
+        },
+        "concentrator_timestamp": "1519752401000"
+      },
+      "correlation_ids": [
+        "gs:uplink:01JXTDG6JR6EEFXBRCKP7PS3BH",
+        "ns:downlink:01JXTDG8B49HPAHCK58ZZ9WCS0",
+        "ns:transmission:01JXTDG8B450TQBVQGXXE381BE"
+      ]
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDG6JR6EEFXBRCKP7PS3BH",
+      "ns:downlink:01JXTDG8B49HPAHCK58ZZ9WCS0",
+      "ns:transmission:01JXTDG8B450TQBVQGXXE381BE"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDG8B5GJH5HT2GZW1MTN86"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:26:49.048035599Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "AAIAAAAAAAAACRMH0H7Vs3AxGQFHHbk=",
+        "payload": {
+          "m_hdr": {},
+          "mic": "AUcduQ==",
+          "join_request_payload": {
+            "join_eui": "0000000000000002",
+            "dev_eui": "70B3D57ED0071309",
+            "dev_nonce": "1931"
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868300000",
+          "timestamp": 1514752401,
+          "time": "2025-06-15T18:26:48.949394941Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:26:48.949394941Z",
+            "timestamp": 1514752401,
+            "rssi": -29,
+            "channel_rssi": -29,
+            "snr": 13,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEJGTpdIFGgsI6aC8wgYQ1aToFiDovJ3yiiw=",
+            "received_at": "2025-06-15T18:26:48.977429423Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:26:49.047845973Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDG6JR6EEFXBRCKP7PS3BH"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDG6JR6EEFXBRCKP7PS3BH"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDG6JR55DKT3XJYT1RCQ3M"
+  },
+  {
+    "name": "gs.up.receive",
+    "time": "2025-06-15T18:26:48.222097668Z",
+    "identifiers": [
+      {
+        "gateway_ids": {
+          "gateway_id": "masters-lorawan-gateway",
+          "eui": "A84041FFFF2537D0"
+        }
+      }
+    ],
+    "data": {
+      "@type": "type.googleapis.com/ttn.lorawan.v3.GatewayUplinkMessage",
+      "message": {
+        "raw_payload": "AAIAAAAAAAAACRMH0H7Vs3Dz/UrmVLE=",
+        "payload": {
+          "m_hdr": {},
+          "mic": "SuZUsQ==",
+          "join_request_payload": {
+            "join_eui": "0000000000000002",
+            "dev_eui": "70B3D57ED0071309",
+            "dev_nonce": "FDF3"
+          }
+        },
+        "settings": {
+          "data_rate": {
+            "lora": {
+              "bandwidth": 125000,
+              "spreading_factor": 9,
+              "coding_rate": "4/5"
+            }
+          },
+          "frequency": "868300000",
+          "timestamp": 1513928810,
+          "time": "2025-06-15T18:26:48.120500087Z"
+        },
+        "rx_metadata": [
+          {
+            "gateway_ids": {
+              "gateway_id": "masters-lorawan-gateway",
+              "eui": "A84041FFFF2537D0"
+            },
+            "time": "2025-06-15T18:26:48.120500087Z",
+            "timestamp": 1513928810,
+            "rssi": -29,
+            "channel_rssi": -29,
+            "snr": 12.75,
+            "uplink_token": "CiUKIwoXbWFzdGVycy1sb3Jhd2FuLWdhdGV3YXkSCKhAQf//JTfQEOrw8tEFGgsI6KC8wgYQseHraSCQvMHphyw=",
+            "received_at": "2025-06-15T18:26:48.151549963Z"
+          }
+        ],
+        "received_at": "2025-06-15T18:26:48.221966513Z",
+        "correlation_ids": [
+          "gs:uplink:01JXTDG5RY46X5Y2Y3YXH0GHT0"
+        ]
+      },
+      "band_id": "EU_863_870"
+    },
+    "correlation_ids": [
+      "gs:uplink:01JXTDG5RY46X5Y2Y3YXH0GHT0"
+    ],
+    "origin": "ip-10-100-14-31.eu-west-1.compute.internal",
+    "context": {
+      "tenant-id": "CgN0dG4="
+    },
+    "visibility": {
+      "rights": [
+        "RIGHT_GATEWAY_TRAFFIC_READ"
+      ]
+    },
+    "unique_id": "01JXTDG5RYX5ZFEJ23KQ5T3AC1"
+  },
+  {
+    "time": "2025-06-15T18:26:44.633Z",
+    "name": "synthetic.status.cleared",
+    "isError": false,
+    "isSynthetic": true,
+    "unique_id": "synthetic.1750012004633"
+  }
+]
