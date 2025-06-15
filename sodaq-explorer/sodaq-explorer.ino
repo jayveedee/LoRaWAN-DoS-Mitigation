@@ -153,7 +153,7 @@ void loop()
   // Send using the active transmission strategy
   bool success = activeStrategy->sendMessage(LORA_PORT, buf, sizeof(buf), count);
 
-  if (counters.uplink >= 50 && success)
+  if (counters.uplink >= 50)
   {
     activeStrategy->printTransmissionCounters();
     CONSOLE_STREAM.println("Reached 50 uplink frame counters, halting Sodaq.");

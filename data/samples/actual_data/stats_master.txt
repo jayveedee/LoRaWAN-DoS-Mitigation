@@ -1,12 +1,20 @@
 Sodaq, Standard             : Failed 00, Success 51, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 00, FN 00, TP 51, TN 00
 Sodaq, Standard w/s jamming : Failed 16, Success 35, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 16, FN 00, TP 35, TN 00
 Sodaq, Standard w/d jamming : Failed 06, Success 45, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 06, FN 00, TP 45, TN 00
-Sodaq, Retry		    : Failed 04, Success 48, SF 09(52)10(00)11(00)12(00), CR 4/5, FP 00, FN 03, TP 48, TN 01
+Sodaq, Retry		        : Failed 04, Success 48, SF 09(52)10(00)11(00)12(00), CR 4/5, FP 00, FN 03, TP 48, TN 01
 Sodaq, Retry w/s jamming    : Failed 28, Success 23, SF 09(52)10(00)11(00)12(00), CR 4/5, FP 00, FN 01, TP 22, TN 28
 Sodaq, Retry w/d jamming    : Failed 08, Success 43, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 00, FN 01, TP 42, TN 07
-Sodaq, Dynamic		    : Failed 01, Success 50, SF 09(48)10(02)11(01)12(00), CR 4/5, FP 00, FN 02, TP 48, TN 01
+Sodaq, Dynamic		        : Failed 01, Success 50, SF 09(48)10(02)11(01)12(00), CR 4/5, FP 00, FN 02, TP 48, TN 01
 Sodaq, Dynamic w/s jamming  : Failed 24, Success 28, SF 09(29)10(22)11(03)12(00), CR 4/5, FP 00, FN 00, TP 28, TN 24
 Sodaq, Dynamic w/d jamming  : Failed 11, Success 40, SF 09(40)10(07)11(02)12(02), CR 4/5, FP 00, FN 00, TP 40, TN 11
 
-Sodaq, Standard w/s jamming : Failed 36, Success 15, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 36, FN 00, TP 15, TN 00
+Sodaq, Standard w/s jamming : Failed 35, Success 16, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 35, FN 00, TP 16, TN 00
 Sodaq, Standard w/d jamming : Failed 08, Success 43, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 08, FN 00, TP 43, TN 00
+
+Heltec, LBT                 : Failed 02, Success 49, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 02, FN 00, TP 49, TN 00 (gateway disconnected when 2 failed)
+Heltec, LBT w/s jamming     : Failed 38, Success 13, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 38, FN 00, TP 13, TN 00
+Heltec, LBT w/d jamming     : Failed 08, Success 43, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 08, FN 00, TP 43, TN 00
+
+Heltec, PALBT               : Failed 00, Success 51, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 00, FN 00, TP 51, TN 00
+Heltec, PALBT w/s jamming   : Failed 33, Success 18, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 33, FN 00, TP 33, TN 00
+Heltec, PALBT w/d jamming   : Failed 03, Success 48, SF 09(51)10(00)11(00)12(00), CR 4/5, FP 03, FN 00, TP 48, TN 00
