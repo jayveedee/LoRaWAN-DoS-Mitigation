@@ -55,7 +55,7 @@ uint8_t appPort = 2;
  * Note, that if NbTrials is set to 1 or 2, the MAC will not decrease
  * the datarate, in case the LoRaMAC layer did not receive an acknowledgment
  */
-// uint8_t confirmedNbTrials = 4;
+ uint8_t confirmedNbTrials = 4;
 
 uint32_t eu868Frequencies[] = {
     868100000, 868300000, 868500000,
@@ -100,7 +100,7 @@ void sendProbePacket(uint32_t frequencyHz)
   Radio.Send(dummyPayload, sizeof(dummyPayload)); // ⬅️ Raw radio transmit
 
   Serial.println("🧪 Raw probe LoRa packet sent.");
-  delay(50); // Optional: allow TX to complete before switching to RX
+  delay(500); // Optional: allow TX to complete before switching to RX
 }
 
 /* Check RSSI and SNR after baiting */
@@ -110,18 +110,34 @@ bool isLikelyJammed(uint32_t frequencyHz)
   Radio.SetChannel(frequencyHz);
   Radio.Rx(0);  // Continuous RX mode
 
-  delay(200); // Allow time for potential jammer to react
+  const uint32_t listenDuration = 2000;
+  int16_t maxRssi = -128;
 
-  int16_t rssi;
-  int8_t snr;
-  getSnrRssi(&rssi, &snr);
+  uint32_t start = millis();
+  while (millis() - start < listenDuration) {
+    int16_t rssi = SX126xGetRssiInst();
+    if (rssi > maxRssi) {
+      maxRssi = rssi;
+    }
+    delay(50);
+  }
+
+  // Sample SNR once at the end
+  int8_t snr = -25;
+  getSnr(&snr);
 
   Radio.Sleep();
 
-  Serial.printf("📡 RSSI: %d dBm, SNR: %d dB\n", rssi, snr);
+  Serial.printf("📡 Max RSSI during window: %d dBm\n", maxRssi);
+  Serial.printf("📶 SNR snapshot: %d dB\n", snr);
 
-  // Custom jamming heuristic
-  return (rssi > -85 && snr < -7);
+  // Heuristic: High RSSI or very low SNR suggests jamming
+  bool jammed = (maxRssi > -85) || (snr < -7);
+  if (jammed) {
+    Serial.println("🚫 Channel likely jammed.");
+  }
+
+  return jammed;
 }
 
 
@@ -138,9 +154,9 @@ void loop()
   {
   case DEVICE_STATE_INIT:
   {
-#if (LORAWAN_DEVEUI_AUTO)
-    LoRaWAN.generateDeveuiByChipID();
-#endif
+    #if (LORAWAN_DEVEUI_AUTO)
+      LoRaWAN.generateDeveuiByChipID();
+    #endif
     LoRaWAN.init(loraWanClass, loraWanRegion);
     LoRaWAN.setDefaultDR(3); // 3 == SF9, 2 == SF10, 1 == SF11, 0 == SF12
     break;
@@ -148,6 +164,11 @@ void loop()
   case DEVICE_STATE_JOIN:
   {
     LoRaWAN.join();
+    // After OTAA join, remove all default channels (0-7)
+    for (int i = 0; i <= 7; i++) {
+        LoRaMacChannelRemove(i);
+    }
+
     break;
   }
   case DEVICE_STATE_SEND:
@@ -175,9 +196,7 @@ void loop()
       }
       else
       {
-        Serial.printf("🚫 Jammed: %.1f MHz\n", freq / 1e6);
-        Serial.printf("🚫 Jammed: %.1f MHz\n", freq / 1e6);
-        Serial.printf("🚫 Jammed: %.1f MHz\n", freq / 1e6);
+        Serial.printf("🚫 Jammed (possibly): %.1f MHz\n", freq / 1e6);
       }
     }
 
@@ -237,27 +256,30 @@ void setTxFrequency(uint32_t frequency)
   customChannel.DrRange.Value = (DR_5 << 4) | DR_0; // DR_0 to DR_5
   customChannel.Band = 0;
 
-  // Use channel index 3 (can be changed)
-  LoRaMacChannelAdd(3, customChannel);
+  // Use a custom, high index (above 8) to avoid clashing with TTN-managed channels
+  const uint8_t customIndex = 8;
+  LoRaMacChannelAdd(customIndex, customChannel);
 
-  // Enable only channel 3 (bitmask)
-  userChannelsMask[0] = 0x08; // binary 00001000 = channel 3 only
+  // Enable only your custom index
+  memset(userChannelsMask, 0, sizeof(userChannelsMask));
+  userChannelsMask[customIndex / 16] = (1 << (customIndex % 16));
+
+  // Apply mask to runtime channels
   MibRequestConfirm_t mibReq;
   mibReq.Type = MIB_CHANNELS_MASK;
   mibReq.Param.ChannelsMask = userChannelsMask;
   LoRaMacMibSetRequestConfirm(&mibReq);
 
-  // Also set default channel mask
+  // Apply mask to default channel set
   mibReq.Type = MIB_CHANNELS_DEFAULT_MASK;
   mibReq.Param.ChannelsMask = userChannelsMask;
   LoRaMacMibSetRequestConfirm(&mibReq);
 }
 
-void getSnrRssi(int16_t* rssiOut, int8_t* snrOut)
+void getSnr(int8_t* snrOut)
 {
   PacketStatus_t pktStatus;
   SX126xGetPacketStatus(&pktStatus);
-  *rssiOut = pktStatus.Params.LoRa.RssiPkt;
   *snrOut = pktStatus.Params.LoRa.SnrPkt;
 }
 
