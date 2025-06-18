@@ -135,8 +135,8 @@ no_jamming_mdr = df[df['Jamming_Condition'] == 'No Jamming']['MDR_numeric'].valu
 static_jamming_mdr = df[df['Jamming_Condition'] == 'Static Jamming']['MDR_numeric'].values
 dynamic_jamming_mdr = df[df['Jamming_Condition'] == 'Dynamic Jamming']['MDR_numeric'].values
 
-static_drop = no_jamming_mdr - static_jamming_mdr
-dynamic_drop = no_jamming_mdr - dynamic_jamming_mdr
+static_drop = no_jamming_mdr - static_jamming_mdr # type: ignore
+dynamic_drop = no_jamming_mdr - dynamic_jamming_mdr # type: ignore
 
 strategies = df['Strategy'].unique()
 x = np.arange(len(strategies))

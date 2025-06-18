@@ -19,7 +19,7 @@ for entry in data:
 
 # For simplicity, pick the most frequent dev_addr as the target
 if dev_addr_counts:
-    target_dev_addr = max(dev_addr_counts, key=dev_addr_counts.get)
+    target_dev_addr = max(dev_addr_counts, key=dev_addr_counts.get) # type: ignore
 else:
     target_dev_addr = None
 
