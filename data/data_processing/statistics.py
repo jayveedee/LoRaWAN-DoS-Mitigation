@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 # Load the JSON data
-with open("data/samples/size50/50x_dynamic_noretry_w_smallPayload_jamming.json", "r") as f:
+with open("../samples/actual_data/sodaq_std_no_jamming.json", "r") as f:
     data = json.load(f)
 
 # Automatically find all unique dev_addrs
