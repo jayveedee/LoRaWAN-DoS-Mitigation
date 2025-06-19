@@ -11,6 +11,6 @@ Sodaq Dynamic (Dynamic Jamming; No Mitigation), 78%, 1.70, 40, 11, 0, 0, 51
 Heltec LBT (No Jamming; No Mitigation), 96%, 1.25, 49, 0, 2, 0, 51
 Heltec LBT (Static Jamming; No Mitigation), 25%, 1.25, 13, 0, 38, 0, 51
 Heltec LBT (Dynamic Jamming; No Mitigation), 84%, 1.25, 43, 0, 8, 0, 51
-Heltec PALBT (No Jamming; No Mitigation), 100%, 1.25, 51, 0, 0, 0, 51
-Heltec PALBT (Static Jamming; No Mitigation), 35%, 1.25, 18, 0, 33, 0, 51
-Heltec PALBT (Dynamic Jamming; No Mitigation), 94%, 1.25, 48, 0, 3, 0, 51
+Heltec PALBT (No Jamming; No Mitigation), 100%, 2.5, 51, 0, 0, 0, 51
+Heltec PALBT (Static Jamming; No Mitigation), 35%, 2.5, 18, 0, 33, 0, 51
+Heltec PALBT (Dynamic Jamming; No Mitigation), 94%, 2.5, 48, 0, 3, 0, 51
