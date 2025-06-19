@@ -34,6 +34,20 @@ ax1.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left'
 ax1.grid(True, alpha=0.3)
 plt.setp(ax1.get_xticklabels(), rotation=45, ha='right')
 
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+pivot_mdr.plot(kind='bar', ax=ax_temp, width=0.8)
+ax_temp.set_title('Message Delivery Rate by Strategy under Different Jamming Conditions', fontsize=14, fontweight='bold')
+ax_temp.set_ylabel('Message Delivery Rate (%)')
+ax_temp.set_xlabel('Strategy')
+ax_temp.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.setp(ax_temp.get_xticklabels(), rotation=45, ha='right')
+plt.tight_layout()
+plt.savefig('01_message_delivery_rate.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
+
 # 2. Energy Consumption Analysis
 ax2 = plt.subplot(3, 3, 2)
 pivot_ec = df.pivot(index='Strategy', columns='Jamming_Condition', values='EC')
@@ -44,6 +58,20 @@ ax2.set_xlabel('Strategy')
 ax2.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
 ax2.grid(True, alpha=0.3)
 plt.setp(ax2.get_xticklabels(), rotation=45, ha='right')
+
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+pivot_ec.plot(kind='bar', ax=ax_temp, width=0.8)
+ax_temp.set_title('Energy Consumption by Strategy under Different Jamming Conditions', fontsize=14, fontweight='bold')
+ax_temp.set_ylabel('Energy Consumption')
+ax_temp.set_xlabel('Strategy')
+ax_temp.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.setp(ax_temp.get_xticklabels(), rotation=45, ha='right')
+plt.tight_layout()
+plt.savefig('02_energy_consumption.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
 
 # 3. True Positives vs False Positives
 ax3 = plt.subplot(3, 3, 3)
@@ -62,8 +90,26 @@ ax3.set_ylabel('True Positives')
 ax3.set_xlabel('Strategy')
 ax3.set_xticks(x + width)
 ax3.set_xticklabels(df['Strategy'].unique(), rotation=45, ha='right')
-ax3.legend()
+ax3.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 ax3.grid(True, alpha=0.3)
+
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+for i, condition in enumerate(jamming_conditions):
+    condition_data = df[df['Jamming_Condition'] == condition]
+    tp_values = condition_data['TP'].values
+    ax_temp.bar(x + i*width, tp_values, width, label=f'{condition} - TP', alpha=0.8, color=colors[i])
+ax_temp.set_title('True Positives by Strategy and Jamming Condition', fontsize=14, fontweight='bold')
+ax_temp.set_ylabel('True Positives')
+ax_temp.set_xlabel('Strategy')
+ax_temp.set_xticks(x + width)
+ax_temp.set_xticklabels(df['Strategy'].unique(), rotation=45, ha='right')
+ax_temp.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('03_true_positives.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
 
 # 4. False Positives Analysis
 ax4 = plt.subplot(3, 3, 4)
@@ -77,8 +123,26 @@ ax4.set_ylabel('False Positives')
 ax4.set_xlabel('Strategy')
 ax4.set_xticks(x + width)
 ax4.set_xticklabels(df['Strategy'].unique(), rotation=45, ha='right')
-ax4.legend()
+ax4.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 ax4.grid(True, alpha=0.3)
+
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+for i, condition in enumerate(jamming_conditions):
+    condition_data = df[df['Jamming_Condition'] == condition]
+    fp_values = condition_data['FP'].values
+    ax_temp.bar(x + i*width, fp_values, width, label=f'{condition} - FP', alpha=0.8, color=colors[i])
+ax_temp.set_title('False Positives by Strategy and Jamming Condition', fontsize=14, fontweight='bold')
+ax_temp.set_ylabel('False Positives')
+ax_temp.set_xlabel('Strategy')
+ax_temp.set_xticks(x + width)
+ax_temp.set_xticklabels(df['Strategy'].unique(), rotation=45, ha='right')
+ax_temp.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('04_false_positives.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
 
 # 5. Performance Efficiency (MDR vs Energy Consumption)
 ax5 = plt.subplot(3, 3, 5)
@@ -97,8 +161,29 @@ for condition in jamming_conditions:
 ax5.set_title('Performance Efficiency:\nMessage Delivery Rate vs Energy Consumption', fontsize=12, fontweight='bold')
 ax5.set_xlabel('Energy Consumption')
 ax5.set_ylabel('Message Delivery Rate (%)')
-ax5.legend()
+ax5.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 ax5.grid(True, alpha=0.3)
+
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+for condition in jamming_conditions:
+    condition_data = df[df['Jamming_Condition'] == condition]
+    ax_temp.scatter(condition_data['EC'], condition_data['MDR_numeric'], 
+                   label=condition, s=100, alpha=0.7)
+    for idx, row in condition_data.iterrows():
+        ax_temp.annotate(row['Strategy'][:10], 
+                        (row['EC'], row['MDR_numeric']),
+                        xytext=(5, 5), textcoords='offset points',
+                        fontsize=8, alpha=0.7)
+ax_temp.set_title('Performance Efficiency: Message Delivery Rate vs Energy Consumption', fontsize=14, fontweight='bold')
+ax_temp.set_xlabel('Energy Consumption')
+ax_temp.set_ylabel('Message Delivery Rate (%)')
+ax_temp.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('05_performance_efficiency.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
 
 # 6. Heatmap of Message Delivery Rates
 ax6 = plt.subplot(3, 3, 6)
@@ -108,6 +193,18 @@ sns.heatmap(heatmap_data, annot=True, fmt='.0f', cmap='RdYlGn',
 ax6.set_title('Message Delivery Rate Heatmap', fontsize=12, fontweight='bold')
 ax6.set_xlabel('Strategy')
 ax6.set_ylabel('Jamming Condition')
+
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+sns.heatmap(heatmap_data, annot=True, fmt='.0f', cmap='RdYlGn', 
+            ax=ax_temp, cbar_kws={'label': 'MDR (%)'})
+ax_temp.set_title('Message Delivery Rate Heatmap', fontsize=14, fontweight='bold')
+ax_temp.set_xlabel('Strategy')
+ax_temp.set_ylabel('Jamming Condition')
+plt.tight_layout()
+plt.savefig('06_mdr_heatmap.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
 
 # 7. Precision and Recall Calculation
 df['Precision'] = df['TP'] / (df['TP'] + df['FP'])
@@ -129,6 +226,20 @@ ax7.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left'
 ax7.grid(True, alpha=0.3)
 plt.setp(ax7.get_xticklabels(), rotation=45, ha='right')
 
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+pivot_precision.plot(kind='bar', ax=ax_temp, width=0.8)
+ax_temp.set_title('Precision by Strategy under Different Jamming Conditions', fontsize=14, fontweight='bold')
+ax_temp.set_ylabel('Precision')
+ax_temp.set_xlabel('Strategy')
+ax_temp.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.setp(ax_temp.get_xticklabels(), rotation=45, ha='right')
+plt.tight_layout()
+plt.savefig('07_precision_analysis.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
+
 # 8. Robustness Analysis (Performance drop under jamming)
 ax8 = plt.subplot(3, 3, 8)
 no_jamming_mdr = df[df['Jamming_Condition'] == 'No Jamming']['MDR_numeric'].values
@@ -149,8 +260,24 @@ ax8.set_ylabel('MDR Drop (%)')
 ax8.set_xlabel('Strategy')
 ax8.set_xticks(x)
 ax8.set_xticklabels(strategies, rotation=45, ha='right')
-ax8.legend()
+ax8.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 ax8.grid(True, alpha=0.3)
+
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+ax_temp.bar(x - 0.2, static_drop, 0.4, label='Static Jamming Impact', alpha=0.8)
+ax_temp.bar(x + 0.2, dynamic_drop, 0.4, label='Dynamic Jamming Impact', alpha=0.8)
+ax_temp.set_title('Robustness Analysis: Performance Drop under Jamming', fontsize=14, fontweight='bold')
+ax_temp.set_ylabel('MDR Drop (%)')
+ax_temp.set_xlabel('Strategy')
+ax_temp.set_xticks(x)
+ax_temp.set_xticklabels(strategies, rotation=45, ha='right')
+ax_temp.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('08_robustness_analysis.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
 
 # 9. Overall Performance Score
 ax9 = plt.subplot(3, 3, 9)
@@ -166,6 +293,20 @@ ax9.set_xlabel('Strategy')
 ax9.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
 ax9.grid(True, alpha=0.3)
 plt.setp(ax9.get_xticklabels(), rotation=45, ha='right')
+
+# Save individual plot
+fig_temp = plt.figure(figsize=(10, 6))
+ax_temp = fig_temp.add_subplot(111)
+pivot_score.plot(kind='bar', ax=ax_temp, width=0.8)
+ax_temp.set_title('Overall Performance Score (60% MDR + 40% Energy Efficiency)', fontsize=14, fontweight='bold')
+ax_temp.set_ylabel('Performance Score')
+ax_temp.set_xlabel('Strategy')
+ax_temp.legend(title='Jamming Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_temp.grid(True, alpha=0.3)
+plt.setp(ax_temp.get_xticklabels(), rotation=45, ha='right')
+plt.tight_layout()
+plt.savefig('09_overall_performance_score.png', dpi=300, bbox_inches='tight')
+plt.close(fig_temp)
 
 plt.tight_layout()
 plt.savefig('lorawan_performance_analysis.png', dpi=300, bbox_inches='tight')
