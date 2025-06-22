@@ -8,10 +8,10 @@
 #define LORA_DIO1 33
 #define LORA_RST 14
 
-#define DEFAULT_JAMMING 0
+#define STATIC_JAMMING 0
 #define DYNAMIC_JAMMING 1
- 
-#define JAMMING_STRATEGY DEFAULT_JAMMING
+
+#define JAMMING_STRATEGY STATIC_JAMMING
 
 // Enhanced jammer with better coverage
 float frequencies[] = {867.1, 867.3, 867.5, 867.7, 867.9, 868.1, 868.3, 868.5}; // All european channels
