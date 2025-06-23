@@ -76,7 +76,7 @@ In the code for the legitimate devices and the jammer, there are some configurai
 #define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_STANDARD // swap out the STRATEGY_STANDARD
 ```
 
-## Heltec
+### Heltec
 For the Heltec the only thing you need to do to change strategies is to flash the different .ino files onto the Heltec device. 
 
 - For the LBT strategy, flash the file `heltec-pure-lbt/heltec-pure-lbt.ino`
