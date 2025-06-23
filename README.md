@@ -24,32 +24,46 @@ To run this setup, ensure the following requirements are met:
 - A TTN (The Things Network) server must be properly configured, with support for OTAA (Over-The-Air Activation) for all participating devices.
 - The following hardware and software components are required:
 
-1. ESP32 with SX1276 LoRa Chip
+1. Lilygo T-Display ESP32 with SX1276 LoRa Chip
    - Required Arduino Libraries:
      - `LoRa` by Sandeep Mistry
      - `RadioLib` by Jan Gnomes
    - Board Manager:
      - `ESP32` by Espressif Systems
 2. Sodaq ExpLoRer with RN2483 LoRa Module
-
    - Required Arduino Libraries:
      - `Sodaq_wdt` by GabrielNotman, SODAQ
    - Board Manager:
      - `SODAQ SAMD Boards` by SODAQ
-
-3. Dragino LPS8N LoRaWAN Gateway
+3. Heltec WiFi LoRa 32(V3) ESP32 
+    - Required Arduino Libraries:
+      - `Heltec ESP32 Dev-Boards` by Heltec Automation
+    - Board Manager:
+      - `Heltec ESP32 Series Dev-Boards` by Heltec Automation
+    - Required USB Driver:
+      - [Guide for downloading and installing driver](https://docs.heltec.org/general/establish_serial_connection.html) from Heltec Docs
+4. The Things Network (TTN)
+   - Setup end-device formatters located in `ttn/heltecFormatter.js` and `ttn/sodaqFormatter.js`
+      - [Guide for Creating Payload Formatter](https://www.thethingsindustries.com/docs/integrations/payload-formatters/create/) from TTN
+   - Setup Webhook for the Flask Server
+     - [Guide for Creating Webhooks](https://www.thethingsindustries.com/docs/integrations/webhooks/creating-webhooks/) from TTN
+5. Dragino LPS8N LoRaWAN Gateway
    - Must be registered and connected to the TTN network using OTAA.
 
 ### Installation
 
-1. Clone the Repo:
-2. (Recommended) Use the Arduino IDE and install the relevant libraries and board managers
-3. Connect your devices to your PC via USB
-4. Compile and flash the devices with the code provided
-5. When the code has been flashed, the devices should be up and running
+1. Clone the Repo
+   - SODAQ, Heltec, and Jammer
+     1. Use the Arduino IDE and install the relevant libraries and board managers
+     2. Connect your devices to your PC via USB
+     3. Compile and flash the devices with the code provided
+     4. When the code has been flashed, the devices should be up and running
+   - Packet Monitor Server
+     1. Install requirements.txt (recommended inside of a virtual environemnt)
 
 ## Usage
 
+### SODAQ 
 In the code for the legitimate devices and the jammer, there are some configuraitons that can be changed and reflashed onto the devices. For the Sodaq, it has the following:
 
 ```cpp
@@ -62,6 +76,13 @@ In the code for the legitimate devices and the jammer, there are some configurai
 #define ACTIVE_TRANSMISSION_STRATEGY STRATEGY_STANDARD // swap out the STRATEGY_STANDARD
 ```
 
+## Heltec
+For the Heltec the only thing you need to do to change strategies is to flash the different .ino files onto the Heltec device. 
+
+- For the LBT strategy, flash the file `heltec-pure-lbt/heltec-pure-lbt.ino`
+- For the PALBT strategy, flash the file `heltec-modified-lbt/heltec-modified-lbt.ino`
+
+### Jammer
 The jammer has two modes, one that targets frequencies only and another that hops between spreading factors as well:
 
 ```cpp
@@ -73,7 +94,15 @@ The jammer has two modes, one that targets frequencies only and another that hop
 #define JAMMING_STRATEGY DEFAULT_JAMMING // swap out the DEFAULT_JAMMING
 ```
 
-### Logging
+### Packet Monitor Server
+The packet monitor server listens for packets sent from TTN. When it has captured 50 messages from a single device it will save statistics of that device in the folder `packet-monitor-server/stats/<DEVEUI>` where DEVEUI is device specific. This file will keep updating as time goes on. It is also possible to call the endpoint `/save` which in turn will save a hardcoded device's window. This could be changed in the future and making it a `/POST` instead where you send a specific DEVEUI.
+
+You run the server with the following command `python3 packet-monitor-server-py` or `python packet-monitor-server-py`
+
+### Extra
+In the directory `ttn/` some python files are used to calculate power usage (`calc.py`) plot statistics manually (`plot.py`) from `ttn/data/device-ttn-combined/stats.csv` and investigate logs (`stats.py`) gathered from TTN located in `ttn/data/logs`.
+
+## Logging
 
 When using the Arduino IDE's Serial Monitor, you can observe detailed information about jamming attempts as well as the detection and mitigation strategies being applied in real time. On the Sodaq device, LED indicators also provide a quick visual reference for various error states, making it easy to determine whether a transmission was successful or if interference occurred.
 
