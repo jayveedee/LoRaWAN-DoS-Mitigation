@@ -39,7 +39,6 @@ DeviceClass_t loraWanClass = CLASS_A;
 
 /*the application data transmission duty cycle.  value in [ms].*/
 uint32_t appTxDutyCycle = 15000;
-// 10000 + rand() % 5000;
 
 /*OTAA or ABP*/
 bool overTheAirActivation = true;
@@ -106,10 +105,7 @@ bool isLikelyJammed(uint32_t frequencyHz)
   Radio.Rx(0);  // Continuous RX mode
 
   const uint32_t listenDuration = 2000;
-  const uint8_t snrSamplesToTake = 5;
   int16_t maxRssi = -128;
-  int8_t snrSum = 0;
-  uint8_t snrCount = 0;
 
   uint32_t start = millis();
   while (millis() - start < listenDuration) {
@@ -117,27 +113,20 @@ bool isLikelyJammed(uint32_t frequencyHz)
     if (rssi > maxRssi) {
       maxRssi = rssi;
     }
-
-    // Sample SNR occasionally (e.g., every 400 ms)
-    if ((millis() - start) % 400 < 50 && snrCount < snrSamplesToTake) {
-      int8_t snr;
-      getSnr(&snr);
-      snrSum += snr;
-      snrCount++;
-    }
-
     delay(50);
   }
 
+  // Sample SNR once at the end
+  int8_t snr = -25;
+  getSnr(&snr);
+
   Radio.Sleep();
 
-  int8_t avgSnr = snrCount > 0 ? snrSum / snrCount : -25;
-
   Serial.printf("📡 Max RSSI during window: %d dBm\n", maxRssi);
-  Serial.printf("📶 Avg SNR over %d samples: %d dB\n", snrCount, avgSnr);
+  Serial.printf("📶 SNR snapshot: %d dB\n", snr);
 
-  // Use both max RSSI and average SNR to decide
-  bool jammed = (maxRssi > -90) && (avgSnr < -5);
+  // Heuristic: High RSSI or very low SNR suggests jamming
+  bool jammed = (maxRssi > -85) || (snr < -7);
   if (jammed) {
     Serial.println("🚫 Channel likely jammed.");
   }

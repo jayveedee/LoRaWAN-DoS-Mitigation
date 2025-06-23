@@ -55,10 +55,7 @@ uint8_t appPort = 2;
  * Note, that if NbTrials is set to 1 or 2, the MAC will not decrease
  * the datarate, in case the LoRaMAC layer did not receive an acknowledgment
  */
-uint8_t confirmedNbTrials = 4;
-
-RTC_DATA_ATTR uint8_t probeCounter = 0;
-RTC_DATA_ATTR uint8_t probeCounterByFrame[51] = {0};  // Index = Frame counter, Value = probeCounter
+ uint8_t confirmedNbTrials = 4;
 
 uint32_t eu868Frequencies[] = {
     868100000, 868300000, 868500000,
@@ -103,8 +100,7 @@ void sendProbePacket(uint32_t frequencyHz)
   Radio.Send(dummyPayload, sizeof(dummyPayload)); // ⬅️ Raw radio transmit
 
   Serial.println("🧪 Raw probe LoRa packet sent.");
-  delay(50); // Optional: allow TX to complete before switching to RX
-  probeCounter++;
+  delay(500); // Optional: allow TX to complete before switching to RX
 }
 
 /* Check RSSI and SNR after baiting */
@@ -114,18 +110,34 @@ bool isLikelyJammed(uint32_t frequencyHz)
   Radio.SetChannel(frequencyHz);
   Radio.Rx(0);  // Continuous RX mode
 
-  delay(200); // Allow time for potential jammer to react
+  const uint32_t listenDuration = 2000;
+  int16_t maxRssi = -128;
 
-  int16_t rssi;
-  int8_t snr;
-  getSnrRssi(&rssi, &snr);
+  uint32_t start = millis();
+  while (millis() - start < listenDuration) {
+    int16_t rssi = SX126xGetRssiInst();
+    if (rssi > maxRssi) {
+      maxRssi = rssi;
+    }
+    delay(50);
+  }
+
+  // Sample SNR once at the end
+  int8_t snr = -25;
+  getSnr(&snr);
 
   Radio.Sleep();
 
-  Serial.printf("📡 RSSI: %d dBm, SNR: %d dB\n", rssi, snr);
+  Serial.printf("📡 Max RSSI during window: %d dBm\n", maxRssi);
+  Serial.printf("📶 SNR snapshot: %d dB\n", snr);
 
-  // Custom jamming heuristic
-  return (rssi > -85 && snr < -7);
+  // Heuristic: High RSSI or very low SNR suggests jamming
+  bool jammed = (maxRssi > -85) || (snr < -7);
+  if (jammed) {
+    Serial.println("🚫 Channel likely jammed.");
+  }
+
+  return jammed;
 }
 
 
@@ -176,16 +188,9 @@ void loop()
       {
         prepareTxFrame(appPort);
         setTxFrequency(freq);
-        uint32_t fcnt = getUplinkFrameCounter();
         LoRaWAN.send();
 
-        // Save probeCounter at index fcnt
-        if (fcnt < 51) {
-          probeCounterByFrame[fcnt] = probeCounter;
-        }
-
         Serial.printf("📤 Transmitting on %.1f MHz | Count: %d\n", freq / 1e6, getUplinkFrameCounter());
-        probeCounter = 0;
         sent = true;
         break;
       }
@@ -228,9 +233,6 @@ void loop()
   if (getUplinkFrameCounter() >= 51)
   {
     Serial.println("Reached 50 (actually 51) transmissions. Halting.");
-    for (uint8_t i = 0; i < 51; i++) {
-      Serial.printf("Frame %02d: %d probes\n", i, probeCounterByFrame[i]);
-    }
     while (true)
       ;
   }
@@ -274,11 +276,10 @@ void setTxFrequency(uint32_t frequency)
   LoRaMacMibSetRequestConfirm(&mibReq);
 }
 
-void getSnrRssi(int16_t* rssiOut, int8_t* snrOut)
+void getSnr(int8_t* snrOut)
 {
   PacketStatus_t pktStatus;
   SX126xGetPacketStatus(&pktStatus);
-  *rssiOut = pktStatus.Params.LoRa.RssiPkt;
   *snrOut = pktStatus.Params.LoRa.SnrPkt;
 }
 
