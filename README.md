@@ -87,11 +87,11 @@ The jammer has two modes, one that targets frequencies only and another that hop
 
 ```cpp
 // Jamming strategy types
-#define DEFAULT_JAMMING 0 // Jams frequencies between 867.1 - 868.5 (EU863-870)
+#define STATIC_JAMMING 0 // Jams frequencies between 867.1 - 868.5 (EU863-870)
 #define DYNAMIC_JAMMING 1 // Jams frequencies between 867.1 - 868.5 (EU863-870) and spreading factors 9 - 12
 
 // Set the active jamming strategy here
-#define JAMMING_STRATEGY DEFAULT_JAMMING // swap out the DEFAULT_JAMMING
+#define JAMMING_STRATEGY STATIC_JAMMING // swap out the DEFAULT_JAMMING
 ```
 
 ### Packet Monitor Server
