@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-# Read the CSV data
-csv_data = "device-ttn-combined/stats.csv"
+# Read the CSV data (Just switch the file depending on the analysis)
+# csv_data = "device-ttn-combined/4byte_stats_cleaned.csv"
+csv_data = "device-ttn-combined/5byte_stats_cleaned.csv"
 
 # Load data
 df = pd.read_csv(csv_data)
