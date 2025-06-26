@@ -1,3 +1,5 @@
+# Airtime energy consumption calculator for TTN EU868
+# https://avbentem.github.io/airtime-calculator/ttn/eu868/5
 # E = V * I * T
 # V is in Voltage
 # I is in Amperes
