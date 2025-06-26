@@ -1,10 +1,10 @@
 # Airtime energy consumption calculator for TTN EU868
 # https://avbentem.github.io/airtime-calculator/ttn/eu868/5
 # E = V * I * T
-# V is in Voltage
-# I is in Amperes
-# T is in seconds
-# E is in Joules
+# V is in Voltage (can be seen in radio datasheets, SX1276 and SX1262 are 3.3V)
+# I is in Amperes (can be seen in radio datasheets, Heltec and SODAQ are 45mA and 40mA respectively)
+# T is in seconds (calculated from airtime, can be seen in the airtime calculator)
+# E is in Joules (calculated from the formula above)
 sf9_heltec_e_4byte = (3.3 * 0.045 * 0.1649)
 sf9_sodaq_e_4byte = (3.3 * 0.04 * 0.1649)
 sf10_sodaq_e_4byte = (3.3 * 0.04 * 0.3297)
@@ -34,6 +34,7 @@ e_dynamic_dj_5byte = sf9_sodaq_e_5byte * 40 + sf10_sodaq_e_5byte * 7 + sf11_soda
 e_lbt_4byte = sf9_heltec_e_4byte * 51
 e_palbt_4byte = sf9_heltec_e_4byte * 51 * 2
 
+# Not so naive approach, probes are 1 byte and message is 5byte, effectively causing there to be a difference in transmission times
 e_lbt_5byte = sf9_heltec_e_5byte * 51
 e_palbt_5byte = sf9_heltec_e_5byte * 51 + sf9_heltec_e_4byte * 51 #4byte is same tx as 1byte
 
