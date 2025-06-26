@@ -36,7 +36,7 @@ e_palbt_4byte = sf9_heltec_e_4byte * 51 * 2
 
 # Not so naive approach, probes are 1 byte and message is 5byte, effectively causing there to be a difference in transmission times
 e_lbt_5byte = sf9_heltec_e_5byte * 51
-e_palbt_5byte = sf9_heltec_e_5byte * 51 + sf9_heltec_e_4byte * 51 #4byte is same tx as 1byte
+e_palbt_5byte = sf9_heltec_e_5byte * 51 + sf9_heltec_e_4byte * 51 #4byte has the same airtime as 1byte
 
 print(f"Energy consumption for 4Byte standard and retry: {e_standard_retry_4byte:.2f} J")
 print(f"Energy consumption for 4Byte dynamic: {e_dynamic_4byte:.2f} J")
