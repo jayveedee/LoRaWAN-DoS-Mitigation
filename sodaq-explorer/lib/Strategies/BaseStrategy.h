@@ -33,6 +33,9 @@ private:
   const int MIN_SF = 9;
   const int MAX_SF = 12;
   int transmissionCounters[4] = {0};
+  int totalTransmissionCount = 0;
+  int totalFailedCount = 0;
+  int totalSuccessCount = 0;
 
   void incrementTransmissionCount(int sf);
 };

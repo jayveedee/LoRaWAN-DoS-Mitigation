@@ -145,7 +145,7 @@ void loop()
   CONSOLE_STREAM.println("------------------------------------");
 
   // Prepare message data
-  uint8_t buf[] = {'t', 'e', 's', 't', count};
+  uint8_t buf[] = {'t', 'e', 's', 't', count}; // 5 bytes of data
 
   // Get frame counters for debugging
   FrameCounters counters = activeStrategy->fetchFrameCounters();
@@ -153,7 +153,7 @@ void loop()
   // Send using the active transmission strategy
   bool success = activeStrategy->sendMessage(LORA_PORT, buf, sizeof(buf), count);
 
-  if (counters.uplink >= 50)
+  if (counters.uplink >= 49)
   {
     activeStrategy->printTransmissionCounters();
     CONSOLE_STREAM.println("Reached 50 uplink frame counters, halting Sodaq.");

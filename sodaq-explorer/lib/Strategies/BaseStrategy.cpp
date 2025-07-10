@@ -18,13 +18,23 @@ void BaseStrategy::incrementTransmissionCount(int sf)
 
 void BaseStrategy::printTransmissionCounters()
 {
-  _console->println("Transmission counters:");
+  _console->println("Total transmission count: " + String(totalTransmissionCount));
+  _console->println("Total successful transmissions: " + String(totalSuccessCount));
+  _console->println("Total failed transmissions: " + String(totalFailedCount));
+
+  _console->print("Spreading Factor counters: ");
   for (int i = MIN_SF; i <= MAX_SF; i++)
   {
     _console->print("SF");
     _console->print(i);
-    _console->print(": ");
-    _console->println(transmissionCounters[i - MIN_SF]);
+    _console->print("(");
+    if (i + 1 == MAX_SF) {
+      _console->print(transmissionCounters[i - MIN_SF]); 
+      _console->println(")");
+    } else {
+      _console->print(transmissionCounters[i - MIN_SF]); 
+      _console->print("), ");
+    }
   }
 }
 
@@ -60,6 +70,7 @@ void BaseStrategy::configureTransmission(const char *cr, uint8_t sf, uint8_t frq
 
 bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count, int sf)
 {
+  totalTransmissionCount++;
   _console->print("LoRa transmission result: ");
   _console->println(res);
 
@@ -69,6 +80,7 @@ bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count, int sf)
   case NoError:
     isInErrorState = false;
     _console->println("Successful transmission.");
+    totalSuccessCount++;
     _setRgbColor(0x00, 0xFF, 0x00);
     if (count == 255)
     {
@@ -134,6 +146,7 @@ bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count, int sf)
     break;
   case NoAcknowledgment:
     _console->println("There was no acknowledgment sent back!");
+    totalFailedCount++;
     _setRgbColor(0xFF, 0xB0, 0x50);
     incrementTransmissionCount(sf);
     delay(10000);
