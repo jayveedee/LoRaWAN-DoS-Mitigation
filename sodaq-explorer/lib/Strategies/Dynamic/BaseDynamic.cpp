@@ -28,7 +28,7 @@ bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uin
     uint8_t res = 0xFF;
     bool isInErrorState = false;
 
-    while (res != NoError)
+    while (res != NoError && _totalActualTransmissionCount < 50)
     {
         configureTransmission(cr, sf, frq, fsb);
 
@@ -38,7 +38,13 @@ bool BaseDynamic::configureDynamicTransmission(bool withRetry, uint8_t port, uin
 
         for (uint8_t i = 0; i < transmissionAmount - 1; i++)
         {
-            if (!isInErrorState)
+            if (_totalActualTransmissionCount == 50)
+            {
+                sentMessageSuccessfully = false;
+                _console->println("Reached 50 uplink frame counters after SF adjustment, stopping strategy.");
+                break;
+            }
+            else if (!isInErrorState)
             {
                 break;
             }

@@ -16,6 +16,7 @@ protected:
   Stream *_console;
   Stream *_loraStream;
   Sodaq_RN2483 *_loRaBee;
+  int _totalActualTransmissionCount = 0;
   void (*_setRgbColor)(uint8_t red, uint8_t green, uint8_t blue);
 
   bool handleErrorState(uint8_t res, uint8_t &count, int sf);
@@ -34,7 +35,6 @@ private:
   const int MAX_SF = 12;
   int transmissionCounters[4] = {0};
   int totalTransmissionCount = 0;
-  int totalActualTransmissionCount = 0;
   int totalFailedCount = 0;
   int totalSuccessCount = 0;
 

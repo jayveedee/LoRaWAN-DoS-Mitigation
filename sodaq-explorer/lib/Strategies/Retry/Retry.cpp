@@ -44,6 +44,14 @@ bool Retry::sendMessage(uint8_t port, uint8_t *buffer, uint8_t size, uint8_t &co
       fetchFrameCounters();
       i = i - 1;
     }
+
+    if (_totalActualTransmissionCount == 50)
+    {
+      sentMessageSucessfully = false;
+      _console->println("Reached 50 uplink frame counters after retry, stopping strategy.");
+      break;
+    }
+    
   }
 
   if (isInErrorState)
