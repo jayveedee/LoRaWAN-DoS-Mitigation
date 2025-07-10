@@ -3,8 +3,8 @@ Device,Strategy,JammingType,TotalMessages,FailedMessages,SuccessMessages,SF09,SF
 Sodaq,Standard,NONE,50,0,50,50,0,0,0,0,0,50,0
 Sodaq,Standard,STATIC_GATEWAY,50,23,27,50,0,0,0,23,0,27,0
 Sodaq,Standard,STATIC_DEVICE,50,44,6,50,0,0,0,44,0,6,0
-Sodaq,Standard,DYNAMIC_GATEWAY,50,
-Sodaq,Standard,DYNAMIC_DEVICE,50,
+Sodaq,Standard,DYNAMIC_GATEWAY,50,12,38,50,0,0,0,12,0,38,0
+Sodaq,Standard,DYNAMIC_DEVICE,50,12,38,50,0,0,0,12,0,38,0
 
 Sodaq,Retry,NONE,50,   
 Sodaq,Retry,STATIC_GATEWAY,50,
