@@ -150,6 +150,10 @@ void loop()
   // Get frame counters for debugging
   FrameCounters counters = activeStrategy->fetchFrameCounters();
 
+  if (counters.uplink == 0) {
+    delay(1000); // Wait a bit before initial message
+  }
+
   // Send using the active transmission strategy
   bool success = activeStrategy->sendMessage(LORA_PORT, buf, sizeof(buf), count);
 

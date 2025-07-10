@@ -19,6 +19,7 @@ void BaseStrategy::incrementTransmissionCount(int sf)
 void BaseStrategy::printTransmissionCounters()
 {
   _console->println("Total transmission count: " + String(totalTransmissionCount));
+  _console->println("Total actual transmission count: " + String(totalActualTransmissionCount));
   _console->println("Total successful transmissions: " + String(totalSuccessCount));
   _console->println("Total failed transmissions: " + String(totalFailedCount));
 
@@ -28,7 +29,7 @@ void BaseStrategy::printTransmissionCounters()
     _console->print("SF");
     _console->print(i);
     _console->print("(");
-    if (i + 1 == MAX_SF) {
+    if (i + 1 > MAX_SF) {
       _console->print(transmissionCounters[i - MIN_SF]); 
       _console->println(")");
     } else {
@@ -81,6 +82,7 @@ bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count, int sf)
     isInErrorState = false;
     _console->println("Successful transmission.");
     totalSuccessCount++;
+    totalActualTransmissionCount++;
     _setRgbColor(0x00, 0xFF, 0x00);
     if (count == 255)
     {
@@ -147,6 +149,7 @@ bool BaseStrategy::handleErrorState(uint8_t res, uint8_t &count, int sf)
   case NoAcknowledgment:
     _console->println("There was no acknowledgment sent back!");
     totalFailedCount++;
+    totalActualTransmissionCount++;
     _setRgbColor(0xFF, 0xB0, 0x50);
     incrementTransmissionCount(sf);
     delay(10000);
