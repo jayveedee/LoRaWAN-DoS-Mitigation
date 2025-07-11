@@ -217,9 +217,9 @@ void loop()
   }
   }
   
-  if (getUplinkFrameCounter() >= 51)
+  if (getUplinkFrameCounter() >= 50)
   {
-    Serial.println("Reached 50 (actually 51) transmissions. Halting.");
+    Serial.println("Reached 50 transmissions. Halting.");
     while (true)
       ;
   }
