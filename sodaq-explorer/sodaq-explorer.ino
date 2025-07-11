@@ -60,6 +60,7 @@ static const uint8_t APP_EUI[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0
 static const uint8_t APP_KEY[16] = {0xC8, 0x6D, 0xF0, 0xA1, 0x92, 0x34, 0xFA, 0x13, 0x3E, 0xD1, 0x6F, 0xAF, 0x08, 0xDB, 0x2D, 0x9B};
 
 uint8_t count = 0;
+bool loaded = false;
 
 // Pointer to the active transmission strategy
 BaseStrategy *activeStrategy = nullptr;
@@ -150,8 +151,10 @@ void loop()
   // Get frame counters for debugging
   FrameCounters counters = activeStrategy->fetchFrameCounters();
 
-  if (counters.uplink == 0) {
+  if (!loaded)
+  {
     delay(1000); // Wait a bit before initial message
+    loaded = true;
   }
 
   // Send using the active transmission strategy
