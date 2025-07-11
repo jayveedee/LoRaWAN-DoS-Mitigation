@@ -9,7 +9,7 @@ class LoRaWANAnalyzer:
 
     def _load_all_files(self):
         file_entries = []
-        for filename in os.listdir(self.folder_path):
+        for filename in sorted(os.listdir(self.folder_path)):
             if filename.lower().endswith(".json"):
                 file_path = os.path.join(self.folder_path, filename)
                 try:
