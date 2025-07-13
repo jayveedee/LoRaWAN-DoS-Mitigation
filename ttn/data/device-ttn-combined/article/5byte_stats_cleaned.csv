@@ -1,0 +1,16 @@
+S,MDR,EC,TP,TN,FP,FN,M
+Sodaq Standard (No Jamming),100%,1.22,50,0,0,0,50
+Sodaq Standard (Static Jamming Device),12%,1.22,6,0,44,0,50
+Sodaq Standard (Static Jamming Gateway),40%,1.22,27,0,23,0,50
+Sodaq Standard (Dynamic Jamming Device),76%,1.22,38,0,12,0,50
+Sodaq Standard (Dynamic Jamming Gateway),76%,1.22,38,0,12,0,50
+Sodaq Retry (No Jamming),100%,1.22,50,0,0,0,50
+Sodaq Retry (Static Jamming Device),13%,1.22,13,36,0,1,50
+Sodaq Retry (Static Jamming Gateway),40%,1.22,20,30,0,0,50
+Sodaq Retry (Dynamic Jamming Device),82%,1.22,41,9,0,0,50
+Sodaq Retry (Dynamic Jamming Gateway),86%,1.22,43,7,0,0,50
+Sodaq Dynamic (No Jamming),100%,1.22,50,0,0,0,50
+Sodaq Dynamic (Static Jamming Device),54%,1.84,26,24,0,0,50
+Sodaq Dynamic (Static Jamming Gateway),48%,2.15,24,26,0,0,50
+Sodaq Dynamic (Dynamic Jamming Device),80%,1.69,38,10,0,2,50
+Sodaq Dynamic (Dynamic Jamming Gateway),90%,1.32,45,5,0,0,50
