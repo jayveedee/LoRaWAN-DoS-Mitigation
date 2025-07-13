@@ -1,16 +1,16 @@
 S,MDR,EC,TP,TN,FP,FN,M
-Sodaq Standard (No Jamming; No Mitigation), 100%, 1.11, 51, 0, 0, 0, 51
-Sodaq Standard (Static Jamming; No Mitigation), 31%, 1.11, 16, 0, 35, 0, 51
-Sodaq Standard (Dynamic Jamming; No Mitigation), 84%, 1.11, 43, 0, 6, 0, 51
-Sodaq Retry (No Jamming; No Mitigation), 94%, 1.11, 48, 1, 0, 2, 51
-Sodaq Retry (Static Jamming; No Mitigation), 45%, 1.11, 22, 28, 0, 1, 51
-Sodaq Retry (Dynamic Jamming; No Mitigation), 84%, 1.11, 42, 7, 0, 1, 51
-Sodaq Dynamic (No Jamming; No Mitigation), 98%, 1.22, 48, 1, 0, 2, 51
-Sodaq Dynamic (Static Jamming; No Mitigation), 55%, 1.85, 28, 23, 0, 0, 51
-Sodaq Dynamic (Dynamic Jamming; No Mitigation), 78%, 1.70, 40, 11, 0, 0, 51
-Heltec LBT (No Jamming; No Mitigation), 96%, 1.25, 49, 0, 2, 0, 51
-Heltec LBT (Static Jamming; No Mitigation), 25%, 1.25, 13, 0, 38, 0, 51
-Heltec LBT (Dynamic Jamming; No Mitigation), 84%, 1.25, 43, 0, 8, 0, 51
-Heltec PALBT (No Jamming; No Mitigation), 100%, 2.5, 51, 0, 0, 0, 51
-Heltec PALBT (Static Jamming; No Mitigation), 35%, 2.5, 18, 0, 33, 0, 51
-Heltec PALBT (Dynamic Jamming; No Mitigation), 94%, 2.5, 48, 0, 3, 0, 51
+Sodaq Standard (No Jamming), 100%, 1.11, 51, 0, 0, 0, 51
+Sodaq Standard (Static Jamming), 31%, 1.11, 16, 0, 35, 0, 51
+Sodaq Standard (Dynamic Jamming), 84%, 1.11, 43, 0, 6, 0, 51
+Sodaq Retry (No Jamming), 94%, 1.11, 48, 1, 0, 2, 51
+Sodaq Retry (Static Jamming), 45%, 1.11, 22, 28, 0, 1, 51
+Sodaq Retry (Dynamic Jamming), 84%, 1.11, 42, 7, 0, 1, 51
+Sodaq Dynamic (No Jamming), 98%, 1.22, 48, 1, 0, 2, 51
+Sodaq Dynamic (Static Jamming), 55%, 1.85, 28, 23, 0, 0, 51
+Sodaq Dynamic (Dynamic Jamming), 78%, 1.70, 40, 11, 0, 0, 51
+Heltec LBT (No Jamming), 96%, 1.25, 49, 0, 2, 0, 51
+Heltec LBT (Static Jamming), 25%, 1.25, 13, 0, 38, 0, 51
+Heltec LBT (Dynamic Jamming), 84%, 1.25, 43, 0, 8, 0, 51
+Heltec PALBT (No Jamming), 100%, 2.5, 51, 0, 0, 0, 51
+Heltec PALBT (Static Jamming), 35%, 2.5, 18, 0, 33, 0, 51
+Heltec PALBT (Dynamic Jamming), 94%, 2.5, 48, 0, 3, 0, 51
