@@ -24,19 +24,19 @@ class PlotConfig:
     def __post_init__(self):
         if self.colors is None:
             self.colors = {
+                'Dynamic Jamming Device': 'tab:red',
+                'Dynamic Jamming Gateway': 'tab:purple',
                 'No Jamming': 'tab:blue',
                 'Static Jamming Device': 'tab:orange',
-                'Static Jamming Gateway': 'tab:green',
-                'Dynamic Jamming Device': 'tab:red',
-                'Dynamic Jamming Gateway': 'tab:purple'
+                'Static Jamming Gateway': 'tab:green'
             }
         if self.condition_abbreviations is None:
             self.condition_abbreviations = {
+                'Dynamic Jamming Device': 'DynDev',
+                'Dynamic Jamming Gateway': 'DynGW',
                 'No Jamming': 'NoJam',
                 'Static Jamming Device': 'StatDev',
-                'Static Jamming Gateway': 'StatGW',
-                'Dynamic Jamming Device': 'DynDev',
-                'Dynamic Jamming Gateway': 'DynGW'
+                'Static Jamming Gateway': 'StatGW'
             }
 
 
@@ -48,7 +48,7 @@ class LoRaWANAnalyzer:
         self.config: PlotConfig = config or PlotConfig()
         self.df: Optional[pd.DataFrame] = None
         self.strategies: Optional[np.ndarray] = None
-        self.jamming_conditions: Optional[np.ndarray] = None
+        self.jamming_conditions: Optional[List[str]] = None
         self.x_positions: Optional[np.ndarray] = None
         
     def load_and_preprocess_data(self) -> pd.DataFrame:
@@ -71,9 +71,20 @@ class LoRaWANAnalyzer:
         for col in ['Precision', 'Recall', 'F1_Score']:
             self.df[col] = self.df[col].fillna(0)
         
-        # Set up common variables
+        # Set up common variables with consistent order
         self.strategies = self.df['Strategy'].unique()
-        self.jamming_conditions = self.df['Jamming_Condition'].unique()
+        # Define the consistent order for jamming conditions
+        self.jamming_conditions = [
+            'Dynamic Jamming Device',
+            'Dynamic Jamming Gateway', 
+            'No Jamming',
+            'Static Jamming Device',
+            'Static Jamming Gateway'
+        ]
+        # Filter to only include conditions that actually exist in the data
+        self.jamming_conditions = [cond for cond in self.jamming_conditions 
+                                 if cond in self.df['Jamming_Condition'].unique()]
+        
         self.x_positions = np.arange(len(self.strategies)) * 1.5
         
         return self.df
@@ -150,6 +161,9 @@ class PlotGenerator:
 
         pivot_data = self.analyzer.df.pivot(index='Strategy', columns='Jamming_Condition', values=data_column)
         
+        # Reorder columns to match desired legend order
+        pivot_data = pivot_data.reindex(columns=self.analyzer.jamming_conditions)
+        
         # Create bars with consistent colors
         colors = [self.config.colors[col] for col in pivot_data.columns]
         pivot_data.plot(kind='bar', ax=ax, width=self.config.width, color=colors)
@@ -169,6 +183,7 @@ class PlotGenerator:
         width = 0.25
         total_width = width * len(self.analyzer.jamming_conditions)
         
+        # Use the ordered jamming conditions
         for i, condition in enumerate(self.analyzer.jamming_conditions):
             positions = self.analyzer.x_positions - total_width / 2 + i * width
             values = pivot_data[condition].reindex(self.analyzer.strategies).values
@@ -197,6 +212,7 @@ class PlotGenerator:
     
         offset_index = 0
         
+        # Use the ordered jamming conditions
         for condition in self.analyzer.jamming_conditions:
             condition_data = self.analyzer.df[self.analyzer.df['Jamming_Condition'] == condition]
             color = self.config.colors[condition]
@@ -229,6 +245,10 @@ class PlotGenerator:
         assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
 
         pivot_data = self.analyzer.df.pivot(index='Strategy', columns='Jamming_Condition', values=data_column)
+        
+        # Reorder columns to match desired legend order
+        pivot_data = pivot_data.reindex(columns=self.analyzer.jamming_conditions)
+        
         heatmap_data = pivot_data.T
         sns.heatmap(heatmap_data, annot=True, fmt='.0f', cmap='RdYlGn', ax=ax, 
                    cbar_kws={'label': cbar_label})
@@ -242,22 +262,24 @@ class PlotGenerator:
         assert self.config.colors is not None, "PlotConfig.colors must not be None"
         assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
         assert self.analyzer.x_positions is not None, "LoRaWANAnalyzer.x_positions must not be None"
+        assert self.analyzer.jamming_conditions is not None, "LoRaWANAnalyzer.jamming_conditions must not be None"
 
         # Calculate performance drops
         no_jamming_mdr = np.asarray(self.analyzer.df[self.analyzer.df['Jamming_Condition'] == 'No Jamming']['MDR_numeric'].values)
         
         drops = {}
-        jamming_conditions = ['Static Jamming Device', 'Static Jamming Gateway', 
-                            'Dynamic Jamming Device', 'Dynamic Jamming Gateway']
+        # Use only jamming conditions (exclude 'No Jamming')
+        jamming_conditions = [cond for cond in self.analyzer.jamming_conditions if cond != 'No Jamming']
         
         for condition in jamming_conditions:
             condition_mdr = np.asarray(self.analyzer.df[self.analyzer.df['Jamming_Condition'] == condition]['MDR_numeric'].values)
             drops[condition] = no_jamming_mdr - condition_mdr
         
-        # Plot bars
+        # Plot bars in the consistent order
         x = self.analyzer.x_positions
         width = 0.2
-        for i, (condition, drop_values) in enumerate(drops.items()):
+        for i, condition in enumerate(jamming_conditions):
+            drop_values = drops[condition]
             positions = x + (i - 1.5) * width
             color = self.config.colors[condition]
             ax.bar(positions, drop_values, width, label=f'{condition} Impact', 
@@ -310,6 +332,7 @@ class ReportGenerator:
         # Assertions
         assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
         assert self.analyzer.strategies is not None, "LoRaWANAnalyzer.strategies must not be None"
+        assert self.analyzer.jamming_conditions is not None, "LoRaWANAnalyzer.jamming_conditions must not be None"
 
         robustness_data = []
         for strategy in self.analyzer.strategies:
@@ -317,8 +340,9 @@ class ReportGenerator:
             no_jam = strategy_data[strategy_data['Jamming_Condition'] == 'No Jamming']['MDR_numeric'].iloc[0]
             
             drops = []
-            for condition in ['Static Jamming Device', 'Static Jamming Gateway', 
-                            'Dynamic Jamming Device', 'Dynamic Jamming Gateway']:
+            # Use only jamming conditions (exclude 'No Jamming')
+            jamming_conditions = [cond for cond in self.analyzer.jamming_conditions if cond != 'No Jamming']
+            for condition in jamming_conditions:
                 jam_mdr = strategy_data[strategy_data['Jamming_Condition'] == condition]['MDR_numeric'].iloc[0]
                 drops.append(no_jam - jam_mdr)
             
@@ -352,7 +376,7 @@ def main():
     
     # CHANGE THIS LINE TO SWITCH BETWEEN FORMATS
     # Set output_format to 'png' or 'eps'
-    config = PlotConfig(figsize=(10, 6), output_format='png', dpi=300)
+    config = PlotConfig(figsize=(10, 6), output_format='eps', dpi=300)
     
     os.makedirs(output_dir, exist_ok=True)
     
