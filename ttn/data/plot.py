@@ -6,7 +6,6 @@ import os
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 
-
 @dataclass
 class PlotConfig:
     """Configuration for plot styling and layout"""
@@ -17,8 +16,10 @@ class PlotConfig:
     ha: str = 'right'
     alpha: float = 0.3
     width: float = 0.8
-    colors: Dict[str, str] = None
-    condition_abbreviations: Dict[str, str] = None
+    colors: Optional[Dict[str, str]] = None
+    condition_abbreviations: Optional[Dict[str, str]] = None
+    output_format: str = 'eps'  
+    dpi: int = 300 
     
     def __post_init__(self):
         if self.colors is None:
@@ -43,12 +44,12 @@ class LoRaWANAnalyzer:
     """Main analyzer class for LoRaWAN performance data"""
     
     def __init__(self, csv_path: str, config: PlotConfig = None):
-        self.csv_path = csv_path
-        self.config = config or PlotConfig()
-        self.df = None
-        self.strategies = None
-        self.jamming_conditions = None
-        self.x_positions = None
+        self.csv_path: str = csv_path
+        self.config: PlotConfig = config or PlotConfig()
+        self.df: Optional[pd.DataFrame] = None
+        self.strategies: Optional[np.ndarray] = None
+        self.jamming_conditions: Optional[np.ndarray] = None
+        self.x_positions: Optional[np.ndarray] = None
         
     def load_and_preprocess_data(self) -> pd.DataFrame:
         """Load CSV data and perform preprocessing"""
@@ -90,6 +91,25 @@ class PlotGenerator:
         self.analyzer = analyzer
         self.config = analyzer.config
         
+    def _get_filename_with_extension(self, base_filename: str) -> str:
+        """Convert base filename to include proper extension"""
+        # Remove existing extension if present
+        base_name = os.path.splitext(base_filename)[0]
+        return f"{base_name}.{self.config.output_format}"
+    
+    def _save_figure(self, fig, filename: str):
+        """Save figure with appropriate format and settings"""
+        actual_filename = self._get_filename_with_extension(filename)
+        
+        if self.config.output_format.lower() == 'png':
+            fig.savefig(actual_filename, format='png', dpi=self.config.dpi, bbox_inches='tight')
+        elif self.config.output_format.lower() == 'eps':
+            fig.savefig(actual_filename, format='eps', bbox_inches='tight')
+        else:
+            raise ValueError(f"Unsupported output format: {self.config.output_format}")
+        
+        print(f"Saved plot: {actual_filename}")
+        
     def create_and_save_plot(self, plot_func, filename: str, title: str, **kwargs):
         """Generic method to create, display, and save plots"""
         # Create individual plot
@@ -97,7 +117,7 @@ class PlotGenerator:
         plot_func(ax, title, **kwargs)
         self._finalize_plot(ax, title)
         plt.tight_layout()
-        plt.savefig(filename, format='eps', bbox_inches='tight')
+        self._save_figure(fig, filename)
         plt.close(fig)
         
         # Return axis for subplot usage
@@ -124,6 +144,10 @@ class PlotGenerator:
     
     def plot_pivot_bar(self, ax, title: str, data_column: str, xlabel: str, ylabel: str):
         """Create pivot bar plot"""
+        # Assertions
+        assert self.config.colors is not None, "PlotConfig.colors must not be None"
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+
         pivot_data = self.analyzer.df.pivot(index='Strategy', columns='Jamming_Condition', values=data_column)
         
         # Create bars with consistent colors
@@ -135,6 +159,12 @@ class PlotGenerator:
     
     def plot_grouped_bar(self, ax, title: str, data_column: str, xlabel: str, ylabel: str, label_suffix: str = ''):
         """Create grouped bar plot"""
+        # Assertions
+        assert self.config.colors is not None, "PlotConfig.colors must not be None"
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+        assert self.analyzer.x_positions is not None, "LoRaWANAnalyzer.x_positions must not be None"
+        assert self.analyzer.jamming_conditions is not None, "LoRaWANAnalyzer.jamming_conditions must not be None"
+        
         pivot_data = self.analyzer.df.pivot_table(index='Strategy', columns='Jamming_Condition', values=data_column)
         width = 0.25
         total_width = width * len(self.analyzer.jamming_conditions)
@@ -153,23 +183,51 @@ class PlotGenerator:
     
     def plot_scatter(self, ax, title: str, x_column: str, y_column: str, xlabel: str, ylabel: str):
         """Create scatter plot"""
+        # Assertions
+        assert self.config.colors is not None, "PlotConfig.colors must not be None"
+        assert self.config.condition_abbreviations is not None, "PlotConfig.condition_abbreviations must not be None"
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+        assert self.analyzer.jamming_conditions is not None, "LoRaWANAnalyzer.jamming_conditions must not be None"
+
+        offsets = [
+            (10, 0), (15, 5), (15, -5), (20, 0),
+            (10, 10), (10, -10), (25, 5), (25, -5),
+            (15, 15), (15, -15), (30, 0), (20, 10)
+        ]
+    
+        offset_index = 0
+        
         for condition in self.analyzer.jamming_conditions:
             condition_data = self.analyzer.df[self.analyzer.df['Jamming_Condition'] == condition]
             color = self.config.colors[condition]
-            ax.scatter(condition_data[x_column], condition_data[y_column], 
-                      label=condition, s=100, alpha=0.7, color=color)
+            ax.scatter(condition_data[x_column], condition_data[y_column],
+                    label=condition, s=100, alpha=0.7, color=color)
             
-            # Add annotations with abbreviations
+            # Add annotations with cycling offsets and styling
             for _, row in condition_data.iterrows():
                 abbrev = self.config.condition_abbreviations[row['Jamming_Condition']]
-                ax.annotate(abbrev, (row[x_column], row[y_column]),
-                           xytext=(5, 5), textcoords='offset points', fontsize=8, alpha=0.7)
+                scatter_title = f"{row['Strategy'].replace('Sodaq', '')} ({abbrev})"
+                
+                # Use cycling offsets to reduce overlaps
+                current_offset = offsets[offset_index % len(offsets)]
+                
+                ax.annotate(scatter_title, (row[x_column], row[y_column]),
+                        xytext=current_offset, textcoords='offset points', 
+                        fontsize=8, alpha=0.8,
+                        bbox=dict(boxstyle="round,pad=0.3", facecolor='white', 
+                                alpha=0.8, edgecolor='gray', linewidth=0.5),
+                        arrowprops=dict(arrowstyle='->', alpha=0.6, color='gray'))
+                
+                offset_index += 1
         
         self._setup_bar_plot(ax, title, xlabel, ylabel, rotation=False)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
     def plot_heatmap(self, ax, title: str, data_column: str, xlabel: str, ylabel: str, cbar_label: str):
         """Create heatmap"""
+        # Assertions
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+
         pivot_data = self.analyzer.df.pivot(index='Strategy', columns='Jamming_Condition', values=data_column)
         heatmap_data = pivot_data.T
         sns.heatmap(heatmap_data, annot=True, fmt='.0f', cmap='RdYlGn', ax=ax, 
@@ -180,15 +238,20 @@ class PlotGenerator:
     
     def plot_robustness_analysis(self, ax, title: str):
         """Create robustness analysis plot"""
+        # Assertions
+        assert self.config.colors is not None, "PlotConfig.colors must not be None"
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+        assert self.analyzer.x_positions is not None, "LoRaWANAnalyzer.x_positions must not be None"
+
         # Calculate performance drops
-        no_jamming_mdr = self.analyzer.df[self.analyzer.df['Jamming_Condition'] == 'No Jamming']['MDR_numeric'].values
+        no_jamming_mdr = np.asarray(self.analyzer.df[self.analyzer.df['Jamming_Condition'] == 'No Jamming']['MDR_numeric'].values)
         
         drops = {}
         jamming_conditions = ['Static Jamming Device', 'Static Jamming Gateway', 
                             'Dynamic Jamming Device', 'Dynamic Jamming Gateway']
         
         for condition in jamming_conditions:
-            condition_mdr = self.analyzer.df[self.analyzer.df['Jamming_Condition'] == condition]['MDR_numeric'].values
+            condition_mdr = np.asarray(self.analyzer.df[self.analyzer.df['Jamming_Condition'] == condition]['MDR_numeric'].values)
             drops[condition] = no_jamming_mdr - condition_mdr
         
         # Plot bars
@@ -214,6 +277,11 @@ class ReportGenerator:
     
     def print_summary_statistics(self):
         """Print comprehensive summary statistics"""
+        # Assertions
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+        assert self.analyzer.jamming_conditions is not None, "LoRaWANAnalyzer.jamming_conditions must not be None"
+        assert self.analyzer.strategies is not None, "LoRaWANAnalyzer.strategies must not be None"
+
         print("=== PERFORMANCE ANALYSIS SUMMARY ===\n")
         
         print("1. MESSAGE DELIVERY RATE STATISTICS:")
@@ -239,6 +307,10 @@ class ReportGenerator:
     
     def _calculate_robustness(self) -> List[Tuple[str, float]]:
         """Calculate robustness metrics for each strategy"""
+        # Assertions
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+        assert self.analyzer.strategies is not None, "LoRaWANAnalyzer.strategies must not be None"
+
         robustness_data = []
         for strategy in self.analyzer.strategies:
             strategy_data = self.analyzer.df[self.analyzer.df['Strategy'] == strategy]
@@ -257,6 +329,10 @@ class ReportGenerator:
     
     def _calculate_efficiency_rankings(self) -> List[Tuple[str, float]]:
         """Calculate energy efficiency rankings"""
+        # Assertions
+        assert self.analyzer.df is not None, "LoRaWANAnalyzer.df must not be None"
+        assert self.analyzer.strategies is not None, "LoRaWANAnalyzer.strategies must not be None"
+
         efficiency_data = []
         for strategy in self.analyzer.strategies:
             strategy_data = self.analyzer.df[self.analyzer.df['Strategy'] == strategy]
@@ -273,8 +349,17 @@ def main():
     # Configuration
     output_dir = 'plots/'
     csv_data = "device-ttn-combined/article/5byte_stats_cleaned.csv"
-    config = PlotConfig(figsize=(10, 6))
+    
+    # CHANGE THIS LINE TO SWITCH BETWEEN FORMATS
+    # Set output_format to 'png' or 'eps'
+    config = PlotConfig(figsize=(10, 6), output_format='png', dpi=300)
+    
     os.makedirs(output_dir, exist_ok=True)
+    
+    # Print current format being used
+    print(f"Saving plots in {config.output_format.upper()} format")
+    if config.output_format.lower() == 'png':
+        print(f"PNG DPI: {config.dpi}")
     
     # Initialize analyzer
     analyzer = LoRaWANAnalyzer(csv_data, config)
@@ -284,11 +369,11 @@ def main():
     # Initialize plot generator
     plot_gen = PlotGenerator(analyzer)
     
-    # Define plots configuration
+    # Define plots configuration (note: extensions will be automatically handled)
     plots_config = [
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'MDR (pivot bar).eps',
+            'filename': output_dir + 'MDR (pivot bar)',
             'title': 'Message Delivery by Strategy Under Jamming',
             'data_column': 'MDR_numeric',
             'xlabel': 'Strategy',
@@ -296,7 +381,7 @@ def main():
         },
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'EC (pivot bar).eps',
+            'filename': output_dir + 'EC (pivot bar)',
             'title': 'Energy Use by Strategy Under Jamming',
             'data_column': 'EC',
             'xlabel': 'Strategy',
@@ -304,7 +389,7 @@ def main():
         },
         {
             'func': plot_gen.plot_grouped_bar,
-            'filename': output_dir + 'TP (grouped bar).eps',
+            'filename': output_dir + 'TP (grouped bar)',
             'title': 'True Positives by Strategy & Jamming',
             'data_column': 'TP',
             'xlabel': 'Strategy',
@@ -313,7 +398,7 @@ def main():
         },
         {
             'func': plot_gen.plot_grouped_bar,
-            'filename': output_dir + 'FP (grouped bar).eps',
+            'filename': output_dir + 'FP (grouped bar)',
             'title': 'False Positives by Strategy & Jamming',
             'data_column': 'FP',
             'xlabel': 'Strategy',
@@ -322,7 +407,7 @@ def main():
         },
         {
             'func': plot_gen.plot_scatter,
-            'filename': output_dir + 'EC (scatter).eps',
+            'filename': output_dir + 'EC (scatter)',
             'title': 'Energy Consumption vs Message Delivery Rate',
             'x_column': 'EC',
             'y_column': 'MDR_numeric',
@@ -331,7 +416,7 @@ def main():
         },
         {
             'func': plot_gen.plot_heatmap,
-            'filename': output_dir + 'MDR (heatmap).eps',
+            'filename': output_dir + 'MDR (heatmap)',
             'title': 'Message Delivery Rate Heatmap',
             'data_column': 'MDR_numeric',
             'xlabel': 'Strategy',
@@ -341,7 +426,7 @@ def main():
         },
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'Precision (pivot bar).eps',
+            'filename': output_dir + 'Precision (pivot bar)',
             'title': 'Precision by Strategy Under Jamming',
             'data_column': 'Precision',
             'xlabel': 'Strategy',
@@ -349,12 +434,12 @@ def main():
         },
         {
             'func': plot_gen.plot_robustness_analysis,
-            'filename': output_dir + 'Robustness (pivot bar).eps',
+            'filename': output_dir + 'Robustness (pivot bar)',
             'title': 'Robustness: Performance Drop Under Jamming',
         },
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'Overall Performance (pivot bar).eps',
+            'filename': output_dir + 'Overall Performance (pivot bar)',
             'title': 'Overall Performance (60% MDR, 40% EC)',
             'data_column': 'Performance_Score',
             'xlabel': 'Strategy',
@@ -362,8 +447,7 @@ def main():
         }
     ]
     
-    # Create comprehensive figure
-    fig = plt.figure(figsize=(20, 16))
+    # Create comprehensive figure - collect subplot functions
     subplot_funcs = []
     
     # Generate individual plots and collect subplot functions
@@ -377,18 +461,21 @@ def main():
         subplot_funcs.append(subplot_func)
     
     # Create combined subplot figure
+    combined_fig = plt.figure(figsize=(20, 16))
     for i, subplot_func in enumerate(subplot_funcs, 1):
         ax = plt.subplot(3, 3, i)
         subplot_func(ax)
     
     plt.tight_layout()
-    plt.savefig('lorawan_performance_analysis.eps', format='eps', bbox_inches='tight')
+    
+    # Save the combined figure with the appropriate extension
+    combined_filename = output_dir + 'Combined Plots'
+    plot_gen._save_figure(combined_fig, combined_filename)
     #plt.show()
     
     # Generate report
     report_gen = ReportGenerator(analyzer)
     report_gen.print_summary_statistics()
-
 
 if __name__ == "__main__":
     main()
