@@ -15,7 +15,7 @@ The primary goal of the project is not merely to demonstrate the attack, but to 
 
 When running the system, the setup involves an active jammer attempting to disrupt communication, while the legitimate device tries to detect the attack and respond through adaptive mechanisms that either avoid, withstand, or neutralize the interference.
 
-## Installation
+## Prerequisites
 
 How to install and run the project
 
@@ -50,7 +50,7 @@ To run this setup, ensure the following requirements are met:
 5. Dragino LPS8N LoRaWAN Gateway
    - Must be registered and connected to the TTN network using OTAA.
 
-### Installation
+## Installation
 
 1. Clone the Repo
    - SODAQ, Heltec, and Jammer
