@@ -24,7 +24,7 @@ class PlotConfig:
     def __post_init__(self):
         if self.colors is None:
             self.colors = {
-                'Dynamic Jamming Device': 'tab:red',
+                'Dynamic Jamming Device': 'tab:cyan',
                 'Dynamic Jamming Gateway': 'tab:purple',
                 'No Jamming': 'tab:blue',
                 'Static Jamming Device': 'tab:orange',
@@ -371,12 +371,11 @@ class ReportGenerator:
 def main():
     """Main execution function"""
     # Configuration
+    output_format = 'eps'  # Change to 'png' or 'eps'
     output_dir = 'plots/'
     csv_data = "device-ttn-combined/article/5byte_stats_cleaned.csv"
     
-    # CHANGE THIS LINE TO SWITCH BETWEEN FORMATS
-    # Set output_format to 'png' or 'eps'
-    config = PlotConfig(figsize=(10, 6), output_format='eps', dpi=300)
+    config = PlotConfig(figsize=(10, 6), output_format=output_format, dpi=300)
     
     os.makedirs(output_dir, exist_ok=True)
     
@@ -397,7 +396,7 @@ def main():
     plots_config = [
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'MDR (pivot bar)',
+            'filename': output_dir + 'mdr-pivot-bar',
             'title': 'Message Delivery by Strategy Under Jamming',
             'data_column': 'MDR_numeric',
             'xlabel': 'Strategy',
@@ -405,7 +404,7 @@ def main():
         },
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'EC (pivot bar)',
+            'filename': output_dir + 'ec-pivot-bar',
             'title': 'Energy Use by Strategy Under Jamming',
             'data_column': 'EC',
             'xlabel': 'Strategy',
@@ -413,7 +412,7 @@ def main():
         },
         {
             'func': plot_gen.plot_grouped_bar,
-            'filename': output_dir + 'TP (grouped bar)',
+            'filename': output_dir + 'tp-grouped-bar',
             'title': 'True Positives by Strategy & Jamming',
             'data_column': 'TP',
             'xlabel': 'Strategy',
@@ -422,7 +421,7 @@ def main():
         },
         {
             'func': plot_gen.plot_grouped_bar,
-            'filename': output_dir + 'FP (grouped bar)',
+            'filename': output_dir + 'fp-grouped-bar',
             'title': 'False Positives by Strategy & Jamming',
             'data_column': 'FP',
             'xlabel': 'Strategy',
@@ -431,7 +430,7 @@ def main():
         },
         {
             'func': plot_gen.plot_scatter,
-            'filename': output_dir + 'EC (scatter)',
+            'filename': output_dir + 'ec-scatter',
             'title': 'Energy Consumption vs Message Delivery Rate',
             'x_column': 'EC',
             'y_column': 'MDR_numeric',
@@ -440,7 +439,7 @@ def main():
         },
         {
             'func': plot_gen.plot_heatmap,
-            'filename': output_dir + 'MDR (heatmap)',
+            'filename': output_dir + 'mdr-heatmap',
             'title': 'Message Delivery Rate Heatmap',
             'data_column': 'MDR_numeric',
             'xlabel': 'Strategy',
@@ -450,7 +449,7 @@ def main():
         },
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'Precision (pivot bar)',
+            'filename': output_dir + 'precision-pivot-bar',
             'title': 'Precision by Strategy Under Jamming',
             'data_column': 'Precision',
             'xlabel': 'Strategy',
@@ -458,12 +457,12 @@ def main():
         },
         {
             'func': plot_gen.plot_robustness_analysis,
-            'filename': output_dir + 'Robustness (pivot bar)',
+            'filename': output_dir + 'robustness-pivot-bar',
             'title': 'Robustness: Performance Drop Under Jamming',
         },
         {
             'func': plot_gen.plot_pivot_bar,
-            'filename': output_dir + 'Overall Performance (pivot bar)',
+            'filename': output_dir + 'overall-performance-pivot-bar',
             'title': 'Overall Performance (60% MDR, 40% EC)',
             'data_column': 'Performance_Score',
             'xlabel': 'Strategy',
@@ -493,7 +492,7 @@ def main():
     plt.tight_layout()
     
     # Save the combined figure with the appropriate extension
-    combined_filename = output_dir + 'Combined Plots'
+    combined_filename = output_dir + 'combined-plots'
     plot_gen._save_figure(combined_fig, combined_filename)
     #plt.show()
     

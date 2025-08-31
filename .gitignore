@@ -1,3 +1,4 @@
 .vscode/*
 venv/*
 packet-monitor-server/stats/*
+ttn/data/plots/*
