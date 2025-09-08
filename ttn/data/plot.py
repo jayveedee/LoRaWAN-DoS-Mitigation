@@ -24,11 +24,11 @@ class PlotConfig:
     def __post_init__(self):
         if self.colors is None:
             self.colors = {
-                'Dynamic Jamming Device': 'tab:cyan',
-                'Dynamic Jamming Gateway': 'tab:purple',
-                'No Jamming': 'tab:blue',
-                'Static Jamming Device': 'tab:orange',
-                'Static Jamming Gateway': 'tab:green'
+                'Dynamic Jamming Device': 'tab:gray',
+                'Dynamic Jamming Gateway': 'tab:blue',
+                'No Jamming': 'tab:olive',
+                'Static Jamming Device': 'tab:purple',
+                'Static Jamming Gateway': 'tab:brown'
             }
         if self.condition_abbreviations is None:
             self.condition_abbreviations = {
